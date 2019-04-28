@@ -7,3 +7,11 @@ services:
       - 3000
     volumes:
       - ./data:/app/data
+  rtmp:
+    build: ./nginx
+    image: horikawacsc/mitei-server-nginx
+    ports:
+      - 8000:8000
+      - 1935:1935
+    extra_hosts:
+      - app:10.0.0.1
