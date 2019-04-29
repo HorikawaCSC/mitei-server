@@ -3,7 +3,7 @@
   "compilerOptions": {
     "jsx": "react",
     "noEmit": true,
-    "baseUrl": ".",
+    "baseUrl": "../..",
     "paths": {
       "shared/*": [
         "../shared/*"
