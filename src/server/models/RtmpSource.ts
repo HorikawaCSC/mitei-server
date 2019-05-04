@@ -12,7 +12,7 @@ export class RtmpSource extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id?: string;
 
-  @Column('text')
+  @Column('varchar', { length: 64 })
   name = '';
 
   @CreateDateColumn()
@@ -20,4 +20,8 @@ export class RtmpSource extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt?: Date;
+
+  get nameOrDefault() {
+    return this.name || this.id || 'no name';
+  }
 }

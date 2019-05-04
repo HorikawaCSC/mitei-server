@@ -24,5 +24,8 @@ export const config = {
     password: process.env.MYSQL_PASSWORD || 'mitei',
     database: process.env.MYSQL_DATABASE || 'mitei',
   },
+  limit: {
+    stream: Number(process.env.MAX_STREAM || 10),
+  },
   prod: process.env.NODE_ENV === 'production',
 };

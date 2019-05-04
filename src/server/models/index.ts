@@ -9,7 +9,7 @@ export const connect = async () => {
   await createConnection({
     type: 'mysql',
     entities,
-    logging: !config.prod,
+    logging: false,
     synchronize: true,
     ...config.mysql,
   });

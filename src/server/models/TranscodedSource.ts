@@ -6,14 +6,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-type TranscodeStatus = 'pending' | 'success' | 'failed';
+export type TranscodeStatus = 'pending' | 'success' | 'failed';
 
 export abstract class TranscodedSource extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id?: number;
-
-  @Column('text')
-  streamPath = '';
+  @PrimaryGeneratedColumn('uuid')
+  id?: string;
 
   @Column('blob')
   manifest = Buffer.from([]);
