@@ -4,6 +4,7 @@ import { RtmpSource } from '../../models/RtmpSource';
 import { RtmpEvent } from '../../types/RtmpEvent';
 import { sleep } from '../../utils/sleep';
 import { liveHlsManager } from '../../workers/live-hls';
+import { liveHlsLogger } from '../../utils/logging';
 
 export const router = Router();
 
@@ -25,20 +26,24 @@ router.post('/rtmp-events', async (req, res) => {
   if (!source || !source.id) {
     return res.status(404).end();
   }
+  try {
+    if (event.call === 'play') {
+      return res.status(200).end(); // TODO
+    }
 
-  if (event.call === 'play') {
-    return res.status(200).end();
-  }
+    if (event.call === 'publish') {
+      await liveHlsManager.create(source);
+      return res.status(200).end();
+    }
 
-  if (event.call === 'publish') {
-    await liveHlsManager.create(source);
-    return res.status(200).end();
-  }
+    if (event.call === 'publish_done') {
+      res.status(200).end();
 
-  if (event.call === 'publish_done') {
-    res.status(200).end();
-
-    await sleep(2000);
-    await liveHlsManager.stop(source);
+      await sleep(2000);
+      await liveHlsManager.stop(source);
+    }
+  } catch (e) {
+    liveHlsLogger.error(e);
+    return res.status(500).end();
   }
 });

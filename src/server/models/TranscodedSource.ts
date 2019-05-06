@@ -18,6 +18,12 @@ export abstract class TranscodedSource extends BaseEntity {
   @Column('varchar', { length: 10 })
   status: TranscodeStatus = 'pending';
 
+  @Column('double')
+  duration = 0;
+
+  @Column('blob', { nullable: true })
+  thumbnail: Buffer | null = null;
+
   @CreateDateColumn()
   createdAt?: Date;
 

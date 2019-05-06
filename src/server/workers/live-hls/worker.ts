@@ -101,6 +101,7 @@ export class LiveHLSWorker extends EventEmitter {
           item.writeUIntBE(length, 8, 6);
           item.writeUIntBE(offset, 14, 6);
           this.record.manifest = Buffer.concat([this.record.manifest, item]);
+          this.record.duration += duration;
           await this.record.save();
 
           this.emit('segment', {

@@ -15,11 +15,11 @@ class LiveHLSManager {
     const worker = new LiveHLSWorker(source);
     this.workers.set(source.id, worker);
     await worker.start();
-    liveHlsLogger.debug('LiveHLSWorker', source.id, 'started');
+    liveHlsLogger.debug('source:', source.id, 'started');
     worker.on('end', () => {
       if (!source.id) throw new Error('source invalid');
       this.workers.delete(source.id);
-      liveHlsLogger.debug('LiveHLSWorker', source.id, 'stopped');
+      liveHlsLogger.debug('source:', source.id, 'stopped');
     });
 
     const record = worker.getRecord();
