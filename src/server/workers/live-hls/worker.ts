@@ -1,6 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
-import { existsSync, promises } from 'fs';
+import { existsSync, promises as fs } from 'fs';
 import { DateTime } from 'luxon';
 import { createInterface } from 'readline';
 import { config } from '../../config';
@@ -54,13 +54,13 @@ export class LiveHLSWorker extends EventEmitter {
   private async createDir() {
     if (!this.source || !this.record) throw new Error('source invalid');
     if (!existsSync(`${config.paths.source}/${this.source.id}`)) {
-      await promises.mkdir(`${config.paths.source}/${this.source.id}`);
+      await fs.mkdir(`${config.paths.source}/${this.source.id}`);
     }
 
     if (
       !existsSync(`${config.paths.source}/${this.source.id}/${this.record.id}`)
     ) {
-      await promises.mkdir(
+      await fs.mkdir(
         `${config.paths.source}/${this.source.id}/${this.record.id}`,
       );
     } else {
