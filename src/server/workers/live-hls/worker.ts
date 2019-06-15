@@ -5,7 +5,7 @@ import { DateTime } from 'luxon';
 import { createInterface } from 'readline';
 import { config } from '../../config';
 import { RecordSource } from '../../models/RecordSource';
-import { RtmpSource } from '../../models/RtmpSource';
+import { RtmpInput } from '../../models/RtmpInput';
 import { TranscodeStatus } from '../../models/TranscodedSource';
 import { SegmentInfo } from '../../types/hls';
 import { liveHlsLogger } from '../../utils/logging';
@@ -16,7 +16,7 @@ export class LiveHLSWorker extends EventEmitter {
   private record: RecordSource | null = null;
   private exitPromise: Promise<void> | null = null;
   isExited = false;
-  constructor(public source: RtmpSource) {
+  constructor(public source: RtmpInput) {
     super();
   }
 

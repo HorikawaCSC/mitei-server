@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class RtmpSource extends BaseEntity {
+export class RtmpInput extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id?: string;
 

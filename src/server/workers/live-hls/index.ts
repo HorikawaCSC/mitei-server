@@ -1,11 +1,11 @@
-import { RtmpSource } from '../../models/RtmpSource';
+import { RtmpInput } from '../../models/RtmpInput';
 import { liveHlsLogger } from '../../utils/logging';
 import { LiveHLSWorker } from './worker';
 
 class LiveHLSManager {
   private workers: Map<string, LiveHLSWorker> = new Map();
 
-  async create(source: RtmpSource) {
+  async create(source: RtmpInput) {
     if (!source.id) throw new Error('source must have `id`');
     if (this.workers.has(source.id)) {
       liveHlsLogger.warn('Same source worker is still alive, trying to stop');
@@ -27,7 +27,7 @@ class LiveHLSManager {
     return worker;
   }
 
-  async stop(source: RtmpSource) {
+  async stop(source: RtmpInput) {
     if (!source.id) throw new Error('source must have `id`');
     if (this.workers.has(source.id)) {
       await this.workers.get(source.id)!.tryStop();

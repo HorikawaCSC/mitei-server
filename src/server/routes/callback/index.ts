@@ -1,6 +1,6 @@
 import { urlencoded } from 'body-parser';
 import { Router } from 'express';
-import { RtmpSource } from '../../models/RtmpSource';
+import { RtmpInput } from '../../models/RtmpInput';
 import { RtmpEvent } from '../../types/RtmpEvent';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
@@ -22,7 +22,7 @@ router.post('/rtmp-events', async (req, res) => {
     return res.status(400).end();
   }
 
-  const source = await RtmpSource.findOne(event.name);
+  const source = await RtmpInput.findOne(event.name);
   if (!source || !source.id) {
     return res.status(404).end();
   }
