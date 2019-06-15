@@ -3,6 +3,7 @@ import * as passport from 'passport';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { config } from '../../config';
 import { User } from '../../models/User';
+import { authLogger } from '../../utils/logging';
 
 passport.use(
   new TwitterStrategy(
@@ -12,6 +13,7 @@ passport.use(
       callbackURL: `${config.appUrl}/auth/callback/twitter`,
     },
     async (token, tokenSecret, profile, done) => {
+      authLogger.info('new login', profile.id, profile.name);
       try {
         const user = await User.findOne({
           userId: profile.id,
