@@ -1,0 +1,68 @@
+import * as Queue from 'bull';
+import { config } from '../../config';
+import { FileSource } from '../../models/FileSource';
+import { ExcludeProp } from '../../utils/types';
+import { Transcoder } from './transcoder';
+
+export interface TranscodeWorkerParam {
+  sourceId: string;
+  probeMode: boolean;
+  targetWidth: number;
+  targetHeight: number;
+  videoBitrate: string;
+}
+
+class TranscodeWorker {
+  private queue = new Queue<TranscodeWorkerParam>('mitei-transcode', {
+    redis: config.redis,
+  });
+
+  constructor() {
+    this.setupQueue();
+  }
+
+  private setupQueue() {
+    this.queue.process(async job => await this.processJob(job));
+  }
+
+  private async processJob(job: Queue.Job<TranscodeWorkerParam>) {
+    const jobParams = job.data;
+    const transcoder = new Transcoder(jobParams);
+
+    await transcoder.lookup();
+
+    if (jobParams.probeMode) {
+      await transcoder.probe();
+      return;
+    } else if (!transcoder.transcodable) {
+      throw new Error('source is not able to transcode');
+    }
+
+    transcoder.on('duration', () => {
+      job.progress(transcoder.progress);
+    });
+
+    await transcoder.transcode();
+  }
+
+  enqueue(
+    source: FileSource,
+    params: ExcludeProp<TranscodeWorkerParam, 'sourceId'>,
+  ) {
+    if (!source.id) throw new Error('source invalid');
+    if (!source.sourceAvailable) throw new Error('source unavailable');
+
+    if (params.probeMode) {
+      if (source.sourceWidth > 0) throw new Error('already probed');
+    } else {
+      if (source.sourceWidth === 0) throw new Error('not probed');
+    }
+
+    this.queue.add({
+      ...params,
+      sourceId: source.id,
+    });
+  }
+}
+
+export const transcodeWorker = new TranscodeWorker();
