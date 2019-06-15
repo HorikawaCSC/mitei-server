@@ -7,9 +7,10 @@
     "test:prettier": "prettier -c './src/**/*.{ts,tsx}'",
     "test:tsc": "tsc -p ./src/client",
     "test": "run-p test:*",
-    "build": "NODE_ENV=production npm-run-all build:{server,client}",
-    "build:dev": "NODE_ENV=development npm-run-all build:{server,client}",
-    "start:client": "webpack-dev-server"
+    "build": "NODE_ENV=production run-p build:{server,client}",
+    "build:dev": "NODE_ENV=development run-p build:{server,client}",
+    "start:client": "webpack --mode=development --watch",
+    "start:client:dev": "webpack-dev-server"
   },
   "name": "mitei-server",
   "version": "1.0.0",
@@ -21,6 +22,7 @@
     "@babel/preset-env": "^7.4.4",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
+    "@material-ui/core": "^4.0.0-rc.0",
     "@types/body-parser": "^1.17.0",
     "@types/bull": "^3.5.11",
     "@types/dotenv": "^6.1.1",
@@ -30,6 +32,7 @@
     "@types/passport": "^1.0.0",
     "@types/passport-twitter": "^1.0.34",
     "@types/react-dom": "^16.8.4",
+    "@types/react-router-dom": "^4.3.4",
     "@types/styled-components": "^4.1.14",
     "babel-loader": "^8.0.5",
     "babel-plugin-styled-components": "^1.10.0",
@@ -41,6 +44,9 @@
     "mini-css-extract-plugin": "^0.6.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.16.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-router-dom": "^5.0.1",
     "style-loader": "^0.23.1",
     "styled-components": "^4.2.0",
     "tslint": "^5.15.0",
@@ -59,10 +65,8 @@
     "mysql2": "^1.6.5",
     "passport": "^0.4.0",
     "passport-twitter": "^1.0.4",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
     "typeorm": "^0.2.16",
     "typeorm-store": "^1.2.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.5.2"
   }
 }
