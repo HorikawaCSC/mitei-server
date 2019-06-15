@@ -30,6 +30,8 @@ export class Transcoder extends EventEmitter {
 
     if (this.source.status !== 'pending')
       throw new Error('the source has already been transcoded or failed');
+    if (!this.source.sourceAvailable)
+      throw new Error('the source is not available');
   }
 
   private async probeSource() {
