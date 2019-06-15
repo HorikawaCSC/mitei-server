@@ -22,7 +22,10 @@ class TranscodeWorker {
   }
 
   private setupQueue() {
-    this.queue.process(async job => await this.processJob(job));
+    this.queue.process(
+      config.limit.transcode,
+      async job => await this.processJob(job),
+    );
   }
 
   private async processJob(job: Queue.Job<TranscodeWorkerParam>) {

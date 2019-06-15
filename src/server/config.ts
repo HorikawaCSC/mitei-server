@@ -26,6 +26,7 @@ export const config = {
   },
   limit: {
     stream: Number(process.env.MAX_STREAM || 10),
+    transcode: Number(process.env.MAX_TRANSCODE || 10),
   },
   prod: process.env.NODE_ENV === 'production',
 };
