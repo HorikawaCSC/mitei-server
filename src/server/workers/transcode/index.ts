@@ -63,6 +63,19 @@ class TranscodeWorker {
       sourceId: source.id,
     });
   }
+
+  async getStatus() {
+    const status = await this.queue.getJobCounts();
+
+    return status;
+  }
+
+  async getJobProgress(jobId: string) {
+    const job = await this.queue.getJob(jobId);
+    if (!job) return -1;
+
+    return ((await job.progress(undefined)) as unknown) as number;
+  }
 }
 
 export const transcodeWorker = new TranscodeWorker();
