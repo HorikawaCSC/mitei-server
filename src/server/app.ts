@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { resolve } from 'path';
 import { getConnection } from 'typeorm';
 import { TypeormStore } from 'typeorm-store';
 import { config } from './config';
@@ -36,7 +37,8 @@ import { router as callbackRouter } from './routes/callback';
 
   app.use('/auth', authRouter);
   app.use('/api', apiRouter);
-  app.use('/packs', express.static('./packs'));
-  app.use('*', (_req, res) => res.sendFile('./packs/index.html'));
+  app.use('/packs', express.static(resolve('./packs')));
+  app.use('/admin/*', (_req, res) => res.sendFile(resolve('./packs/admin.html')));
+  app.use('*', (_req, res) => res.sendFile(resolve('./packs/index.html')));
   app.listen(config.appPort);
 })();
