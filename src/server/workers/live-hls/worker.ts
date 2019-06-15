@@ -46,23 +46,16 @@ export class LiveHLSWorker extends EventEmitter {
       '-hls_list_size',
       '1',
       '-hls_segment_filename',
-      `${config.paths.source}/${this.source.id}/${this.record.id}/stream.ts`,
+      `${config.paths.source}/${this.record.id}/stream.ts`,
       '-',
     ];
   }
 
   private async createDir() {
     if (!this.source || !this.record) throw new Error('source invalid');
-    if (!existsSync(`${config.paths.source}/${this.source.id}`)) {
-      await fs.mkdir(`${config.paths.source}/${this.source.id}`);
-    }
 
-    if (
-      !existsSync(`${config.paths.source}/${this.source.id}/${this.record.id}`)
-    ) {
-      await fs.mkdir(
-        `${config.paths.source}/${this.source.id}/${this.record.id}`,
-      );
+    if (!existsSync(`${config.paths.source}/${this.record.id}`)) {
+      await fs.mkdir(`${config.paths.source}/${this.record.id}`);
     } else {
       throw new Error('uuid duplicate');
     }
