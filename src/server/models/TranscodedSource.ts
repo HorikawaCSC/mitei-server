@@ -24,6 +24,12 @@ export abstract class TranscodedSource extends BaseEntity {
   @Column('blob', { nullable: true })
   thumbnail: Buffer | null = null;
 
+  @Column('int')
+  width = 0;
+
+  @Column('int')
+  height = 0;
+
   @CreateDateColumn()
   createdAt?: Date;
 
