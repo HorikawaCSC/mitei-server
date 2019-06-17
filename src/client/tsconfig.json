@@ -3,11 +3,8 @@
   "compilerOptions": {
     "jsx": "react",
     "noEmit": true,
-    "baseUrl": "../..",
-    "paths": {
-      "shared/*": [
-        "../shared/*"
-      ]
-    }
+    "lib": [
+      "dom"
+    ]
   }
 }

@@ -60,7 +60,7 @@ const config = (isProd, isWatch) => ({
   plugins: [
     isProd ? null : new webpack.HotModuleReplacementPlugin(),
 
-    isProd ? new CleanWebpackPlugin() : null,
+    new CleanWebpackPlugin(),
 
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
@@ -97,9 +97,14 @@ const config = (isProd, isWatch) => ({
     historyApiFallback: true,
     hot: true,
     port: 8080,
-    index: 'index.html',
+    index: '',
     watchOptions: {
       ignored: /node_modules/,
+    },
+    proxy: {
+      '*': {
+        target: 'http://localhost:3000',
+      },
     },
     host: '0.0.0.0',
   },
