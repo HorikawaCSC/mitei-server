@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export type TranscodeStatus = 'pending' | 'success' | 'failed';
+export type TranscodeStatus = 'pending' | 'running' | 'success' | 'failed';
 
 export abstract class TranscodedSource extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')

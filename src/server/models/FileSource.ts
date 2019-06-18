@@ -1,6 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { TranscodedSource } from './TranscodedSource';
 
+export type SourceStatus = 'uploading' | 'avail' | 'deleted';
 @Entity()
 export class FileSource extends TranscodedSource {
   @Column('text')
@@ -9,8 +10,8 @@ export class FileSource extends TranscodedSource {
   @Column('varchar', { length: 10 })
   sourceExtension = '';
 
-  @Column('bool')
-  sourceAvailable = true;
+  @Column('varchar', { length: 10 })
+  sourceStatus: SourceStatus = 'uploading';
 
   @Column('text')
   error = '';

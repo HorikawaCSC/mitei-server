@@ -1,15 +1,12 @@
 import * as Queue from 'bull';
 import { config } from '../../config';
 import { FileSource } from '../../models/FileSource';
-import { ExcludeProp } from '../../utils/types';
 import { Transcoder } from './transcoder';
 
 export interface TranscodeWorkerParam {
   sourceId: string;
   probeMode: boolean;
-  targetWidth: number;
-  targetHeight: number;
-  videoBitrate: string;
+  transcodeArgs: string;
 }
 
 class TranscodeWorker {
@@ -48,12 +45,9 @@ class TranscodeWorker {
     await transcoder.transcode();
   }
 
-  enqueue(
-    source: FileSource,
-    params: ExcludeProp<TranscodeWorkerParam, 'sourceId'>,
-  ) {
+  enqueue(source: FileSource, params: Omit<TranscodeWorkerParam, 'sourceId'>) {
     if (!source.id) throw new Error('source invalid');
-    if (!source.sourceAvailable) throw new Error('source unavailable');
+    if (source.sourceStatus !== 'avail') throw new Error('source unavailable');
 
     if (params.probeMode) {
       if (source.sourceWidth > 0) throw new Error('already probed');

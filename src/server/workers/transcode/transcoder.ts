@@ -30,7 +30,7 @@ export class Transcoder extends EventEmitter {
 
     if (this.source.status !== 'pending')
       throw new Error('the source has already been transcoded or failed');
-    if (!this.source.sourceAvailable)
+    if (this.source.sourceStatus !== 'avail')
       throw new Error('the source is not available');
   }
 
@@ -98,6 +98,7 @@ export class Transcoder extends EventEmitter {
       'copy',
       '-f',
       'hls',
+      ...this.params.transcodeArgs,
       '-hls_time',
       '5',
       '-hls_flags',
@@ -105,12 +106,12 @@ export class Transcoder extends EventEmitter {
       '-hls_list_size',
       '1',
       '-hls_segment_filename',
-      `${config.paths.source}/${this.source.id}/stream.ts`,
+      `${config.paths.source}/${this.source.id}/stream.m2ts`,
       '-',
     ];
   }
 
-  private async finalize(status: TranscodeStatus = 'success') {
+  private async setStatus(status: TranscodeStatus) {
     if (!this.source) throw new Error('source not set');
 
     this.source.status = status;
@@ -118,6 +119,8 @@ export class Transcoder extends EventEmitter {
   }
 
   async transcode() {
+    await this.setStatus('running');
+
     return new Promise<void>((resolve, reject) => {
       const args = this.transcodeArgs;
       transcodeLogger.debug('transcode params', ...args);
@@ -188,7 +191,7 @@ export class Transcoder extends EventEmitter {
       });
 
       this.ffmpeg.on('error', async err => {
-        await this.finalize('failed');
+        await this.setStatus('failed');
         reject(err);
       });
 
@@ -200,12 +203,12 @@ export class Transcoder extends EventEmitter {
             this.transcodedDuration,
           );
 
-          await this.finalize();
+          await this.setStatus('success');
           resolve();
         } else {
           transcodeLogger.error('ffmpeg exit code', code);
 
-          await this.finalize('failed');
+          await this.setStatus('failed');
           reject(`exit code: ${code}`);
         }
       });
