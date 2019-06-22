@@ -1,0 +1,64 @@
+scalar Date
+
+input UploadFileInfo {
+  filename: String!
+  size: Int!
+}
+
+enum TranscodeStatus {
+  pending
+  running
+  success
+  failed
+}
+
+interface SourceBase {
+  id: ID!
+  status: TranscodeStatus!
+  duration: Float!
+  thumbnailUrl: String
+  width: Int!
+  height: Int!
+  createdAt: Date!
+  updatedAt: Date!
+  createdBy: ID!
+}
+
+enum SourceStatus {
+  uploading
+  avail
+  deleted
+}
+
+type FileSource implements SourceBase {
+  id: ID!
+  status: TranscodeStatus!
+  duration: Float!
+  thumbnailUrl: String
+  width: Int!
+  height: Int!
+  createdAt: Date!
+  updatedAt: Date!
+  createdBy: ID!
+
+  name: String!
+  sourceExtension: String!
+  sourceStatus: SourceStatus!
+  error: String
+  sourceWidth: Int!
+  sourceHeight: Int!
+}
+
+type Query {
+  getFileSource(sourceId: String!): FileSource
+}
+
+type Mutation {
+  createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource!
+  transcodeFileSource(sourceId: String!): Boolean!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

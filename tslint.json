@@ -100,5 +100,8 @@
           "singleline": "never"
       }
     ]
+  },
+  "linterOptions": {
+    "exclude": ["src/**/generated/*.ts"]
   }
 }

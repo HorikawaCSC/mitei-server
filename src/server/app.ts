@@ -1,3 +1,4 @@
+import { json } from 'body-parser';
 import * as express from 'express';
 import * as session from 'express-session';
 import * as passport from 'passport';
@@ -10,6 +11,7 @@ import { Session } from './models/Session';
 import { router as apiRouter } from './routes/api';
 import { router as authRouter } from './routes/auth';
 import { router as callbackRouter } from './routes/callback';
+import { gqlServer } from './routes/gql';
 
 (async () => {
   await connect();
@@ -24,6 +26,7 @@ import { router as callbackRouter } from './routes/callback';
     repository: getConnection().getRepository(Session),
   });
 
+  app.use(json());
   app.use(
     session({
       secret: config.secrets.session,
@@ -38,7 +41,12 @@ import { router as callbackRouter } from './routes/callback';
   app.use('/auth', authRouter);
   app.use('/api', apiRouter);
   app.use('/packs', express.static(resolve('./packs')));
-  app.use('/admin/*', (_req, res) => res.sendFile(resolve('./packs/admin.html')));
+  const server = app.listen(config.appPort);
+  gqlServer.installSubscriptionHandlers(server);
+  gqlServer.applyMiddleware({ app, path: '/gql' });
+
+  app.use('/admin/*', (_req, res) =>
+    res.sendFile(resolve('./packs/admin.html')),
+  );
   app.use('*', (_req, res) => res.sendFile(resolve('./packs/index.html')));
-  app.listen(config.appPort);
 })();
