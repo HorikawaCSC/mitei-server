@@ -21,4 +21,7 @@ export class FileSource extends TranscodedSource {
 
   @Column('int')
   sourceHeight = 0;
+
+  @Column('int')
+  sourceSize = 0;
 }
