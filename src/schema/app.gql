@@ -41,6 +41,7 @@ type FileSource implements SourceBase {
   updatedAt: Date!
   createdBy: ID!
 
+  # additional props
   name: String!
   sourceExtension: String!
   sourceStatus: SourceStatus!
@@ -49,8 +50,35 @@ type FileSource implements SourceBase {
   sourceHeight: Int!
 }
 
+enum UserKind {
+  normal
+  admin
+}
+
+enum IdPType {
+  twitter
+}
+
+type User {
+  id: ID!
+  userId: ID!
+  screenName: String!
+  iconUrl: String
+  kind: UserKind!
+  type: IdPType!
+}
+
+type Users {
+  users: [User!]!
+  total: Int!
+}
 type Query {
-  getFileSource(sourceId: String!): FileSource
+  # admin func
+  fileSource(sourceId: String!): FileSource
+  users(kind: UserKind, type: IdPType, skip: Int, take: Int): Users!
+
+  # normal func
+  me: User
 }
 
 type Mutation {
