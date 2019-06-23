@@ -11,8 +11,9 @@
     "build:dev": "NODE_ENV=development run-p build:{server,client}",
     "start:client": "webpack --mode=development --watch",
     "start:client:dev": "webpack-dev-server",
-    "build:codegen": "gql-gen --config ./codegen.yml",
-    "build:codegen:client": "gql-gen --config ./codegen.client.yml"
+    "build:codegen:server": "gql-gen --config ./codegen.yml",
+    "build:codegen:client": "gql-gen --config ./codegen.client.yml",
+    "build:codegen": "run-p build:codegen:*"
   },
   "name": "mitei-server",
   "version": "1.0.0",

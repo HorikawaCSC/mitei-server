@@ -8,6 +8,7 @@ import { CloudUpload } from '@material-ui/icons';
 import * as React from 'react';
 import {
   useCreateFileSourceUploadMutation,
+  useProbeFileSourceMutation,
   useUploadFileSourceChunkMutation,
 } from '../../../../api/generated/graphql';
 import { LabeledCheckbox } from '../../../../components/LabeledCheckbox';
@@ -19,9 +20,11 @@ export const SourcesUpload = () => {
   const [uploading, setUploading] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const [bufferProgress, setBufferProgress] = React.useState(0);
+  const [probeFile, setProbeFile] = React.useState(true);
   const [file, setFile] = React.useState<File | null>(null);
   const createUpload = useCreateFileSourceUploadMutation();
   const uploadChunk = useUploadFileSourceChunkMutation();
+  const probeFileSource = useProbeFileSourceMutation();
 
   const handleUpload = React.useCallback(async () => {
     if (!file) return;
@@ -38,6 +41,7 @@ export const SourcesUpload = () => {
     });
     if (errors || !sourceData) return;
 
+    let uploadSuccess = false;
     for (let offset = 0; offset < file.size; offset += FILE_UPLOAD_CHUNK) {
       setBufferProgress((file.size / offset) * 100);
 
@@ -58,14 +62,27 @@ export const SourcesUpload = () => {
       setUploadProgress((file.size / end) * 100);
 
       if (!result) return;
-      if (result.uploadFileSourceChunk) break;
+      if (result.uploadFileSourceChunk) {
+        uploadSuccess = true;
+        break;
+      }
     }
-
-    setUploading(false);
+    if (uploadSuccess) {
+      if (probeFile) {
+        await probeFileSource({
+          variables: { sourceId: sourceData.createFileSourceUpload.id },
+        });
+      }
+      setUploading(false);
+    }
   }, [file]);
 
   const handleFileChange = (input: File[]) => {
     setFile(input[0]);
+  };
+
+  const handleProbeFile = (_e: React.ChangeEvent<{}>, checked: boolean) => {
+    setProbeFile(checked);
   };
 
   return (
@@ -85,6 +102,8 @@ export const SourcesUpload = () => {
           color='primary'
           label='アップロード後にファイルを確認する'
           disabled={uploading}
+          value={probeFile}
+          onChange={handleProbeFile}
         />
       </FormGroup>
       <Button

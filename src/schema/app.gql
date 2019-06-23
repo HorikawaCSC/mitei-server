@@ -92,6 +92,7 @@ type Mutation {
   # admin func
   createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource!
   uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean!
+  probeFileSource(sourceId: String!): Boolean!
   transcodeFileSource(sourceId: String!): Boolean!
 }
 

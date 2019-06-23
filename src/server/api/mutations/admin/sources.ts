@@ -5,6 +5,7 @@ import { FileSource } from '../../../models/FileSource';
 import { GqlUpload } from '../../../types/gql-upload';
 import { extractExtension } from '../../../utils/filename';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
+import { transcodeWorker } from '../../../workers/transcode';
 
 export const sourcesMutationResolvers: MutationResolvers = {
   createFileSourceUpload: ensureLoggedInAsAdmin(
@@ -70,5 +71,16 @@ export const sourcesMutationResolvers: MutationResolvers = {
       return false;
     },
   ),
-  transcodeFileSource: () => true,
+  probeFileSource: ensureLoggedInAsAdmin(async (_parent, { sourceId }) => {
+    const source = await FileSource.findOne({
+      id: sourceId,
+    });
+
+    if (!source) {
+      throw new Error('source not found');
+    }
+
+    transcodeWorker.enqueue(source, { probeMode: true, transcodeArgs: '' });
+    return true;
+  }),
 };
