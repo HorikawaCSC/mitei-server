@@ -1,5 +1,8 @@
 overwrite: true
-schema: "./src/schema/app.gql"
+schema:
+  - "./src/schema/app.gql"
+  - |
+   scalar Upload
 documents:
   - "./src/client/api/**/*.gql"
 generates:
@@ -20,3 +23,4 @@ config:
   withHOC: false
   scalars:
     Date: string
+    Upload: Blob

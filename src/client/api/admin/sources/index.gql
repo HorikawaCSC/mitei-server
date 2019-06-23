@@ -1,0 +1,9 @@
+mutation createFileSourceUpload($fileInfo: UploadFileInfo!) {
+  createFileSourceUpload(fileInfo: $fileInfo) {
+    id
+  }
+}
+
+mutation uploadFileSourceChunk($sourceId: String!, $file: UploadFileChunk!) {
+  uploadFileSourceChunk(sourceId: $sourceId, file: $file)
+}

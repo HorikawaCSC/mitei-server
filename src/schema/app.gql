@@ -5,6 +5,12 @@ input UploadFileInfo {
   size: Int!
 }
 
+input UploadFileChunk {
+  chunk: Upload!
+  begin: Int!
+  size: Int!
+}
+
 enum TranscodeStatus {
   pending
   running
@@ -72,6 +78,7 @@ type Users {
   users: [User!]!
   total: Int!
 }
+
 type Query {
   # admin func
   fileSource(sourceId: String!): FileSource
@@ -82,7 +89,9 @@ type Query {
 }
 
 type Mutation {
+  # admin func
   createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource!
+  uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean!
   transcodeFileSource(sourceId: String!): Boolean!
 }
 

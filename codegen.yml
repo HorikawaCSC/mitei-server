@@ -1,5 +1,8 @@
 overwrite: true
-schema: "./src/schema/app.gql"
+schema:
+  - "./src/schema/app.gql"
+  - |
+   scalar Upload
 documents: null
 generates:
   ./src/server/generated/graphql.ts:

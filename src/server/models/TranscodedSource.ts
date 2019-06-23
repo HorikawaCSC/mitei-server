@@ -30,7 +30,7 @@ export abstract class TranscodedSource extends BaseEntity {
   @Column('int')
   height = 0;
 
-  @Column('varchar', { length: 32 })
+  @Column('varchar', { length: 36 })
   createdBy = '';
 
   @CreateDateColumn()

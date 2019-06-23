@@ -7,7 +7,6 @@ export const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-
 type Props = {
   title: string;
 };

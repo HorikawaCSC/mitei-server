@@ -5,7 +5,7 @@ import * as React from 'react';
 import { ApolloProvider } from 'react-apollo-hooks';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { apolloClient } from '../../../utils/gql-client';
-import { HeaderMenu } from '../../components/HeaderMenu';
+import { HeaderMenu } from '../../components/shared/HeaderMenu';
 import { theme } from '../../styles/theme';
 import { SourcesUpload } from '../sources/upload';
 

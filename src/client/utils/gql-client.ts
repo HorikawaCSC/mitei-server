@@ -5,13 +5,13 @@ import {
 import ApolloClient from 'apollo-client';
 import { from, split } from 'apollo-link';
 import { onError } from 'apollo-link-error';
-import { createHttpLink } from 'apollo-link-http';
 import { WebSocketLink } from 'apollo-link-ws';
+import { createUploadLink } from 'apollo-upload-client';
 import { getMainDefinition } from 'apollo-utilities';
 import introspectionQueryResultData from '../api/generated/introspection-result';
 
 const httpEndpoint = `${location.origin}/gql`;
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
   uri: httpEndpoint,
   credentials: 'include',
 });
