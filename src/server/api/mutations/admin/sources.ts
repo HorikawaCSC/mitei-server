@@ -18,6 +18,7 @@ export const sourcesMutationResolvers: MutationResolvers = {
       source.sourceSize = fileInfo.size;
       source.sourceExtension = ext;
       source.createdBy = userInfo.id!;
+      source.name = fileInfo.filename;
 
       return await source.save();
     },
