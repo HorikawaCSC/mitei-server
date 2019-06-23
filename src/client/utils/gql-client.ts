@@ -16,7 +16,7 @@ const httpLink = createHttpLink({
   credentials: 'include',
 });
 
-const wsEndpoint = `${location.origin.replace(/^http/, 'ws')}/gql`;
+const wsEndpoint = `${location.origin.replace(/^http/, 'ws')}/gql/ws`;
 const wsLink = new WebSocketLink({
   uri: wsEndpoint,
   options: {
