@@ -1,0 +1,5 @@
+mutation createFileSourceUpload($fileInfo: UploadFileInfo!) {
+  createFileSourceUpload(fileInfo: $fileInfo) {
+    id
+  }
+}

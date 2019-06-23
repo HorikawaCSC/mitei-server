@@ -34,7 +34,7 @@ export const gqlServer = new ApolloServer({
     ],
     settings: {
       'request.credentials': 'include',
-    // tslint:disable-next-line:no-any
+      // tslint:disable-next-line:no-any
     } as any,
   },
 });

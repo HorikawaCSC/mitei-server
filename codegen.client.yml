@@ -1,0 +1,22 @@
+overwrite: true
+schema: "./src/schema/app.gql"
+documents:
+  - "./src/client/api/**/*.gql"
+generates:
+  ./src/client/api/generated/graphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+  ./src/client/api/generated/graphql.d.ts:
+    plugins:
+      - "typescript-graphql-files-modules"
+  ./src/client/api/generated/introspection-result.ts:
+    plugins:
+      - "fragment-matcher"
+config:
+  withHooks: true
+  withComponent: false
+  withHOC: false
+  scalars:
+    Date: string
