@@ -23,7 +23,7 @@ export const gqlServer = new ApolloServer({
   resolvers,
   context: createContext,
   subscriptions: {
-    path: '/gql/subscription',
+    path: '/gql',
   },
   playground: {
     tabs: [
