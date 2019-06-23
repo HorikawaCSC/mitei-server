@@ -102,7 +102,7 @@ export const SourcesUpload = () => {
           color='primary'
           label='アップロード後にファイルを確認する'
           disabled={uploading}
-          value={probeFile}
+          checked={probeFile}
           onChange={handleProbeFile}
         />
       </FormGroup>
