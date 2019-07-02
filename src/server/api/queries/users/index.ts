@@ -1,5 +1,6 @@
 import { QueryResolvers } from '../../../generated/graphql';
 import { User } from '../../../models/User';
+import { omitUndefined } from '../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 
 export const usersQueryResolver: QueryResolvers = {
@@ -8,7 +9,10 @@ export const usersQueryResolver: QueryResolvers = {
   },
   users: ensureLoggedInAsAdmin(async (_parent, { kind, type, skip, take }) => {
     const [result, count] = await User.findAndCount({
-      where: { kind: kind || undefined, type: type || undefined },
+      where: omitUndefined({
+        kind: kind || undefined,
+        type: type || undefined,
+      }),
       skip: skip || 0,
       take: take || 10,
     });

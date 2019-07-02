@@ -27,7 +27,7 @@ interface SourceBase {
   height: Int!
   createdAt: Date!
   updatedAt: Date!
-  createdBy: ID!
+  createdBy: User!
 }
 
 enum SourceStatus {
@@ -45,7 +45,7 @@ type FileSource implements SourceBase {
   height: Int!
   createdAt: Date!
   updatedAt: Date!
-  createdBy: ID!
+  createdBy: User!
 
   # additional props
   name: String!
@@ -54,6 +54,11 @@ type FileSource implements SourceBase {
   error: String
   sourceWidth: Int!
   sourceHeight: Int!
+}
+
+type FileSourceList {
+  sources: [FileSource!]!
+  total: Int!
 }
 
 enum UserKind {
@@ -81,7 +86,9 @@ type Users {
 
 type Query {
   # admin func
-  fileSource(sourceId: String!): FileSource
+  fileSource(sourceId: ID!): FileSource
+  fileSources(status: TranscodeStatus, skip: Int, take: Int): FileSourceList!
+
   users(kind: UserKind, type: IdPType, skip: Int, take: Int): Users!
 
   # normal func
