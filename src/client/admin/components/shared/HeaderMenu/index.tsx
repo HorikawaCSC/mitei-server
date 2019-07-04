@@ -68,7 +68,7 @@ export const HeaderMenu = () => {
           <Divider />
 
           <List subheader={<ListSubheader>ソース管理</ListSubheader>}>
-            <ListItem button component={Link} to='/sources/upload'>
+            <ListItem button component={Link} to='/sources/file/upload'>
               <ListItemIcon>
                 <CloudUpload />
               </ListItemIcon>

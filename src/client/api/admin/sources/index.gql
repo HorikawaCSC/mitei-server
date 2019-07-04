@@ -11,3 +11,34 @@ mutation uploadFileSourceChunk($sourceId: String!, $file: UploadFileChunk!) {
 mutation probeFileSource($sourceId: String!) {
   probeFileSource(sourceId: $sourceId)
 }
+
+query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
+  fileSources(skip: $skip, take: $take, status: $status) {
+    total
+    sources {
+      id
+      duration
+      name
+      thumbnailUrl
+      status
+      createdAt
+    }
+  }
+}
+
+query getFileSource($id: ID!) {
+  fileSource(sourceId: $id) {
+    duration
+    name
+    thumbnailUrl
+    status
+    createdAt
+    sourceStatus
+    width
+    height
+    sourceExtension
+    error
+    sourceWidth
+    sourceHeight
+  }
+}

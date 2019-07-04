@@ -19,7 +19,7 @@ generates:
       - "fragment-matcher"
 config:
   withHooks: true
-  withComponent: false
+  withComponent: true
   withHOC: false
   scalars:
     Date: string
