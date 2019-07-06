@@ -79,6 +79,33 @@ type RtmpInput {
   createdBy: User!
 }
 
+type RtmpInputList {
+  inputs: [RtmpInput!]!
+  total: Int!
+}
+
+type RecordSource implements SourceBase {
+  id: ID!
+  status: TranscodeStatus!
+  duration: Float
+  thumbnailUrl: String
+  width: Int
+  height: Int
+  name: String!
+  createdAt: Date!
+  updatedAt: Date!
+  createdBy: User!
+
+  # additional props
+  source: RtmpInput!
+  error: String
+}
+
+type RecordSourceList {
+  sources: [RecordSource!]!
+  total: Int!
+}
+
 enum UserKind {
   normal
   admin
@@ -107,6 +134,8 @@ type Query {
   fileSource(sourceId: ID!): FileSource
   fileSourceList(status: TranscodeStatus, skip: Int, take: Int): FileSourceList!
 
+  recordSource(sourceId: ID!): RecordSource
+  recordSourceList(skip: Int, take: Int): RecordSourceList!
 
   users(kind: UserKind, type: IdPType, skip: Int, take: Int): Users!
 
