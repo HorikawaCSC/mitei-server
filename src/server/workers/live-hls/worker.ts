@@ -7,7 +7,6 @@ import { config } from '../../config';
 import { RecordSource, RecordSourceDocument } from '../../models/RecordSource';
 import { RtmpInputDocument } from '../../models/RtmpInput';
 import { Manifest, TranscodeStatus } from '../../models/TranscodedSource';
-import { SegmentInfo } from '../../types/hls';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
 
@@ -26,6 +25,7 @@ export class LiveHLSWorker extends EventEmitter {
     this.record.name = `${this.source.name} - ${dateTime}`;
     this.record.source = this.source.id!;
     this.record.duration = 0;
+    this.record.createdById = this.source.createdById;
 
     return await this.record.save();
   }
@@ -47,7 +47,7 @@ export class LiveHLSWorker extends EventEmitter {
       '-hls_list_size',
       '1',
       '-hls_segment_filename',
-      `${config.paths.source}/${this.record.id}/stream.ts`,
+      `${config.paths.source}/${this.record.id}/stream.m2ts`,
       '-',
     ];
   }
@@ -103,12 +103,6 @@ export class LiveHLSWorker extends EventEmitter {
           this.record.manifest.push(manifestEntry);
           this.record.duration! += duration;
           await this.record.save();
-
-          this.emit('segment', {
-            duration,
-            offset,
-            length,
-          } as SegmentInfo);
         }
         buffer.splice(0, buffer.length);
       }
