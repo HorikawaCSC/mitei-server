@@ -12,8 +12,14 @@ mutation probeFileSource($sourceId: String!) {
   probeFileSource(sourceId: $sourceId)
 }
 
+mutation addRtmpInput($name: String!) {
+  createRtmpInput(name: $name) {
+    id
+  }
+}
+
 query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
-  fileSources(skip: $skip, take: $take, status: $status) {
+  fileSourceList(skip: $skip, take: $take, status: $status) {
     total
     sources {
       id

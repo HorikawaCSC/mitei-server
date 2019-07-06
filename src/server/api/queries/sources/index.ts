@@ -7,7 +7,7 @@ export const sourcesQueryResolvers: QueryResolvers = {
   fileSource: ensureLoggedInAsAdmin(async (_parent, { sourceId }) => {
     return (await FileSource.findById(sourceId)) || null;
   }),
-  fileSources: ensureLoggedInAsAdmin(
+  fileSourceList: ensureLoggedInAsAdmin(
     async (_parent, { take, skip, ...query }) => {
       const conditions = omitUndefined(query);
 

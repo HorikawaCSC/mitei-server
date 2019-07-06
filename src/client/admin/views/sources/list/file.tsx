@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { useGetFileSourcesSimpleQuery } from '../../../../api/generated/graphql';
 import { useErrorSnack } from '../../../components/shared/ErrorSnackbar';
 import { useCommonStyles } from '../../../styles/common';
+import { fileSourceSimpleDetailString } from '../../../utils/file-source';
 
 export const FileSourceList = () => {
   const commonStyles = useCommonStyles();
@@ -21,15 +22,15 @@ export const FileSourceList = () => {
   if (loading) return <CircularProgress />;
 
   if (!data || error) {
-    openErrorMessage('Failed to get file sources');
+    openErrorMessage(error ? error.message : 'ファイル一覧の取得に失敗');
     return null;
   }
 
   return (
     <>
-      <Typography>{data.fileSources.total} 件</Typography>
+      <Typography>{data.fileSourceList.total} 件</Typography>
       <List>
-        {data.fileSources.sources.map(source => {
+        {data.fileSourceList.sources.map(source => {
           return (
             <ListItem
               key={source.id}
@@ -39,7 +40,7 @@ export const FileSourceList = () => {
             >
               <ListItemText
                 primary={source.name}
-                secondary={`${source.status}`}
+                secondary={fileSourceSimpleDetailString(source)}
               />
             </ListItem>
           );

@@ -105,7 +105,8 @@ type Users {
 type Query {
   # admin func
   fileSource(sourceId: ID!): FileSource
-  fileSources(status: TranscodeStatus, skip: Int, take: Int): FileSourceList!
+  fileSourceList(status: TranscodeStatus, skip: Int, take: Int): FileSourceList!
+
 
   users(kind: UserKind, type: IdPType, skip: Int, take: Int): Users!
 

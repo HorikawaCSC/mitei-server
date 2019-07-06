@@ -3,6 +3,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useGetFileSourceQuery } from '../../../../api/generated/graphql';
 import { PageContainer } from '../../../components/shared/PageContainer';
+import Typography from '@material-ui/core/Typography';
 
 export const FileSourceDetails = ({
   match,
@@ -20,5 +21,9 @@ export const FileSourceDetails = ({
   }
 
   const { fileSource: source } = data;
-  return <PageContainer title={`ソース: ${source.name}`} />;
+  return (
+    <PageContainer title={`ソース: ${source.name}`}>
+      <Typography>ソースのステータス: {source.status}</Typography>
+    </PageContainer>
+  );
 };
