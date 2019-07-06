@@ -73,9 +73,10 @@ export const ErrorSnackView = () => {
       open={contextValue.isOpen}
       autoHideDuration={6000}
       onClose={handleClose}
-      message={contextValue.text}
+      message={`エラー: ${contextValue.text}`}
       action={[
         <IconButton
+          key='close'
           color='inherit'
           className={styles.close}
           onClick={handleClose}
