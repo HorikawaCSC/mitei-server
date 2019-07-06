@@ -57,11 +57,12 @@ export const sourcesMutationResolvers: MutationResolvers = {
 
       const stream = createWriteStream(filePath, { flags: 'a' });
       const upload = (await file.chunk) as GqlUpload;
-      upload.createReadStream().pipe(stream);
+      const inputStream = upload.createReadStream();
+      inputStream.pipe(stream);
 
       await new Promise((resolve, reject) => {
         stream.on('close', () => resolve());
-        upload.stream.on('error', e => reject(e));
+        inputStream.on('error', e => reject(e));
         stream.on('error', e => reject(e));
       });
 
