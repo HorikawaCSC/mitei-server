@@ -5,15 +5,16 @@ import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 
 export const sourcesQueryResolvers: QueryResolvers = {
   fileSource: ensureLoggedInAsAdmin(async (_parent, { sourceId }) => {
-    return (await FileSource.findOne(sourceId)) || null;
+    return (await FileSource.findById(sourceId)) || null;
   }),
   fileSources: ensureLoggedInAsAdmin(
     async (_parent, { take, skip, ...query }) => {
-      const [result, total] = await FileSource.findAndCount({
-        where: omitUndefined(query),
-        skip: skip || 0,
-        take: take || 10,
-      });
+      const conditions = omitUndefined(query);
+
+      const total = await FileSource.countDocuments(conditions);
+      const result = await FileSource.find(conditions)
+        .skip(skip || 0)
+        .limit(take || 10);
 
       return {
         sources: result,

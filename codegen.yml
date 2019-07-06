@@ -12,8 +12,8 @@ generates:
 config:
   contextType: ../api/context#GqlContext
   mappers:
-    FileSource: ../models/FileSource#FileSource
-    SourceBase: ../models/TranscodedSource#TranscodedSource
-    User: ../models/User#User
+    FileSource: ../models/FileSource#FileSourceDocument
+    SourceBase: ../models/TranscodedSource#TranscodedSourceDocumentBase
+    User: ../models/User#UserDocument
   scalars:
     Date: string

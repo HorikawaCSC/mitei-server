@@ -33,12 +33,15 @@ query getFileSource($id: ID!) {
     thumbnailUrl
     status
     createdAt
-    sourceStatus
     width
     height
-    sourceExtension
     error
-    sourceWidth
-    sourceHeight
+    source {
+      extension
+      width
+      height
+      status
+      fileSize
+    }
   }
 }

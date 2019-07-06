@@ -1,5 +1,5 @@
 import { QueryResolvers } from '../../../generated/graphql';
-import { User } from '../../../models/User';
+import { AuthType, User, UserKind } from '../../../models/User';
 import { omitUndefined } from '../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 
@@ -8,14 +8,15 @@ export const usersQueryResolver: QueryResolvers = {
     return userInfo || null;
   },
   users: ensureLoggedInAsAdmin(async (_parent, { kind, type, skip, take }) => {
-    const [result, count] = await User.findAndCount({
-      where: omitUndefined({
-        kind: kind || undefined,
-        type: type || undefined,
-      }),
-      skip: skip || 0,
-      take: take || 10,
+    const conditions = omitUndefined({
+      kind: kind || UserKind.Normal,
+      type: type || AuthType.Twitter,
     });
+
+    const count = await User.countDocuments(conditions);
+    const result = await User.find(conditions)
+      .skip(skip || 0)
+      .limit(take || 0);
 
     return {
       users: result,

@@ -1,27 +1,35 @@
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Document, model, Schema, SchemaTypes } from 'mongoose';
 
-@Entity()
-export class RtmpInput extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id?: string;
-
-  @Column('varchar', { length: 64 })
-  name = '';
-
-  @CreateDateColumn()
-  createdAt?: Date;
-
-  @UpdateDateColumn()
-  updatedAt?: Date;
-
-  get nameOrDefault() {
-    return this.name || this.id || 'no name';
-  }
+export enum RtmpStatus {
+  Live = 'live',
+  Unused = 'unused',
 }
+export interface RtmpInputDocument extends Document {
+  name: string;
+  status: RtmpStatus;
+  createdAt?: Date;
+}
+
+const schema = new Schema(
+  {
+    name: {
+      type: SchemaTypes.String,
+      required: true,
+      default: 'input',
+    },
+    status: {
+      type: SchemaTypes.String,
+      required: true,
+      enum: Object.values(RtmpStatus),
+      default: RtmpStatus.Unused,
+    },
+  },
+  {
+    timestamps: {
+      createdAt: true,
+      updatedAt: false,
+    },
+  },
+);
+
+export const RtmpInput = model<RtmpInputDocument>('RtmpInput', schema);

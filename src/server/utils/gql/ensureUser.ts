@@ -1,9 +1,11 @@
 import { AuthenticationError } from 'apollo-server-core';
 import { GqlContext } from '../../api/context';
 import { ResolverFn } from '../../generated/graphql';
-import { User } from '../../models/User';
+import { UserDocument } from '../../models/User';
 
-type LoggedInContext = Omit<GqlContext, 'userInfo'> & { userInfo: User };
+type LoggedInContext = Omit<GqlContext, 'userInfo'> & {
+  userInfo: UserDocument;
+};
 export const ensureLoggedInAsAdmin = <TResult, TParent = {}, TArgs = {}>(
   input: ResolverFn<TResult, TParent, LoggedInContext, TArgs>,
 ): ResolverFn<TResult, TParent, GqlContext, TArgs> => {

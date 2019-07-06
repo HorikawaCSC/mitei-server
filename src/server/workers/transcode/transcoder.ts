@@ -3,20 +3,24 @@ import { EventEmitter } from 'events';
 import { createInterface } from 'readline';
 import { TranscodeWorkerParam } from '.';
 import { config } from '../../config';
-import { FileSource } from '../../models/FileSource';
-import { TranscodeStatus } from '../../models/TranscodedSource';
+import {
+  FileSource,
+  FileSourceDocument,
+  SourceStatus,
+} from '../../models/FileSource';
+import { Manifest, TranscodeStatus } from '../../models/TranscodedSource';
 import { AudioStream, VideoStream } from '../../types/ffprobe';
 import { transcodeLogger } from '../../utils/logging';
 import { ffprobe } from '../../utils/transcode/ffprobe';
 
 export class Transcoder extends EventEmitter {
-  private source?: FileSource;
+  private source: FileSourceDocument | null = null;
   private ffmpeg?: ChildProcessWithoutNullStreams;
 
   transcodedDuration = 0;
 
   get progress() {
-    if (!this.source) return 0;
+    if (!this.source || !this.source.duration) return 0;
     return Math.ceil(this.source.duration / this.transcodedDuration);
   }
 
@@ -25,12 +29,12 @@ export class Transcoder extends EventEmitter {
   }
 
   async lookup() {
-    this.source = await FileSource.findOne(this.params.sourceId);
+    this.source = await FileSource.findById(this.params.sourceId);
     if (!this.source) throw new Error('source not found');
 
     if (this.source.status !== 'pending')
       throw new Error('the source has already been transcoded or failed');
-    if (this.source.sourceStatus !== 'avail')
+    if (this.source.source.status !== SourceStatus.Available)
       throw new Error('the source is not available');
   }
 
@@ -39,7 +43,7 @@ export class Transcoder extends EventEmitter {
 
     const result = await ffprobe(
       `${config.paths.source}/${this.source.id}/source.${
-        this.source.sourceExtension
+        this.source.source.extension
       }`,
     );
 
@@ -59,8 +63,8 @@ export class Transcoder extends EventEmitter {
       }
     }
 
-    this.source.sourceWidth = video.width;
-    this.source.sourceHeight = video.height;
+    this.source.source.width = video.width;
+    this.source.source.height = video.height;
     this.source.duration = Number(video.duration);
 
     await this.source.save();
@@ -68,7 +72,7 @@ export class Transcoder extends EventEmitter {
 
   async probe() {
     if (!this.source) throw new Error('source not set');
-    if (this.source.sourceWidth !== 0) throw new Error('already probed');
+    if (this.source.source.width) throw new Error('already probed');
 
     try {
       await this.probeSource();
@@ -76,14 +80,13 @@ export class Transcoder extends EventEmitter {
       transcodeLogger.error('failed to probe', err);
 
       this.source.error = err.toString();
-      this.source.status = 'failed';
-      await this.source.save();
+      await this.setStatus(TranscodeStatus.Failed);
     }
   }
 
   // probed?
   get transcodable() {
-    return this.source && this.source.sourceWidth > 0;
+    return this.source && this.source.source.width;
   }
 
   private get transcodeArgs() {
@@ -92,7 +95,7 @@ export class Transcoder extends EventEmitter {
     return [
       '-i',
       `${config.paths.source}/${this.source.id}/source.${
-        this.source.sourceExtension
+        this.source.source.extension
       }`,
       '-c',
       'copy',
@@ -119,7 +122,7 @@ export class Transcoder extends EventEmitter {
   }
 
   async transcode() {
-    await this.setStatus('running');
+    await this.setStatus(TranscodeStatus.Running);
 
     return new Promise<void>((resolve, reject) => {
       const args = this.transcodeArgs;
@@ -162,16 +165,9 @@ export class Transcoder extends EventEmitter {
                 offset,
               );
 
-              const item = Buffer.alloc(8 + 6 * 2);
+              const item: Manifest = [offset, length, duration, 0];
 
-              item.writeDoubleBE(duration, 0);
-              item.writeUIntBE(length, 8, 6);
-              item.writeUIntBE(offset, 14, 6);
-
-              this.source.manifest = Buffer.concat([
-                this.source.manifest,
-                item,
-              ]);
+              this.source.manifest.push(item);
               this.transcodedDuration += duration;
 
               this.emit('duration', this.transcodedDuration);
@@ -191,7 +187,7 @@ export class Transcoder extends EventEmitter {
       });
 
       this.ffmpeg.on('error', async err => {
-        await this.setStatus('failed');
+        await this.setStatus(TranscodeStatus.Failed);
         reject(err);
       });
 
@@ -203,12 +199,12 @@ export class Transcoder extends EventEmitter {
             this.transcodedDuration,
           );
 
-          await this.setStatus('success');
+          await this.setStatus(TranscodeStatus.Success);
           resolve();
         } else {
           transcodeLogger.error('ffmpeg exit code', code);
 
-          await this.setStatus('failed');
+          await this.setStatus(TranscodeStatus.Failed);
           reject(`exit code: ${code}`);
         }
       });

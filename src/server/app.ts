@@ -1,20 +1,21 @@
 import { json } from 'body-parser';
+import * as createMongoSessionStore from 'connect-mongo';
 import * as express from 'express';
 import * as session from 'express-session';
+import { connect } from 'mongoose';
 import * as passport from 'passport';
 import { resolve } from 'path';
-import { getConnection } from 'typeorm';
-import { TypeormStore } from 'typeorm-store';
 import { config } from './config';
-import { connect } from './models';
-import { Session } from './models/Session';
 import { router as apiRouter } from './routes/api';
 import { router as authRouter } from './routes/auth';
 import { router as callbackRouter } from './routes/callback';
 import { gqlServer } from './routes/gql';
 
 (async () => {
-  await connect();
+  const { connection } = await connect(
+    config.mongo,
+    { useNewUrlParser: true },
+  );
 
   const callbackApp = express();
   callbackApp.use(callbackRouter);
@@ -22,9 +23,7 @@ import { gqlServer } from './routes/gql';
 
   const app = express();
 
-  const store = new TypeormStore({
-    repository: getConnection().getRepository(Session),
-  });
+  const MongoStore = createMongoSessionStore(session);
 
   app.use(json());
   app.use(
@@ -32,7 +31,7 @@ import { gqlServer } from './routes/gql';
       secret: config.secrets.session,
       resave: false,
       saveUninitialized: false,
-      store,
+      store: new MongoStore({ mongooseConnection: connection }),
     }),
   );
   app.use(passport.initialize());

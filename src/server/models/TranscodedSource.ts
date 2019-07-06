@@ -1,41 +1,55 @@
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { ObjectID } from 'bson';
+import { Document, SchemaDefinition, SchemaTypes } from 'mongoose';
+import { User, UserDocument } from './User';
 
-export type TranscodeStatus = 'pending' | 'running' | 'success' | 'failed';
+export enum TranscodeStatus {
+  Pending = 'pending',
+  Running = 'running',
+  Success = 'success',
+  Failed = 'failed',
+}
 
-export abstract class TranscodedSource extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id?: string;
+// offset size duration date
+export type Manifest = [number, number, number, number | undefined];
 
-  @Column('blob')
-  manifest = Buffer.from([]);
-
-  @Column('varchar', { length: 10 })
-  status: TranscodeStatus = 'pending';
-
-  @Column('double')
-  duration = 0;
-
-  @Column('blob', { nullable: true })
-  thumbnail: Buffer | null = null;
-
-  @Column('int')
-  width = 0;
-
-  @Column('int')
-  height = 0;
-
-  @Column('varchar', { length: 36 })
-  createdBy = '';
-
-  @CreateDateColumn()
+export interface TranscodedSourceDocumentBase extends Document {
+  createdById: ObjectID;
+  createdBy?: UserDocument;
+  status: TranscodeStatus;
+  name: string;
+  manifest: Manifest[];
+  duration?: number;
+  thumbnailPath?: string;
+  width?: number;
+  height?: number;
   createdAt?: Date;
-
-  @UpdateDateColumn()
   updatedAt?: Date;
 }
+
+export const transcodedSourceSchemaBase: SchemaDefinition = {
+  createdBy: {
+    type: SchemaTypes.ObjectId,
+    required: true,
+    ref: User,
+    alias: 'createdById',
+  },
+  name: {
+    type: SchemaTypes.String,
+    required: true,
+    default: '',
+  },
+  status: {
+    type: SchemaTypes.String,
+    required: true,
+    default: TranscodeStatus.Pending,
+  },
+  manifest: {
+    type: SchemaTypes.Array,
+    required: true,
+    default: [],
+  },
+  duration: SchemaTypes.Number,
+  thumbnailPath: SchemaTypes.String,
+  width: SchemaTypes.Number,
+  height: SchemaTypes.Number,
+};

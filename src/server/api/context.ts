@@ -1,5 +1,5 @@
-import { User } from '../models/User';
+import { UserDocument } from '../models/User';
 
 export interface GqlContext {
-  userInfo?: User;
+  userInfo?: UserDocument;
 }

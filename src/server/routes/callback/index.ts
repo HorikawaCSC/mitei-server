@@ -22,7 +22,7 @@ router.post('/rtmp-events', async (req, res) => {
     return res.status(400).end();
   }
 
-  const source = await RtmpInput.findOne(event.name);
+  const source = await RtmpInput.findById(event.name);
   if (!source || !source.id) {
     return res.status(404).end();
   }
@@ -39,7 +39,7 @@ router.post('/rtmp-events', async (req, res) => {
     if (event.call === 'publish_done') {
       res.status(200).end();
 
-      await sleep(2000);
+      await sleep(5000);
       await liveHlsManager.stop(source);
     }
   } catch (e) {

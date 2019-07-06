@@ -1,7 +1,7 @@
 import { createWriteStream, existsSync, promises as fs } from 'fs';
 import { config } from '../../../config';
 import { MutationResolvers } from '../../../generated/graphql';
-import { FileSource } from '../../../models/FileSource';
+import { FileSource, SourceStatus } from '../../../models/FileSource';
 import { GqlUpload } from '../../../types/gql-upload';
 import { extractExtension } from '../../../utils/filename';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
@@ -16,9 +16,12 @@ export const sourcesMutationResolvers: MutationResolvers = {
       }
 
       const source = new FileSource();
-      source.sourceSize = fileInfo.size;
-      source.sourceExtension = ext;
-      source.createdBy = userInfo.id!;
+      source.source = {
+        fileSize: fileInfo.size,
+        extension: ext,
+        status: SourceStatus.Uploading,
+      };
+      source.createdById = userInfo.id!;
       source.name = fileInfo.filename;
 
       return await source.save();
@@ -27,7 +30,7 @@ export const sourcesMutationResolvers: MutationResolvers = {
   uploadFileSourceChunk: ensureLoggedInAsAdmin(
     async (_parent, { file, sourceId }, { userInfo }) => {
       const source = await FileSource.findOne({
-        id: sourceId,
+        _id: sourceId,
         createdBy: userInfo.id!,
       });
 
@@ -36,7 +39,7 @@ export const sourcesMutationResolvers: MutationResolvers = {
       }
 
       const dirPath = `${config.paths.source}/${source.id}`;
-      const filePath = `${dirPath}/source.${source.sourceExtension}`;
+      const filePath = `${dirPath}/source.${source.source.extension}`;
       if (!existsSync(dirPath)) {
         // in this case, offset must be 0
         if (file.begin !== 0) throw new Error('offset != 0');
@@ -45,7 +48,7 @@ export const sourcesMutationResolvers: MutationResolvers = {
       if (existsSync(filePath)) {
         const fileInfo = await fs.stat(filePath);
         if (fileInfo.size !== file.begin) throw new Error('invalid offset');
-        if (fileInfo.size + file.size > source.sourceSize)
+        if (fileInfo.size + file.size > source.source.fileSize)
           throw new Error('chunk too large');
       } else {
         if (file.begin !== 0) throw new Error('offset != 0');
@@ -53,7 +56,7 @@ export const sourcesMutationResolvers: MutationResolvers = {
 
       const stream = createWriteStream(filePath, { flags: 'a' });
       const upload = (await file.chunk) as GqlUpload;
-      upload.stream.pipe(stream);
+      upload.createReadStream().pipe(stream);
 
       await new Promise((resolve, reject) => {
         stream.on('close', () => resolve());
@@ -62,8 +65,8 @@ export const sourcesMutationResolvers: MutationResolvers = {
       });
 
       const fileInfo = await fs.stat(filePath);
-      if (fileInfo.size === source.sourceSize) {
-        source.sourceStatus = 'avail';
+      if (fileInfo.size === source.source.fileSize) {
+        source.source.status = SourceStatus.Available;
         await source.save();
         return true;
       }
@@ -72,9 +75,7 @@ export const sourcesMutationResolvers: MutationResolvers = {
     },
   ),
   probeFileSource: ensureLoggedInAsAdmin(async (_parent, { sourceId }) => {
-    const source = await FileSource.findOne({
-      id: sourceId,
-    });
+    const source = await FileSource.findById(sourceId);
 
     if (!source) {
       throw new Error('source not found');

@@ -5,13 +5,13 @@ import { Request } from 'express';
 import { readFileSync } from 'fs';
 import { resolvers as apiResolvers } from '../api';
 import { GqlContext } from '../api/context';
-import { User } from '../models/User';
+import { UserDocument } from '../models/User';
 
 const createContext: ContextFunction<{ req: Request }, GqlContext> = ({
   req,
 }) => {
   if (req.user) {
-    return { userInfo: req.user as User };
+    return { userInfo: req.user as UserDocument };
   } else {
     return {};
   }

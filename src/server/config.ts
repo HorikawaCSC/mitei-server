@@ -18,13 +18,7 @@ export const config = {
     host: process.env.REDIS_HOST || 'redis',
     port: Number(process.env.REDIS_PORT || 6379),
   },
-  mysql: {
-    host: process.env.MYSQL_HOST || 'mysql',
-    port: Number(process.env.MYSQL_PORT || 3306),
-    username: process.env.MYSQL_USERNAME || 'mitei',
-    password: process.env.MYSQL_PASSWORD || 'mitei',
-    database: process.env.MYSQL_DATABASE || 'mitei',
-  },
+  mongo: process.env.MONGO_URI || 'mongodb://localhost/mitei',
   limit: {
     stream: Number(process.env.MAX_STREAM || 10),
     transcode: Number(process.env.MAX_TRANSCODE || 10),

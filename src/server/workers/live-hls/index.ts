@@ -1,21 +1,24 @@
-import { RtmpInput } from '../../models/RtmpInput';
+import { RtmpInputDocument } from '../../models/RtmpInput';
 import { liveHlsLogger } from '../../utils/logging';
 import { LiveHLSWorker } from './worker';
 
 class LiveHLSManager {
   private workers: Map<string, LiveHLSWorker> = new Map();
 
-  async create(source: RtmpInput) {
+  async create(source: RtmpInputDocument) {
     if (!source.id) throw new Error('source must have `id`');
     if (this.workers.has(source.id)) {
-      liveHlsLogger.warn('Same source worker is still alive, trying to stop');
-      await this.stop(source);
+      liveHlsLogger.warn('Same source worker is still running');
+      throw new Error('already broadcasting');
     }
 
     const worker = new LiveHLSWorker(source);
     this.workers.set(source.id, worker);
+
     await worker.start();
+
     liveHlsLogger.debug('source:', source.id, 'started');
+
     worker.on('end', () => {
       if (!source.id) throw new Error('source invalid');
       this.workers.delete(source.id);
@@ -24,13 +27,16 @@ class LiveHLSManager {
 
     const record = worker.getRecord();
     if (!record) throw new Error('worker does not start correctly');
+
     return worker;
   }
 
-  async stop(source: RtmpInput) {
+  async stop(source: RtmpInputDocument) {
     if (!source.id) throw new Error('source must have `id`');
     if (this.workers.has(source.id)) {
-      await this.workers.get(source.id)!.tryStop();
+      const worker = this.workers.get(source.id);
+
+      if (worker) await worker.tryStop();
     } else {
       liveHlsLogger.debug('ffmpeg seemed to be stopped');
     }

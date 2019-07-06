@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as passport from 'passport';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { config } from '../../config';
-import { User } from '../../models/User';
+import { AuthType, User, UserDocument, UserKind } from '../../models/User';
 import { authLogger } from '../../utils/logging';
 
 passport.use(
@@ -31,8 +31,8 @@ passport.use(
 
         const userNew = new User();
         userNew.userId = profile.id;
-        userNew.kind = 'normal';
-        userNew.type = 'twitter';
+        userNew.kind = UserKind.Normal;
+        userNew.type = AuthType.Twitter;
         userNew.iconUrl = profile.photos ? profile.photos[0].value : '';
         userNew.token = token;
         userNew.tokenSecret = tokenSecret;
@@ -48,16 +48,20 @@ passport.use(
   ),
 );
 
-passport.serializeUser((user: User, done) => {
+passport.serializeUser((user: UserDocument, done) => {
   done(null, user.id);
 });
 
 passport.deserializeUser(async (userId: string, done) => {
-  const user = await User.findOne(userId);
-  if (user) {
-    done(null, user);
-  } else {
-    done('no user');
+  try {
+    const user = await User.findById(userId);
+    if (user) {
+      done(null, user);
+    } else {
+      done('no user');
+    }
+  } catch (err) {
+    done(err);
   }
 });
 

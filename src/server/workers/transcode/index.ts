@@ -1,6 +1,6 @@
 import * as Queue from 'bull';
 import { config } from '../../config';
-import { FileSource } from '../../models/FileSource';
+import { FileSourceDocument, SourceStatus } from '../../models/FileSource';
 import { Transcoder } from './transcoder';
 
 export interface TranscodeWorkerParam {
@@ -45,14 +45,18 @@ class TranscodeWorker {
     await transcoder.transcode();
   }
 
-  enqueue(source: FileSource, params: Omit<TranscodeWorkerParam, 'sourceId'>) {
+  enqueue(
+    source: FileSourceDocument,
+    params: Omit<TranscodeWorkerParam, 'sourceId'>,
+  ) {
     if (!source.id) throw new Error('source invalid');
-    if (source.sourceStatus !== 'avail') throw new Error('source unavailable');
+    if (source.source.status !== SourceStatus.Available)
+      throw new Error('source unavailable');
 
     if (params.probeMode) {
-      if (source.sourceWidth > 0) throw new Error('already probed');
+      if (source.source.width) throw new Error('already probed');
     } else {
-      if (source.sourceWidth === 0) throw new Error('not probed');
+      if (!source.source.width) throw new Error('not probed');
     }
 
     this.queue.add({

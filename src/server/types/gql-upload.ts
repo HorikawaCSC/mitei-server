@@ -5,4 +5,5 @@ export interface GqlUpload {
   filename: string;
   mimetype: string;
   encoding?: string;
+  createReadStream(): Readable;
 }

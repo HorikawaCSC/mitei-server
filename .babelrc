@@ -16,8 +16,5 @@
         "corejs": 3
       }
     ]
-  ],
-  "plugins": [
-    "babel-plugin-styled-components"
   ]
 }

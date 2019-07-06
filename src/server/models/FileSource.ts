@@ -1,27 +1,51 @@
-import { Column, Entity } from 'typeorm';
-import { TranscodedSource } from './TranscodedSource';
+import { model, Schema, SchemaTypes } from 'mongoose';
+import {
+  TranscodedSourceDocumentBase,
+  transcodedSourceSchemaBase,
+} from './TranscodedSource';
 
-export type SourceStatus = 'uploading' | 'avail' | 'deleted';
-@Entity()
-export class FileSource extends TranscodedSource {
-  @Column('text')
-  name = '';
-
-  @Column('varchar', { length: 10 })
-  sourceExtension = '';
-
-  @Column('varchar', { length: 10 })
-  sourceStatus: SourceStatus = 'uploading';
-
-  @Column('text')
-  error = '';
-
-  @Column('int')
-  sourceWidth = 0;
-
-  @Column('int')
-  sourceHeight = 0;
-
-  @Column('int')
-  sourceSize = 0;
+export enum SourceStatus {
+  Uploading = 'uploading',
+  Available = 'available',
+  Deleted = 'deleted',
 }
+
+export interface FileSourceDocument extends TranscodedSourceDocumentBase {
+  source: {
+    extension: string;
+    status: SourceStatus;
+    width?: number;
+    height?: number;
+    fileSize: number;
+  };
+  error?: string;
+}
+
+const sourceSchema = new Schema({
+  extension: {
+    type: SchemaTypes.String,
+    required: true,
+  },
+  status: {
+    type: SchemaTypes.String,
+    required: true,
+    enum: Object.values(SourceStatus),
+    default: SourceStatus.Uploading,
+  },
+  width: SchemaTypes.Number,
+  height: SchemaTypes.Number,
+  fileSize: SchemaTypes.Number,
+});
+
+const schema = new Schema(
+  {
+    ...transcodedSourceSchemaBase,
+    error: SchemaTypes.String,
+    source: sourceSchema,
+  },
+  {
+    timestamps: true,
+  },
+);
+
+export const FileSource = model<FileSourceDocument>('FileSource', schema);

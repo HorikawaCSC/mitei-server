@@ -21,10 +21,11 @@ enum TranscodeStatus {
 interface SourceBase {
   id: ID!
   status: TranscodeStatus!
-  duration: Float!
+  duration: Float
   thumbnailUrl: String
-  width: Int!
-  height: Int!
+  width: Int
+  height: Int
+  name: String!
   createdAt: Date!
   updatedAt: Date!
   createdBy: User!
@@ -32,28 +33,33 @@ interface SourceBase {
 
 enum SourceStatus {
   uploading
-  avail
+  available
   deleted
+}
+
+type FileSourceOrignalInfo {
+  status: SourceStatus!
+  extension: String!
+  width: Int
+  height: Int
+  fileSize: Int!
 }
 
 type FileSource implements SourceBase {
   id: ID!
   status: TranscodeStatus!
-  duration: Float!
+  duration: Float
   thumbnailUrl: String
-  width: Int!
-  height: Int!
+  width: Int
+  height: Int
+  name: String!
   createdAt: Date!
   updatedAt: Date!
   createdBy: User!
 
   # additional props
-  name: String!
-  sourceExtension: String!
-  sourceStatus: SourceStatus!
+  source: FileSourceOrignalInfo!
   error: String
-  sourceWidth: Int!
-  sourceHeight: Int!
 }
 
 type FileSourceList {

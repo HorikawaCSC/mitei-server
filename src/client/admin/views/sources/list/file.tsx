@@ -3,7 +3,6 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
-import { Duration } from 'luxon';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { useGetFileSourcesSimpleQuery } from '../../../../api/generated/graphql';
@@ -30,9 +29,7 @@ export const FileSourceList = () => {
             >
               <ListItemText
                 primary={source.name}
-                secondary={`長さ: ${Duration.fromMillis(
-                  source.duration * 1000,
-                ).toFormat('hh:mm:ss.SSS')}, ${source.status}`}
+                secondary={`${source.status}`}
               />
             </ListItem>
           );
