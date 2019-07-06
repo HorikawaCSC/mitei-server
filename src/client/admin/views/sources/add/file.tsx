@@ -6,6 +6,7 @@ import {
 } from '@material-ui/core';
 import { CloudUpload } from '@material-ui/icons';
 import * as React from 'react';
+import useRouter from 'use-react-router';
 import {
   useCreateFileSourceUploadMutation,
   useProbeFileSourceMutation,
@@ -13,10 +14,11 @@ import {
 } from '../../../../api/generated/graphql';
 import { LabeledCheckbox } from '../../../../components/LabeledCheckbox';
 import { FILE_UPLOAD_CHUNK } from '../../../../constant';
+import { useErrorSnack } from '../../../components/shared/ErrorSnackbar';
 import { FileChooser } from '../../../components/shared/FileChooser';
 import { PageContainer } from '../../../components/shared/PageContainer';
 
-export const SourcesUpload = () => {
+export const FileSourceUploadView = () => {
   const [uploading, setUploading] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const [bufferProgress, setBufferProgress] = React.useState(0);
@@ -25,6 +27,8 @@ export const SourcesUpload = () => {
   const createUpload = useCreateFileSourceUploadMutation();
   const uploadChunk = useUploadFileSourceChunkMutation();
   const probeFileSource = useProbeFileSourceMutation();
+  const openErrorMessage = useErrorSnack();
+  const { history } = useRouter();
 
   const handleUpload = React.useCallback(async () => {
     if (!file) return;
@@ -38,30 +42,44 @@ export const SourcesUpload = () => {
           size: file.size,
         },
       },
+      errorPolicy: 'all',
     });
-    if (errors || !sourceData) return;
+    if (errors || !sourceData) {
+      openErrorMessage(
+        errors ? errors[0].message : 'アップロードを開始できません',
+      );
+      return;
+    }
+
+    const sourceId = sourceData.createFileSourceUpload.id;
 
     let uploadSuccess = false;
     for (let offset = 0; offset < file.size; offset += FILE_UPLOAD_CHUNK) {
-      setBufferProgress((file.size / offset) * 100);
-
       const end = offset + Math.min(file.size - offset, FILE_UPLOAD_CHUNK);
+
+      setBufferProgress((end / file.size) * 100);
+
       const blob = file.slice(offset, end);
 
-      const { data: result } = await uploadChunk({
+      const { data: result, errors } = await uploadChunk({
         variables: {
           file: {
             chunk: blob,
             size: end - offset,
             begin: offset,
           },
-          sourceId: sourceData.createFileSourceUpload.id,
+          sourceId,
         },
+        errorPolicy: 'all',
       });
 
-      setUploadProgress((file.size / end) * 100);
+      setUploadProgress((end / file.size) * 100);
 
-      if (!result) return;
+      if (!result || errors) {
+        openErrorMessage(errors ? errors[0].message : 'アップロード失敗');
+        return;
+      }
+
       if (result.uploadFileSourceChunk) {
         uploadSuccess = true;
         break;
@@ -69,11 +87,19 @@ export const SourcesUpload = () => {
     }
     if (uploadSuccess) {
       if (probeFile) {
-        await probeFileSource({
-          variables: { sourceId: sourceData.createFileSourceUpload.id },
+        const { errors } = await probeFileSource({
+          variables: { sourceId },
+          errorPolicy: 'all',
         });
+        if (errors) {
+          openErrorMessage(
+            errors ? errors[0].message : 'ファイル確認処理を開始できません',
+          );
+          return;
+        }
       }
       setUploading(false);
+      history.push(`/sources/file/${sourceId}`);
     }
   }, [file]);
 

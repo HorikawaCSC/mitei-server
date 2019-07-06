@@ -11,7 +11,7 @@ import { FileSourceList } from './file';
 
 const renderTabs = (props: RouteComponentProps<{ type: string }>) => {
   return (
-    <Tabs value={props.match.params.type}>
+    <Tabs value={props.match.params.type || 'file'}>
       <Tab component={Link} to='/sources/file' label='ファイル' value='file' />
       <Tab
         component={Link}
@@ -19,6 +19,7 @@ const renderTabs = (props: RouteComponentProps<{ type: string }>) => {
         label='生放送録画'
         value='recorded'
       />
+      <Tab component={Link} to='/sources/rtmp' label='RTMP' value='rtmp' />
     </Tabs>
   );
 };
