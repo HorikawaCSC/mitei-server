@@ -2,6 +2,7 @@ import { GraphQLDateTime } from 'graphql-iso-date';
 import { Resolvers } from '../generated/graphql';
 import { mutationResolvers } from './mutations';
 import { queryResolvers } from './queries';
+import { rtmpInputResolvers } from './types/rtmp-input';
 import { sourceBaseResolvers } from './types/source-base';
 
 export const resolvers: Resolvers = {
@@ -10,4 +11,5 @@ export const resolvers: Resolvers = {
   Query: queryResolvers,
   SourceBase: sourceBaseResolvers,
   FileSource: sourceBaseResolvers,
+  RtmpInput: rtmpInputResolvers,
 };

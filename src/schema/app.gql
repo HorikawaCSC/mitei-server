@@ -67,6 +67,18 @@ type FileSourceList {
   total: Int!
 }
 
+enum RtmpStatus {
+  live
+  unused
+}
+
+type RtmpInput {
+  id: ID!
+  name: String!
+  status: RtmpStatus!
+  createdBy: User!
+}
+
 enum UserKind {
   normal
   admin
@@ -107,6 +119,8 @@ type Mutation {
   uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean!
   probeFileSource(sourceId: String!): Boolean!
   transcodeFileSource(sourceId: String!): Boolean!
+
+  createRtmpInput(name: String!): RtmpInput!
 }
 
 schema {

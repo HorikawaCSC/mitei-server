@@ -15,5 +15,6 @@ config:
     FileSource: ../models/FileSource#FileSourceDocument
     SourceBase: ../models/TranscodedSource#TranscodedSourceDocumentBase
     User: ../models/User#UserDocument
+    RtmpInput: ../models/RtmpInput#RtmpInputDocument
   scalars:
     Date: string

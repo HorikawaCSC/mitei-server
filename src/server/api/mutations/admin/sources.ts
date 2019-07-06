@@ -2,6 +2,7 @@ import { createWriteStream, existsSync, promises as fs } from 'fs';
 import { config } from '../../../config';
 import { MutationResolvers } from '../../../generated/graphql';
 import { FileSource, SourceStatus } from '../../../models/FileSource';
+import { RtmpInput, RtmpStatus } from '../../../models/RtmpInput';
 import { GqlUpload } from '../../../types/gql-upload';
 import { extractExtension } from '../../../utils/filename';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
@@ -84,4 +85,14 @@ export const sourcesMutationResolvers: MutationResolvers = {
     transcodeWorker.enqueue(source, { probeMode: true, transcodeArgs: '' });
     return true;
   }),
+  createRtmpInput: ensureLoggedInAsAdmin(
+    async (_parent, { name }, { userInfo }) => {
+      const input = new RtmpInput();
+      input.status = RtmpStatus.Unused;
+      input.name = name;
+      input.createdById = userInfo._id;
+
+      return await input.save();
+    },
+  ),
 };
