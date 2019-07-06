@@ -28,6 +28,9 @@ query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
       thumbnailUrl
       status
       createdAt
+      source {
+        status
+      }
     }
   }
 }

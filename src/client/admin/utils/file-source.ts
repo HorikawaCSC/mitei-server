@@ -1,6 +1,7 @@
 import { Duration } from 'luxon';
 import {
   GetFileSourcesSimpleQuery,
+  SourceStatus,
   TranscodeStatus,
 } from '../../api/generated/graphql';
 
@@ -14,6 +15,10 @@ export const transcodeStatusText = {
 export const fileSourceSimpleDetailString = (
   info: GetFileSourcesSimpleQuery['fileSourceList']['sources'][0],
 ) => {
+  if (info.source.status === SourceStatus.Uploading) {
+    return 'アップロード待機中/エラー';
+  }
+
   if (!info.duration) {
     return `${transcodeStatusText[info.status]}`;
   }

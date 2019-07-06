@@ -136,7 +136,7 @@ export const FileSourceUploadView = () => {
         color='primary'
         variant='contained'
         size='large'
-        disabled={uploading}
+        disabled={uploading || !file}
         onClick={handleUpload}
       >
         <CloudUpload />
