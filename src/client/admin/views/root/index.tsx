@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/styles';
 import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { useGetMyselfSimpleQuery } from '../../../api/generated/graphql';
+import { ErrorSnackView } from '../../components/shared/ErrorSnackbar';
 import { FullscreenProgress } from '../../components/shared/FullscreenProgress';
 import { HeaderMenu } from '../../components/shared/HeaderMenu';
 import { LoginView } from '../login';
@@ -44,6 +45,7 @@ export const Root = () => {
           <Route path='/sources' component={SourcesRoot} />
         </Switch>
       </Container>
+      <ErrorSnackView />
     </>
   );
 };

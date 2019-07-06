@@ -5,6 +5,7 @@ import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { apolloClient } from '../utils/gql-client';
+import { ErrorSnackContextProvider } from './components/shared/ErrorSnackbar';
 import { theme } from './styles/theme';
 import { Root } from './views/root';
 
@@ -15,9 +16,11 @@ if (target) {
     <MuiThemeProvider theme={theme}>
       <ApolloProvider client={apolloClient}>
         <ApolloHooksProvider client={apolloClient}>
-          <BrowserRouter basename='/admin'>
-            <Root />
-          </BrowserRouter>
+          <ErrorSnackContextProvider>
+            <BrowserRouter basename='/admin'>
+              <Root />
+            </BrowserRouter>
+          </ErrorSnackContextProvider>
         </ApolloHooksProvider>
       </ApolloProvider>
     </MuiThemeProvider>,
