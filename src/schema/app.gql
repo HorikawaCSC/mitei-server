@@ -137,6 +137,8 @@ type Query {
   recordSource(sourceId: ID!): RecordSource
   recordSourceList(skip: Int, take: Int): RecordSourceList!
 
+  rtmpInputsList(skip: Int, take: Int): RtmpInputList!
+
   users(kind: UserKind, type: IdPType, skip: Int, take: Int): Users!
 
   # normal func

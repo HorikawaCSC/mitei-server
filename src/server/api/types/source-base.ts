@@ -9,7 +9,7 @@ export const sourceBaseResolvers: SourceBaseResolvers = {
     return null;
   },
   createdBy: ensureLoggedInAsAdmin(async source => {
-    await source.populate('createdBy');
+    await source.populate('createdBy').execPopulate();
     if (!source.createdBy) throw new Error('failed to populate');
 
     return source.createdBy;

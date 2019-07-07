@@ -1,5 +1,6 @@
 import { QueryResolvers } from '../../../generated/graphql';
 import { FileSource } from '../../../models/FileSource';
+import { RtmpInput } from '../../../models/RtmpInput';
 import { omitUndefined } from '../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 
@@ -22,4 +23,15 @@ export const sourcesQueryResolvers: QueryResolvers = {
       };
     },
   ),
+  rtmpInputsList: ensureLoggedInAsAdmin(async (_parent, { take, skip }) => {
+    const total = await RtmpInput.countDocuments();
+    const result = await RtmpInput.find()
+      .skip(skip || 0)
+      .limit(take || 10);
+
+    return {
+      inputs: result,
+      total,
+    };
+  }),
 };
