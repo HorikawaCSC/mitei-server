@@ -8,6 +8,7 @@ import {
   Switch,
 } from 'react-router-dom';
 import { FileSourceList } from './file';
+import { RtmpInputList } from './rtmp';
 
 const renderTabs = (props: RouteComponentProps<{ type: string }>) => {
   return (
@@ -35,6 +36,7 @@ export const SourcesListView = () => {
           exact
         />
         <Route path='/sources/file' component={FileSourceList} exact />
+        <Route path='/sources/rtmp' component={RtmpInputList} exact />
       </Switch>
     </Paper>
   );
