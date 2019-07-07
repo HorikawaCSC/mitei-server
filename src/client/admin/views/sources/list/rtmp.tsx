@@ -1,28 +1,34 @@
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Fab from '@material-ui/core/Fab';
+import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
-import { Add } from '@material-ui/icons';
+import { Add, Delete } from '@material-ui/icons';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import {
   RtmpStatus,
   useGetRtmpInputListSimpleQuery,
+  useRemoveRtmpInputMutation,
 } from '../../../../api/generated/graphql';
+import { useErrorDialog } from '../../../components/errors/ErrorDialog';
 import { useErrorSnack } from '../../../components/errors/ErrorSnackbar';
 import { AddRtmpInputDialog } from '../../../components/sources/AddRtmpInputDialog';
 import { useCommonStyles } from '../../../styles/common';
+import { rtmpInputSimpleString } from '../../../utils/sources';
 
 export const RtmpInputList = () => {
   const commonStyles = useCommonStyles();
   const [addDialogOpen, setAddDialogOpen] = React.useState(false);
   const openErrorMessage = useErrorSnack();
-  const { data, error, loading } = useGetRtmpInputListSimpleQuery({
+  const openErrorMessageDialog = useErrorDialog();
+  const { data, error, loading, refetch } = useGetRtmpInputListSimpleQuery({
     variables: { skip: 0, take: 10 },
     fetchPolicy: 'network-only',
   });
+  const removeRtmpInput = useRemoveRtmpInputMutation();
 
   if (loading) return <CircularProgress />;
 
@@ -33,9 +39,20 @@ export const RtmpInputList = () => {
 
   const handleDialogClose = () => {
     setAddDialogOpen(false);
+
+    refetch();
   };
   const handleDialogOpen = () => {
     setAddDialogOpen(true);
+  };
+  const createDeleteHandle = (id: string) => async () => {
+    const { errors } = await removeRtmpInput({ variables: { id } });
+
+    if (errors) {
+      openErrorMessageDialog(errors[0].message);
+    }
+
+    refetch();
   };
 
   return (
@@ -44,16 +61,20 @@ export const RtmpInputList = () => {
       <List>
         {data.rtmpInputList.inputs.map(input => {
           return (
-            <ListItem
-              key={input.id}
-              button
-              component={Link}
-              to={`/sources/file/${input.id}`}
-            >
+            <ListItem key={input.id}>
               <ListItemText
                 primary={input.name}
-                secondary={input.status === RtmpStatus.Live ? '使用中' : ''}
+                secondary={rtmpInputSimpleString(input)}
               />
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge='end'
+                  onClick={createDeleteHandle(input.id)}
+                  disabled={input.status !== RtmpStatus.Unused}
+                >
+                  <Delete />
+                </IconButton>
+              </ListItemSecondaryAction>
             </ListItem>
           );
         })}

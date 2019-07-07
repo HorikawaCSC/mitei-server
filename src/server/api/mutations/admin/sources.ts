@@ -96,4 +96,14 @@ export const sourcesMutationResolvers: MutationResolvers = {
       return await input.save();
     },
   ),
+  removeRtmpInput: ensureLoggedInAsAdmin(async (_parent, { id }) => {
+    const input = await RtmpInput.findById(id);
+    if (!input) throw new Error('not found');
+    if (input.status !== RtmpStatus.Unused)
+      throw new Error('stream is being used');
+
+    await input.remove();
+
+    return true;
+  }),
 };

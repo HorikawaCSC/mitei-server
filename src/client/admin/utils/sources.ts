@@ -1,6 +1,8 @@
 import { Duration } from 'luxon';
 import {
   GetFileSourcesSimpleQuery,
+  GetRtmpInputListSimpleQuery,
+  RtmpStatus,
   SourceStatus,
   TranscodeStatus,
 } from '../../api/generated/graphql';
@@ -25,4 +27,15 @@ export const fileSourceSimpleDetailString = (
   return `${transcodeStatusText[info.status]} 長さ: ${Duration.fromMillis(
     info.duration * 1000,
   ).toFormat('hh:mm:ss')}`;
+};
+
+export const rtmpStatusText = {
+  [RtmpStatus.Unused]: '待機中',
+  [RtmpStatus.Live]: '配信中',
+};
+
+export const rtmpInputSimpleString = (
+  input: GetRtmpInputListSimpleQuery['rtmpInputList']['inputs'][0],
+) => {
+  return `${rtmpStatusText[input.status]} / 配信先: ${input.publishUrl}`;
 };

@@ -1,3 +1,4 @@
+import { config } from '../../config';
 import { RtmpInputResolvers } from '../../generated/graphql';
 import { ensureLoggedInAsAdmin } from '../../utils/gql/ensureUser';
 
@@ -8,4 +9,7 @@ export const rtmpInputResolvers: RtmpInputResolvers = {
 
     return source.createdBy;
   }),
+  publishUrl: source => {
+    return `${config.streaming.rtmpClientEndpoint}/${source.id}`;
+  },
 };

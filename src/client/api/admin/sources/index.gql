@@ -18,6 +18,10 @@ mutation addRtmpInput($name: String!) {
   }
 }
 
+mutation removeRtmpInput($id: ID!) {
+  removeRtmpInput(id: $id)
+}
+
 query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
   fileSourceList(skip: $skip, take: $take, status: $status) {
     total
@@ -61,6 +65,7 @@ query getRtmpInputListSimple($skip: Int!, $take: Int!) {
       id
       status
       name
+      publishUrl
     }
     total
   }

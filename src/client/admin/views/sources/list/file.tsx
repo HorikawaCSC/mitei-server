@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { useGetFileSourcesSimpleQuery } from '../../../../api/generated/graphql';
 import { useErrorSnack } from '../../../components/errors/ErrorSnackbar';
 import { useCommonStyles } from '../../../styles/common';
-import { fileSourceSimpleDetailString } from '../../../utils/file-source';
+import { fileSourceSimpleDetailString } from '../../../utils/sources';
 
 export const FileSourceList = () => {
   const commonStyles = useCommonStyles();

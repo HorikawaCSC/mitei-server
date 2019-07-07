@@ -76,6 +76,7 @@ type RtmpInput {
   id: ID!
   name: String!
   status: RtmpStatus!
+  publishUrl: String!
   createdBy: User!
 }
 
@@ -153,6 +154,7 @@ type Mutation {
   transcodeFileSource(sourceId: String!): Boolean!
 
   createRtmpInput(name: String!): RtmpInput!
+  removeRtmpInput(id: ID!): Boolean!
 }
 
 schema {
