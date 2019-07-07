@@ -1,6 +1,6 @@
 import { urlencoded } from 'body-parser';
 import { Router } from 'express';
-import { RtmpInput } from '../../models/RtmpInput';
+import { RtmpInput, RtmpStatus } from '../../models/RtmpInput';
 import { RtmpEvent } from '../../types/RtmpEvent';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
@@ -26,20 +26,27 @@ router.post('/rtmp-events', async (req, res) => {
   if (!source || !source.id) {
     return res.status(404).end();
   }
+
   try {
     if (event.call === 'play') {
       return res.status(200).end(); // TODO
     }
 
+    if (source.status !== RtmpStatus.Unused) {
+      return res.status(503).end();
+    }
+
     if (event.call === 'publish') {
+      res.status(200).end();
+
+      await sleep(500);
       await liveHlsManager.create(source);
-      return res.status(200).end();
     }
 
     if (event.call === 'publish_done') {
       res.status(200).end();
 
-      await sleep(5000);
+      await sleep(1000);
       await liveHlsManager.stop(source);
     }
   } catch (e) {

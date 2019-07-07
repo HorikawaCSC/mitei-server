@@ -10,12 +10,15 @@ import { router as apiRouter } from './routes/api';
 import { router as authRouter } from './routes/auth';
 import { router as callbackRouter } from './routes/callback';
 import { gqlServer } from './routes/gql';
+import { liveHlsManager } from './workers/live-hls';
 
 (async () => {
   const { connection } = await connect(
     config.mongo,
     { useNewUrlParser: true },
   );
+
+  await liveHlsManager.cleanUpUnused();
 
   const callbackApp = express();
   callbackApp.use(callbackRouter);

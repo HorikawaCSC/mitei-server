@@ -117,8 +117,13 @@ export class Transcoder extends EventEmitter {
   private async setStatus(status: TranscodeStatus) {
     if (!this.source) throw new Error('source not set');
 
-    this.source.status = status;
-    await this.source.save();
+    // ここで、データ壊れてるかも
+    await this.source.updateOne({
+      $set: {
+        status,
+        updatedAt: new Date(),
+      },
+    });
   }
 
   async transcode() {
@@ -167,12 +172,17 @@ export class Transcoder extends EventEmitter {
 
               const item: Manifest = [offset, length, duration, 0];
 
-              this.source.manifest.push(item);
+              await this.source.updateOne({
+                $push: {
+                  manifest: item,
+                },
+                $set: {
+                  updatedAt: new Date(),
+                },
+              });
               this.transcodedDuration += duration;
 
               this.emit('duration', this.transcodedDuration);
-
-              await this.source.save();
             }
 
             buffer.splice(0, buffer.length);

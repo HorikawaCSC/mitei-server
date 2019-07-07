@@ -5,7 +5,7 @@ import { DateTime } from 'luxon';
 import { createInterface } from 'readline';
 import { config } from '../../config';
 import { RecordSource, RecordSourceDocument } from '../../models/RecordSource';
-import { RtmpInputDocument } from '../../models/RtmpInput';
+import { RtmpInputDocument, RtmpStatus } from '../../models/RtmpInput';
 import { Manifest, TranscodeStatus } from '../../models/TranscodedSource';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
@@ -75,7 +75,7 @@ export class LiveHLSWorker extends EventEmitter {
     const buffer: string[] = [];
     readline.on('line', async line => {
       if (!this.record) return;
-      if (line.match(/#EXTM3U/)) {
+      if (line.match(/\.m2ts/)) {
         if (
           buffer
             .join('\n')
@@ -100,9 +100,18 @@ export class LiveHLSWorker extends EventEmitter {
             duration,
             Date.now(),
           ];
-          this.record.manifest.push(manifestEntry);
-          this.record.duration! += duration;
-          await this.record.save();
+
+          await this.record.updateOne({
+            $push: {
+              manifest: manifestEntry,
+            },
+            $inc: {
+              duration,
+            },
+            $set: {
+              updatedAt: new Date(),
+            },
+          });
         }
         buffer.splice(0, buffer.length);
       }
@@ -114,26 +123,39 @@ export class LiveHLSWorker extends EventEmitter {
       this.ffmpegProcess.on('error', async err => {
         this.isExited = true;
         this.emit('end');
-        await this.setStatus(TranscodeStatus.Failed);
+        await this.finalize(TranscodeStatus.Failed);
         reject(err);
       });
       this.ffmpegProcess.on('exit', async code => {
         this.isExited = true;
         this.emit('end');
         if (code === 0) {
-          await this.setStatus(TranscodeStatus.Success);
+          await this.finalize(TranscodeStatus.Success);
           resolve();
         } else {
-          await this.setStatus(TranscodeStatus.Failed);
+          await this.finalize(TranscodeStatus.Failed);
           reject(`code: ${code}`);
         }
       });
     });
   }
 
+  private async finalize(status: TranscodeStatus) {
+    this.source.status = RtmpStatus.Unused;
+    await this.source.save();
+    await this.setStatus(status);
+  }
+
   private async setStatus(status: TranscodeStatus) {
-    this.record!.status = status;
-    await this.record!.save();
+    if (!this.record) throw new Error('record not set');
+
+    // ここで、データ壊れてるかも
+    await this.record.updateOne({
+      $set: {
+        status,
+        updatedAt: new Date(),
+      },
+    });
   }
 
   getRecord() {
@@ -144,9 +166,17 @@ export class LiveHLSWorker extends EventEmitter {
     if (this.ffmpegProcess) throw new Error('ffmpeg already started');
     if (!this.source.id) throw new Error('uninitialized source');
 
-    await this.createRecord();
-    await this.createDir();
-    await this.startTranscoder();
+    try {
+      this.source.status = RtmpStatus.Live;
+      await this.source.save();
+
+      await this.createRecord();
+      await this.createDir();
+      await this.startTranscoder();
+    } catch (err) {
+      liveHlsLogger.error(err);
+      await this.finalize(TranscodeStatus.Failed);
+    }
   }
 
   async tryStop() {
@@ -159,7 +189,7 @@ export class LiveHLSWorker extends EventEmitter {
         this.ffmpegProcess.kill('KILL');
         await Promise.race([this.exitPromise, sleep(1000 * 5)]);
         if (!this.isExited) {
-          await this.setStatus(TranscodeStatus.Failed);
+          await this.finalize(TranscodeStatus.Failed);
           throw new Error('failed to kill ffmpeg');
         }
       } catch (e) {
@@ -167,5 +197,7 @@ export class LiveHLSWorker extends EventEmitter {
         return;
       }
     }
+
+    await this.finalize(TranscodeStatus.Success);
   }
 }

@@ -44,7 +44,7 @@ export const transcodedSourceSchemaBase: SchemaDefinition = {
     default: TranscodeStatus.Pending,
   },
   manifest: {
-    type: SchemaTypes.Array,
+    type: [SchemaTypes.Array],
     required: true,
     default: [],
   },

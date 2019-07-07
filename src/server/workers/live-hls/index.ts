@@ -1,4 +1,10 @@
-import { RtmpInputDocument } from '../../models/RtmpInput';
+import { RecordSource } from '../../models/RecordSource';
+import {
+  RtmpInput,
+  RtmpInputDocument,
+  RtmpStatus,
+} from '../../models/RtmpInput';
+import { TranscodeStatus } from '../../models/TranscodedSource';
 import { liveHlsLogger } from '../../utils/logging';
 import { LiveHLSWorker } from './worker';
 
@@ -39,6 +45,47 @@ class LiveHLSManager {
       if (worker) await worker.tryStop();
     } else {
       liveHlsLogger.debug('ffmpeg seemed to be stopped');
+    }
+  }
+
+  async cleanUpUnused() {
+    const liveInputs = await RtmpInput.find({ status: RtmpStatus.Live });
+    const now = Date.now();
+    for (const input of liveInputs) {
+      const records = await RecordSource.find({
+        source: input._id,
+        status: {
+          $in: [TranscodeStatus.Running, TranscodeStatus.Pending],
+        },
+      });
+      if (
+        records.filter(record => now - record.updatedAt!.getTime() < 1000 * 60)
+          .length > 0
+      ) {
+        continue;
+      }
+
+      for (const record of records) {
+        liveHlsLogger.warn(
+          'record:',
+          record.id,
+          ' by source:',
+          input.id,
+          ' seems to be failed',
+        );
+        await record.updateOne({
+          $set: {
+            status: TranscodeStatus.Failed,
+          },
+        });
+      }
+
+      liveHlsLogger.warn('source:', input.id, ' seems to be unused');
+      await input.updateOne({
+        $set: {
+          status: RtmpStatus.Unused,
+        },
+      });
     }
   }
 }
