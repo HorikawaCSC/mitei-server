@@ -14,7 +14,7 @@ import {
 } from '../../../../api/generated/graphql';
 import { LabeledCheckbox } from '../../../../components/LabeledCheckbox';
 import { FILE_UPLOAD_CHUNK } from '../../../../constant';
-import { useErrorSnack } from '../../../components/shared/ErrorSnackbar';
+import { useErrorDialog } from '../../../components/errors/ErrorDialog';
 import { FileChooser } from '../../../components/shared/FileChooser';
 import { PageContainer } from '../../../components/shared/PageContainer';
 
@@ -27,7 +27,7 @@ export const FileSourceUploadView = () => {
   const createUpload = useCreateFileSourceUploadMutation();
   const uploadChunk = useUploadFileSourceChunkMutation();
   const probeFileSource = useProbeFileSourceMutation();
-  const openErrorMessage = useErrorSnack();
+  const openErrorMessage = useErrorDialog();
   const { history } = useRouter();
 
   const handleUpload = React.useCallback(async () => {

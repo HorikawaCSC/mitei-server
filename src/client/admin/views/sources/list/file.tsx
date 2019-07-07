@@ -4,11 +4,11 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
-import { CloudUpload } from '@material-ui/icons';
+import { Publish } from '@material-ui/icons';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { useGetFileSourcesSimpleQuery } from '../../../../api/generated/graphql';
-import { useErrorSnack } from '../../../components/shared/ErrorSnackbar';
+import { useErrorSnack } from '../../../components/errors/ErrorSnackbar';
 import { useCommonStyles } from '../../../styles/common';
 import { fileSourceSimpleDetailString } from '../../../utils/file-source';
 
@@ -16,6 +16,7 @@ export const FileSourceList = () => {
   const commonStyles = useCommonStyles();
   const { loading, data, error } = useGetFileSourcesSimpleQuery({
     variables: { skip: 0, take: 10 },
+    fetchPolicy: 'no-cache',
   });
   const openErrorMessage = useErrorSnack();
 
@@ -52,7 +53,7 @@ export const FileSourceList = () => {
         className={commonStyles.fab}
         color='primary'
       >
-        <CloudUpload />
+        <Publish />
       </Fab>
     </>
   );
