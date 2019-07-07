@@ -23,7 +23,7 @@ export const sourcesQueryResolvers: QueryResolvers = {
       };
     },
   ),
-  rtmpInputsList: ensureLoggedInAsAdmin(async (_parent, { take, skip }) => {
+  rtmpInputList: ensureLoggedInAsAdmin(async (_parent, { take, skip }) => {
     const total = await RtmpInput.countDocuments();
     const result = await RtmpInput.find()
       .skip(skip || 0)

@@ -54,3 +54,14 @@ query getFileSource($id: ID!) {
     }
   }
 }
+
+query getRtmpInputListSimple($skip: Int!, $take: Int!) {
+  rtmpInputList(skip: $skip, take: $take) {
+    inputs {
+      id
+      status
+      name
+    }
+    total
+  }
+}
