@@ -9,6 +9,12 @@ export const rtmpInputResolvers: RtmpInputResolvers = {
 
     return source.createdBy;
   }),
+  preset: ensureLoggedInAsAdmin(async source => {
+    await source.populate('preset').execPopulate();
+    if (!source.preset) throw new Error('failed to populate');
+
+    return source.preset;
+  }),
   publishUrl: source => {
     return `${config.streaming.rtmpClientEndpoint}/${source.id}`;
   },

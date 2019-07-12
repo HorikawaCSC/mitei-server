@@ -17,5 +17,6 @@ config:
     User: ../models/User#UserDocument
     RtmpInput: ../models/RtmpInput#RtmpInputDocument
     RecordSource: ../models/RecordSource#RecordSourceDocument
+    TranscodePreset: ../models/TranscodePreset#TranscodePresetDocument
   scalars:
     Date: string

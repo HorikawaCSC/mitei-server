@@ -14,4 +14,10 @@ export const sourceBaseResolvers: SourceBaseResolvers = {
 
     return source.createdBy;
   }),
+  preset: ensureLoggedInAsAdmin(async source => {
+    await source.populate('preset').execPopulate();
+    if (!source.preset) return null;
+
+    return source.preset;
+  }),
 };

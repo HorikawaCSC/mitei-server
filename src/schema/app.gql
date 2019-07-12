@@ -29,6 +29,7 @@ interface SourceBase {
   createdAt: Date!
   updatedAt: Date!
   createdBy: User!
+  preset: TranscodePreset
 }
 
 enum SourceStatus {
@@ -56,6 +57,7 @@ type FileSource implements SourceBase {
   createdAt: Date!
   updatedAt: Date!
   createdBy: User!
+  preset: TranscodePreset
 
   # additional props
   source: FileSourceOrignalInfo!
@@ -77,6 +79,7 @@ type RtmpInput {
   name: String!
   status: RtmpStatus!
   publishUrl: String!
+  preset: TranscodePreset!
   createdBy: User!
 }
 
@@ -96,6 +99,7 @@ type RecordSource implements SourceBase {
   createdAt: Date!
   updatedAt: Date!
   createdBy: User!
+  preset: TranscodePreset!
 
   # additional props
   source: RtmpInput!
@@ -105,6 +109,12 @@ type RecordSource implements SourceBase {
 type RecordSourceList {
   sources: [RecordSource!]!
   total: Int!
+}
+
+type TranscodePreset {
+  id: ID!
+  name: String!
+  parameter: [String!]!
 }
 
 enum UserKind {
@@ -133,14 +143,14 @@ type Users {
 type Query {
   # admin func
   fileSource(sourceId: ID!): FileSource
-  fileSourceList(status: TranscodeStatus, skip: Int, take: Int): FileSourceList!
+  fileSourceList(status: TranscodeStatus, skip: Int = 0, take: Int = 10): FileSourceList!
 
   recordSource(sourceId: ID!): RecordSource
-  recordSourceList(skip: Int, take: Int): RecordSourceList!
+  recordSourceList(skip: Int = 0, take: Int = 10): RecordSourceList!
 
-  rtmpInputList(skip: Int, take: Int): RtmpInputList!
+  rtmpInputList(skip: Int = 0, take: Int = 10): RtmpInputList!
 
-  users(kind: UserKind, type: IdPType, skip: Int, take: Int): Users!
+  users(kind: UserKind, type: IdPType, skip: Int = 0, take: Int = 10): Users!
 
   # normal func
   me: User
@@ -151,10 +161,14 @@ type Mutation {
   createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource!
   uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean!
   probeFileSource(sourceId: String!): Boolean!
-  transcodeFileSource(sourceId: String!): Boolean!
+  transcodeFileSource(sourceId: String!, presetId: String!): Boolean!
 
-  createRtmpInput(name: String!): RtmpInput!
+  createRtmpInput(name: String!, presetId: ID!): RtmpInput!
   removeRtmpInput(id: ID!): Boolean!
+
+  createTranscodePreset(name: String!, parameter: [String!]!): TranscodePreset!
+
+  enqueueFileSourceTranscode(sourceId: ID!, presetId: ID!): Boolean!
 }
 
 schema {

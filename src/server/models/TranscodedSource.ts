@@ -1,5 +1,6 @@
 import { ObjectID } from 'bson';
 import { Document, SchemaDefinition, SchemaTypes } from 'mongoose';
+import { TranscodePreset, TranscodePresetDocument } from './TranscodePreset';
 import { User, UserDocument } from './User';
 
 export enum TranscodeStatus {
@@ -22,6 +23,8 @@ export interface TranscodedSourceDocumentBase extends Document {
   thumbnailPath?: string;
   width?: number;
   height?: number;
+  presetId?: ObjectID;
+  preset?: TranscodePresetDocument;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -47,6 +50,11 @@ export const transcodedSourceSchemaBase: SchemaDefinition = {
     type: [SchemaTypes.Array],
     required: true,
     default: [],
+  },
+  preset: {
+    type: SchemaTypes.ObjectId,
+    ref: TranscodePreset,
+    alias: 'presetId',
   },
   duration: SchemaTypes.Number,
   thumbnailPath: SchemaTypes.String,

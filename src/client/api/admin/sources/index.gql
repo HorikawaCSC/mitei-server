@@ -12,8 +12,8 @@ mutation probeFileSource($sourceId: String!) {
   probeFileSource(sourceId: $sourceId)
 }
 
-mutation addRtmpInput($name: String!) {
-  createRtmpInput(name: $name) {
+mutation addRtmpInput($name: String!, $presetId: ID!) {
+  createRtmpInput(name: $name, presetId: $presetId) {
     id
   }
 }
@@ -66,6 +66,9 @@ query getRtmpInputListSimple($skip: Int!, $take: Int!) {
       status
       name
       publishUrl
+      preset {
+        name
+      }
     }
     total
   }

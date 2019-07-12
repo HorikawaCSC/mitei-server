@@ -37,5 +37,7 @@ export const rtmpStatusText = {
 export const rtmpInputSimpleString = (
   input: GetRtmpInputListSimpleQuery['rtmpInputList']['inputs'][0],
 ) => {
-  return `${rtmpStatusText[input.status]} / 配信先: ${input.publishUrl}`;
+  return `${rtmpStatusText[input.status]} / 配信先: ${
+    input.publishUrl
+  } / エンコ設定: ${input.preset.name}`;
 };
