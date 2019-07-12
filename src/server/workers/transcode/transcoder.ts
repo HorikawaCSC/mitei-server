@@ -129,90 +129,27 @@ export class Transcoder extends EventEmitter {
     if (!this.preset) throw new Error('specific preset is not found');
 
     this.source.presetId = this.preset._id;
+    this.source.manifest = []; // reset manifest
     await this.source.save();
 
     await this.setStatus(TranscodeStatus.Running);
+    const args = this.getTranscodeArgs();
+    transcodeLogger.debug('transcode params', ...args);
 
-    return new Promise<void>((resolve, reject) => {
-      const args = this.getTranscodeArgs();
-      transcodeLogger.debug('transcode params', ...args);
+    this.ffmpeg = spawn('ffmpeg', args, {
+      stdio: 'pipe',
+    });
 
-      this.ffmpeg = spawn('ffmpeg', args, {
-        stdio: 'pipe',
-      });
+    transcodeLogger.info('transcoder pid:', this.ffmpeg.pid);
 
-      transcodeLogger.info('transcoder pid:', this.ffmpeg.pid);
-
-      const readline = createInterface(this.ffmpeg.stdout);
-      const buffer: string[] = [];
-      readline.on('line', async line => {
-        if (!this.source) {
-          // 普通はありえない
-          transcodeLogger.fatal('no source');
-          this.ffmpeg!.kill('KILL');
-          return reject('no source');
-        }
-
-        try {
-          if (line.match(/#EXTM3U/)) {
-            if (
-              buffer
-                .join('\n')
-                .match(/#EXTINF:([\d\.]+),[\n\r]+#EXT-X-BYTERANGE:(\d+)@(\d+)/)
-            ) {
-              const [duration, length, offset] = [
-                Number(RegExp.$1),
-                Number(RegExp.$2),
-                Number(RegExp.$3),
-              ];
-
-              transcodeLogger.trace(
-                'segment',
-                this.source.id,
-                duration,
-                length,
-                offset,
-              );
-
-              const item: Manifest = [offset, length, duration, 0];
-
-              await this.source.updateOne({
-                $push: {
-                  manifest: item,
-                },
-                $set: {
-                  updatedAt: new Date(),
-                },
-              });
-              this.transcodedDuration += duration;
-
-              this.emit('duration', this.transcodedDuration);
-            }
-
-            buffer.splice(0, buffer.length);
-          }
-          buffer.push(line);
-        } catch (err) {
-          transcodeLogger.error('failed to update hls manifest', err);
-          if (this.ffmpeg) {
-            this.ffmpeg.kill('KILL');
-          }
-        }
-      });
-
+    const exitPromise = new Promise<void>(async (resolve, reject) => {
+      if (!this.ffmpeg) return reject();
       this.ffmpeg.on('error', async err => {
         reject(err);
       });
 
       this.ffmpeg.on('close', async code => {
         if (code === 0) {
-          transcodeLogger.info(
-            'transcode successful',
-            'duration:',
-            this.transcodedDuration,
-          );
-
-          await this.setStatus(TranscodeStatus.Success);
           resolve();
         } else {
           transcodeLogger.error('ffmpeg exit code', code);
@@ -221,5 +158,70 @@ export class Transcoder extends EventEmitter {
         }
       });
     });
+
+    const readline = createInterface(this.ffmpeg.stdout);
+    const buffer: string[] = [];
+    for await (const line of readline) {
+      if (!this.source) {
+        if (this.ffmpeg) this.ffmpeg.kill();
+        throw new Error('no source');
+      }
+
+      try {
+        if (line.match(/\.m2ts/)) {
+          if (
+            buffer
+              .join('\n')
+              .match(/#EXTINF:([\d\.]+),[\n\r]+#EXT-X-BYTERANGE:(\d+)@(\d+)/)
+          ) {
+            buffer.splice(0, buffer.length);
+
+            const [duration, length, offset] = [
+              Number(RegExp.$1),
+              Number(RegExp.$2),
+              Number(RegExp.$3),
+            ];
+
+            transcodeLogger.debug(
+              'segment',
+              this.source.id,
+              duration,
+              length,
+              offset,
+            );
+
+            const item: Manifest = [offset, length, duration, 0];
+
+            await this.source.updateOne({
+              $push: {
+                manifest: item,
+              },
+              $set: {
+                updatedAt: new Date(),
+              },
+            });
+            this.transcodedDuration += duration;
+
+            this.emit('duration', this.transcodedDuration);
+          }
+        }
+        buffer.push(line);
+      } catch (err) {
+        transcodeLogger.error('failed to update hls manifest', err);
+        if (this.ffmpeg) {
+          this.ffmpeg.kill('KILL');
+        }
+      }
+    }
+
+    await exitPromise;
+
+    transcodeLogger.info(
+      'transcode successful',
+      'duration:',
+      this.transcodedDuration,
+    );
+
+    await this.setStatus(TranscodeStatus.Success);
   }
 }
