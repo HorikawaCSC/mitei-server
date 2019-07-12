@@ -62,6 +62,7 @@ type FileSource implements SourceBase {
   # additional props
   source: FileSourceOrignalInfo!
   error: String
+  transcodeProgress: Float
 }
 
 type FileSourceList {

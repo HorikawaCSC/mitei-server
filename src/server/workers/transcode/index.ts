@@ -76,6 +76,13 @@ class TranscodeWorker {
     return await this.queue.getJob(`p:${source.id}`);
   }
 
+  async getTranscodeJobProgress(source: FileSourceDocument) {
+    const job = await this.getTranscodeJob(source);
+    if (!job) return null;
+
+    return ((await job.progress(undefined)) as unknown) as number;
+  }
+
   async enqueueTranscode(
     source: FileSourceDocument,
     preset: TranscodePresetDocument,
@@ -123,13 +130,6 @@ class TranscodeWorker {
     const status = await this.queue.getJobCounts();
 
     return status;
-  }
-
-  async getJobProgress(jobId: string) {
-    const job = await this.queue.getJob(jobId);
-    if (!job) return -1;
-
-    return ((await job.progress(undefined)) as unknown) as number;
   }
 }
 
