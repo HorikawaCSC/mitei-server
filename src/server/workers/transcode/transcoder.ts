@@ -9,6 +9,10 @@ import {
   SourceStatus,
 } from '../../models/FileSource';
 import { Manifest, TranscodeStatus } from '../../models/TranscodedSource';
+import {
+  TranscodePreset,
+  TranscodePresetDocument,
+} from '../../models/TranscodePreset';
 import { AudioStream, VideoStream } from '../../types/ffprobe';
 import { transcodeLogger } from '../../utils/logging';
 import { ffprobe } from '../../utils/transcode/ffprobe';
@@ -16,12 +20,13 @@ import { ffprobe } from '../../utils/transcode/ffprobe';
 export class Transcoder extends EventEmitter {
   private source: FileSourceDocument | null = null;
   private ffmpeg?: ChildProcessWithoutNullStreams;
+  private preset: TranscodePresetDocument | null = null;
 
   transcodedDuration = 0;
 
   get progress() {
     if (!this.source || !this.source.duration) return 0;
-    return Math.ceil(this.source.duration / this.transcodedDuration);
+    return (this.transcodedDuration / this.source.duration) * 100;
   }
 
   constructor(private params: TranscodeWorkerParam) {
@@ -32,14 +37,18 @@ export class Transcoder extends EventEmitter {
     this.source = await FileSource.findById(this.params.sourceId);
     if (!this.source) throw new Error('source not found');
 
-    if (this.source.status !== 'pending')
+    if (
+      this.source.status !== TranscodeStatus.Pending &&
+      (!this.transcodable || this.source.status !== TranscodeStatus.Failed) // probed but transcode error
+    )
       throw new Error('the source has already been transcoded or failed');
     if (this.source.source.status !== SourceStatus.Available)
       throw new Error('the source is not available');
   }
 
-  private async probeSource() {
+  async probe() {
     if (!this.source) throw new Error('source not set');
+    if (this.source.source.width) throw new Error('already probed');
 
     const result = await ffprobe(
       `${config.paths.source}/${this.source.id}/source.${
@@ -70,27 +79,14 @@ export class Transcoder extends EventEmitter {
     await this.source.save();
   }
 
-  async probe() {
-    if (!this.source) throw new Error('source not set');
-    if (this.source.source.width) throw new Error('already probed');
-
-    try {
-      await this.probeSource();
-    } catch (err) {
-      transcodeLogger.error('failed to probe', err);
-
-      this.source.error = err.toString();
-      await this.setStatus(TranscodeStatus.Failed);
-    }
-  }
-
   // probed?
   get transcodable() {
     return this.source && this.source.source.width;
   }
 
-  private get transcodeArgs() {
+  private getTranscodeArgs() {
     if (!this.source) throw new Error('source not set');
+    if (!this.preset) throw new Error('preset not set');
 
     return [
       '-i',
@@ -101,7 +97,7 @@ export class Transcoder extends EventEmitter {
       'copy',
       '-f',
       'hls',
-      ...this.params.transcodeArgs,
+      ...this.preset.parameter,
       '-hls_time',
       '5',
       '-hls_flags',
@@ -127,10 +123,18 @@ export class Transcoder extends EventEmitter {
   }
 
   async transcode() {
+    if (!this.source) throw new Error('source not set');
+
+    this.preset = await TranscodePreset.findById(this.params.presetId);
+    if (!this.preset) throw new Error('specific preset is not found');
+
+    this.source.presetId = this.preset._id;
+    await this.source.save();
+
     await this.setStatus(TranscodeStatus.Running);
 
     return new Promise<void>((resolve, reject) => {
-      const args = this.transcodeArgs;
+      const args = this.getTranscodeArgs();
       transcodeLogger.debug('transcode params', ...args);
 
       this.ffmpeg = spawn('ffmpeg', args, {
@@ -197,7 +201,6 @@ export class Transcoder extends EventEmitter {
       });
 
       this.ffmpeg.on('error', async err => {
-        await this.setStatus(TranscodeStatus.Failed);
         reject(err);
       });
 
@@ -214,7 +217,6 @@ export class Transcoder extends EventEmitter {
         } else {
           transcodeLogger.error('ffmpeg exit code', code);
 
-          await this.setStatus(TranscodeStatus.Failed);
           reject(`exit code: ${code}`);
         }
       });

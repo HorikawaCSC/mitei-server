@@ -1,12 +1,19 @@
 import * as Queue from 'bull';
 import { config } from '../../config';
-import { FileSourceDocument, SourceStatus } from '../../models/FileSource';
+import {
+  FileSource,
+  FileSourceDocument,
+  SourceStatus,
+} from '../../models/FileSource';
+import { TranscodeStatus } from '../../models/TranscodedSource';
+import { TranscodePresetDocument } from '../../models/TranscodePreset';
+import { transcodeLogger } from '../../utils/logging';
 import { Transcoder } from './transcoder';
 
 export interface TranscodeWorkerParam {
   sourceId: string;
   probeMode: boolean;
-  transcodeArgs: string;
+  presetId: string;
 }
 
 class TranscodeWorker {
@@ -23,6 +30,22 @@ class TranscodeWorker {
       config.limit.transcode,
       async job => await this.processJob(job),
     );
+
+    this.queue.on('failed', async (job, err) => {
+      transcodeLogger.error('job', job.id, 'failed', err, job.stacktrace);
+
+      await FileSource.updateOne(
+        {
+          _id: job.data.sourceId,
+        },
+        {
+          $set: {
+            status: TranscodeStatus.Failed,
+            error: err.message,
+          },
+        },
+      );
+    });
   }
 
   private async processJob(job: Queue.Job<TranscodeWorkerParam>) {
@@ -45,24 +68,55 @@ class TranscodeWorker {
     await transcoder.transcode();
   }
 
-  enqueue(
+  async getTranscodeJob(source: FileSourceDocument) {
+    return await this.queue.getJob(`t:${source.id}`);
+  }
+
+  async getProbeJob(source: FileSourceDocument) {
+    return await this.queue.getJob(`p:${source.id}`);
+  }
+
+  async enqueueTranscode(
     source: FileSourceDocument,
-    params: Omit<TranscodeWorkerParam, 'sourceId'>,
+    preset: TranscodePresetDocument,
   ) {
-    if (!source.id) throw new Error('source invalid');
     if (source.source.status !== SourceStatus.Available)
       throw new Error('source unavailable');
 
-    if (params.probeMode) {
-      if (source.source.width) throw new Error('already probed');
-    } else {
-      if (!source.source.width) throw new Error('not probed');
-    }
+    if (await this.getTranscodeJob(source)) throw new Error('already queued');
 
-    this.queue.add({
-      ...params,
-      sourceId: source.id,
-    });
+    return await this.queue.add(
+      {
+        probeMode: false,
+        presetId: preset.id,
+        sourceId: source.id,
+      },
+      {
+        jobId: `t:${source.id}`,
+        removeOnFail: true,
+      },
+    );
+  }
+
+  async enqueueProbe(source: FileSourceDocument) {
+    if (source.source.status !== SourceStatus.Available)
+      throw new Error('source unavailable');
+
+    if (await this.getProbeJob(source)) throw new Error('already queued');
+
+    if (source.source.width) throw new Error('already probed');
+
+    return await this.queue.add(
+      {
+        sourceId: source.id,
+        presetId: '',
+        probeMode: true,
+      },
+      {
+        jobId: `p:${source.id}`,
+        removeOnFail: true,
+      },
+    );
   }
 
   async getStatus() {
