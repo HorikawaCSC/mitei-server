@@ -182,7 +182,7 @@ export class Transcoder extends EventEmitter {
               Number(RegExp.$3),
             ];
 
-            transcodeLogger.debug(
+            transcodeLogger.trace(
               'segment',
               this.source.id,
               duration,

@@ -81,6 +81,7 @@ export class LiveHLSWorker extends EventEmitter {
             .join('\n')
             .match(/#EXTINF:([\d\.]+),[\n\r]+#EXT-X-BYTERANGE:(\d+)@(\d+)/)
         ) {
+          buffer.splice(0, buffer.length);
           const [duration, length, offset] = [
             Number(RegExp.$1),
             Number(RegExp.$2),
@@ -113,7 +114,6 @@ export class LiveHLSWorker extends EventEmitter {
             },
           });
         }
-        buffer.splice(0, buffer.length);
       }
       buffer.push(line);
     });
