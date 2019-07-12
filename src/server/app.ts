@@ -7,6 +7,7 @@ import * as passport from 'passport';
 import { resolve } from 'path';
 import { config } from './config';
 import { router as apiRouter } from './routes/api';
+import { arenaApp } from './routes/arena';
 import { router as authRouter } from './routes/auth';
 import { router as callbackRouter } from './routes/callback';
 import { gqlServer } from './routes/gql';
@@ -43,6 +44,9 @@ import { liveHlsManager } from './workers/live-hls';
   app.use('/auth', authRouter);
   app.use('/api', apiRouter);
   app.use('/packs', express.static(resolve('./packs')));
+  if (!config.prod) {
+    app.use('/', arenaApp);
+  }
   const server = app.listen(config.appPort);
   gqlServer.installSubscriptionHandlers(server);
   gqlServer.applyMiddleware({ app, path: '/gql' });
