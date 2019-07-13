@@ -29,6 +29,7 @@ export const config = {
   },
   secrets: {
     session: process.env.SECRET_SESSION || '',
+    segmentRef: process.env.SECRET_SEGREF || '',
   },
   prod: process.env.NODE_ENV === 'production',
 };
