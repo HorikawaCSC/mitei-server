@@ -104,6 +104,8 @@ export class Transcoder extends EventEmitter {
       'single_file',
       '-hls_list_size',
       '1',
+      '-hls_ts_options',
+      'mpegts_m2ts_mode=0',
       '-hls_segment_filename',
       `${config.paths.source}/${this.source.id}/stream.m2ts`,
       '-',
