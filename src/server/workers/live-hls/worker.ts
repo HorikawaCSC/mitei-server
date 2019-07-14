@@ -71,6 +71,10 @@ export class LiveHLSWorker extends EventEmitter {
       stdio: 'pipe',
     });
 
+    this.ffmpegProcess.stderr.on('data', data =>
+      liveHlsLogger.trace(data.toString('utf8')),
+    );
+
     await this.setStatus(TranscodeStatus.Running);
 
     const readline = createInterface(this.ffmpegProcess.stdout);
@@ -89,7 +93,7 @@ export class LiveHLSWorker extends EventEmitter {
             Number(RegExp.$2),
             Number(RegExp.$3),
           ];
-          liveHlsLogger.debug(
+          liveHlsLogger.trace(
             'segment',
             this.record.id,
             duration,

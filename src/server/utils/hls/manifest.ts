@@ -1,13 +1,13 @@
 export interface ManifestItem {
   url: string;
   duration: number;
-  discontinuityBegin?: true;
+  discontinuityBegin?: boolean;
 }
 
 export interface ManifestInput {
   seqBegin: number;
   items: ManifestItem[];
-  endList?: true;
+  endList?: boolean;
 }
 
 export const generateManifest = (input: ManifestInput) => {

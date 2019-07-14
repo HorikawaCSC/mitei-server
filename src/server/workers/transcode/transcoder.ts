@@ -144,6 +144,10 @@ export class Transcoder extends EventEmitter {
 
     transcodeLogger.info('transcoder pid:', this.ffmpeg.pid);
 
+    this.ffmpeg.stderr.on('data', data =>
+      transcodeLogger.trace(data.toString('utf8')),
+    );
+
     const exitPromise = new Promise<void>(async (resolve, reject) => {
       if (!this.ffmpeg) return reject();
       this.ffmpeg.on('error', async err => {
