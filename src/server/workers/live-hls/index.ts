@@ -1,3 +1,4 @@
+import { config } from '../../config';
 import { RecordSource } from '../../models/RecordSource';
 import {
   RtmpInput,
@@ -13,6 +14,11 @@ class LiveHLSManager {
 
   async create(source: RtmpInputDocument) {
     if (!source.id) throw new Error('source must have `id`');
+
+    if (this.workers.size > config.limit.stream) {
+      throw new Error('too many streams');
+    }
+
     if (this.workers.has(source.id)) {
       liveHlsLogger.warn('Same source worker is still running');
       throw new Error('already broadcasting');
