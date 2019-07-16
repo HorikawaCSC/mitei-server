@@ -150,6 +150,18 @@ type ChannelList {
   channels: [Channel!]!
 }
 
+type Schedule {
+  startAt: Date!
+  endAt: Date!
+  channel: Channel!
+  sources: [TranscodedSource!]!
+}
+
+type ScheduleList {
+  total: Int!
+  schedules: [Schedule!]!
+}
+
 enum UserKind {
   normal
   admin
@@ -213,6 +225,13 @@ type Mutation {
     fillerControl: FillerControl = "random",
     fillerSources: [ID!] = []
   ): Channel!
+
+  createSchedule(
+    channelId: ID!,
+    startAt: Date!,
+    endAt: Date!,
+    sourceIds: [ID!]!
+  ): Schedule!
 }
 
 schema {

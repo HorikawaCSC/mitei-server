@@ -19,5 +19,6 @@ config:
     RecordSource: ../models/RecordSource#RecordSourceDocument
     TranscodePreset: ../models/TranscodePreset#TranscodePresetDocument
     Channel: ../models/streaming/Channel#ChannelDocument
+    Schedule: ../models/streaming/Schedule#ScheduleDocument
   scalars:
-    Date: string
+    Date: Date
