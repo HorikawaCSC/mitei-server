@@ -18,5 +18,6 @@ config:
     RtmpInput: ../models/RtmpInput#RtmpInputDocument
     RecordSource: ../models/RecordSource#RecordSourceDocument
     TranscodePreset: ../models/TranscodePreset#TranscodePresetDocument
+    Channel: ../models/streaming/Channel#ChannelDocument
   scalars:
     Date: string

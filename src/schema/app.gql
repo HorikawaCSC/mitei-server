@@ -131,6 +131,25 @@ type TranscodePreset {
   parameter: [String!]!
 }
 
+
+enum FillerControl {
+  random
+  sequential
+}
+
+type Channel {
+  id: String!
+  displayName: String!
+  createdBy: User!
+  fillerSources: [TranscodedSource!]!
+  fillerControl: FillerControl!
+}
+
+type ChannelList {
+  total: Int!
+  channels: [Channel!]!
+}
+
 enum UserKind {
   normal
   admin
@@ -168,6 +187,8 @@ type Query {
 
   users(kind: UserKind, type: IdPType, skip: Int = 0, take: Int = 10): Users!
 
+  channelList(skip: Int = 0, take: Int = 10): ChannelList!
+
   # normal func
   me: User
 }
@@ -185,6 +206,13 @@ type Mutation {
   createTranscodePreset(name: String!, parameter: [String!]!): TranscodePreset!
 
   enqueueFileSourceTranscode(sourceId: ID!, presetId: ID!): Boolean!
+
+  createChannel(
+    id: String!,
+    displayName: String!,
+    fillerControl: FillerControl = "random",
+    fillerSources: [ID!] = []
+  ): Channel!
 }
 
 schema {
