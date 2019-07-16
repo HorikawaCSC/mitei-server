@@ -1,10 +1,11 @@
-import { SourceBaseResolvers } from '../../generated/graphql';
-import { FileSourceDocument } from '../../models/FileSource';
+import { TranscodedSourceResolvers } from '../../generated/graphql';
+import { SourceType } from '../../models/TranscodedSource';
 import { ensureLoggedInAsAdmin } from '../../utils/gql/ensureUser';
 
-export const sourceBaseResolvers: SourceBaseResolvers = {
+export const transcodedSourceResolvers: TranscodedSourceResolvers = {
   __resolveType: source => {
-    if ((source as FileSourceDocument).source) return 'FileSource';
+    if (source.type === SourceType.File) return 'FileSource';
+    if (source.type === SourceType.Record) return 'RecordSource';
 
     return null;
   },

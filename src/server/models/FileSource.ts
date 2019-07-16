@@ -1,8 +1,5 @@
-import { model, Schema, SchemaTypes } from 'mongoose';
-import {
-  TranscodedSourceDocumentBase,
-  transcodedSourceSchemaBase,
-} from './TranscodedSource';
+import { Schema, SchemaTypes } from 'mongoose';
+import { TranscodedSource, TranscodedSourceDocument } from './TranscodedSource';
 
 export enum SourceStatus {
   Uploading = 'uploading',
@@ -10,7 +7,7 @@ export enum SourceStatus {
   Deleted = 'deleted',
 }
 
-export interface FileSourceDocument extends TranscodedSourceDocumentBase {
+export interface FileSourceDocument extends TranscodedSourceDocument {
   source: {
     extension: string;
     status: SourceStatus;
@@ -37,15 +34,12 @@ const sourceSchema = new Schema({
   fileSize: SchemaTypes.Number,
 });
 
-const schema = new Schema(
-  {
-    ...transcodedSourceSchemaBase,
-    error: SchemaTypes.String,
-    source: sourceSchema,
-  },
-  {
-    timestamps: true,
-  },
-);
+const schema = new Schema({
+  error: SchemaTypes.String,
+  source: sourceSchema,
+});
 
-export const FileSource = model<FileSourceDocument>('FileSource', schema);
+export const FileSource = TranscodedSource.discriminator<FileSourceDocument>(
+  'file',
+  schema,
+);

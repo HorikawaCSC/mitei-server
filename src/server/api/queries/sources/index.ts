@@ -2,6 +2,7 @@ import { QueryResolvers } from '../../../generated/graphql';
 import { FileSource } from '../../../models/FileSource';
 import { RecordSource } from '../../../models/RecordSource';
 import { RtmpInput } from '../../../models/RtmpInput';
+import { TranscodedSource } from '../../../models/TranscodedSource';
 import { omitUndefined } from '../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 
@@ -44,6 +45,21 @@ export const sourcesQueryResolvers: QueryResolvers = {
 
       const total = await RecordSource.countDocuments(conditions);
       const result = await RecordSource.find(conditions)
+        .skip(skip || 0)
+        .limit(take || 10);
+
+      return {
+        sources: result,
+        total,
+      };
+    },
+  ),
+  sourceList: ensureLoggedInAsAdmin(
+    async (_parent, { take, skip, ...query }) => {
+      const conditions = omitUndefined(query);
+
+      const total = await TranscodedSource.countDocuments(conditions);
+      const result = await TranscodedSource.find(conditions)
         .skip(skip || 0)
         .limit(take || 10);
 

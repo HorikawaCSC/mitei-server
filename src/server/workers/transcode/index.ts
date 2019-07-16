@@ -58,7 +58,13 @@ class TranscodeWorker {
       await transcoder.probe();
       return;
     } else if (!transcoder.transcodable) {
-      throw new Error('source is not able to transcode');
+      transcodeLogger.warn(
+        'source',
+        jobParams.sourceId,
+        'is not able to transcode',
+      );
+      await job.remove();
+      return;
     }
 
     transcoder.on('duration', () => {

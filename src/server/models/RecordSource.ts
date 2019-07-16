@@ -1,12 +1,9 @@
 import { ObjectID } from 'bson';
-import { model, Schema, SchemaTypes } from 'mongoose';
+import { Schema, SchemaTypes } from 'mongoose';
 import { RtmpInput, RtmpInputDocument } from './RtmpInput';
-import {
-  TranscodedSourceDocumentBase,
-  transcodedSourceSchemaBase,
-} from './TranscodedSource';
+import { TranscodedSource, TranscodedSourceDocument } from './TranscodedSource';
 
-export interface RecordSourceDocument extends TranscodedSourceDocumentBase {
+export interface RecordSourceDocument extends TranscodedSourceDocument {
   sourceId: ObjectID;
   source?: RtmpInputDocument;
   error?: string;
@@ -14,7 +11,6 @@ export interface RecordSourceDocument extends TranscodedSourceDocumentBase {
 
 const schema = new Schema(
   {
-    ...transcodedSourceSchemaBase,
     error: SchemaTypes.String,
     source: {
       type: SchemaTypes.ObjectId,
@@ -28,4 +24,6 @@ const schema = new Schema(
   },
 );
 
-export const RecordSource = model<RecordSourceDocument>('RecordSource', schema);
+export const RecordSource = TranscodedSource.discriminator<
+  RecordSourceDocument
+>('record', schema);

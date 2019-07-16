@@ -5,13 +5,13 @@ import { queryResolvers } from './queries';
 import { fileSourceResolvers } from './types/file-source';
 import { recordSourceResolvers } from './types/record-source';
 import { rtmpInputResolvers } from './types/rtmp-input';
-import { sourceBaseResolvers } from './types/source-base';
+import { transcodedSourceResolvers } from './types/transcoded-source';
 
 export const resolvers: Resolvers = {
   Date: GraphQLDateTime,
   Mutation: mutationResolvers,
   Query: queryResolvers,
-  SourceBase: sourceBaseResolvers,
+  TranscodedSource: transcodedSourceResolvers,
   FileSource: fileSourceResolvers,
   RtmpInput: rtmpInputResolvers,
   RecordSource: recordSourceResolvers,

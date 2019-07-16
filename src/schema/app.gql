@@ -18,7 +18,12 @@ enum TranscodeStatus {
   failed
 }
 
-interface SourceBase {
+enum SourceType {
+  file
+  record
+}
+
+interface TranscodedSource {
   id: ID!
   status: TranscodeStatus!
   duration: Float
@@ -30,6 +35,12 @@ interface SourceBase {
   updatedAt: Date!
   createdBy: User!
   preset: TranscodePreset
+  type: SourceType!
+}
+
+type SourceList {
+  sources: [TranscodedSource!]!
+  total: Int!
 }
 
 enum SourceStatus {
@@ -46,7 +57,7 @@ type FileSourceOrignalInfo {
   fileSize: Int!
 }
 
-type FileSource implements SourceBase {
+type FileSource implements TranscodedSource {
   id: ID!
   status: TranscodeStatus!
   duration: Float
@@ -58,6 +69,7 @@ type FileSource implements SourceBase {
   updatedAt: Date!
   createdBy: User!
   preset: TranscodePreset
+  type: SourceType!
 
   # additional props
   source: FileSourceOrignalInfo!
@@ -89,7 +101,7 @@ type RtmpInputList {
   total: Int!
 }
 
-type RecordSource implements SourceBase {
+type RecordSource implements TranscodedSource {
   id: ID!
   status: TranscodeStatus!
   duration: Float
@@ -101,6 +113,7 @@ type RecordSource implements SourceBase {
   updatedAt: Date!
   createdBy: User!
   preset: TranscodePreset!
+  type: SourceType!
 
   # additional props
   source: RtmpInput!
@@ -148,6 +161,8 @@ type Query {
 
   recordSource(sourceId: ID!): RecordSource
   recordSourceList(skip: Int = 0, take: Int = 10): RecordSourceList!
+
+  sourceList(type: SourceType, skip: Int = 0, take: Int = 10): SourceList!
 
   rtmpInputList(skip: Int = 0, take: Int = 10): RtmpInputList!
 

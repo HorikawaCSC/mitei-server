@@ -1,5 +1,5 @@
 import { ObjectID } from 'bson';
-import { Document, SchemaDefinition, SchemaTypes } from 'mongoose';
+import { Document, model, Schema, SchemaTypes } from 'mongoose';
 import { TranscodePreset, TranscodePresetDocument } from './TranscodePreset';
 import { User, UserDocument } from './User';
 
@@ -10,10 +10,15 @@ export enum TranscodeStatus {
   Failed = 'failed',
 }
 
+export enum SourceType {
+  File = 'file',
+  Record = 'record',
+}
+
 // offset size duration date
 export type Manifest = [number, number, number, number | undefined];
 
-export interface TranscodedSourceDocumentBase extends Document {
+export interface TranscodedSourceDocument extends Document {
   createdById: ObjectID;
   createdBy?: UserDocument;
   status: TranscodeStatus;
@@ -27,37 +32,49 @@ export interface TranscodedSourceDocumentBase extends Document {
   preset?: TranscodePresetDocument;
   createdAt?: Date;
   updatedAt?: Date;
+  type: SourceType;
 }
 
-export const transcodedSourceSchemaBase: SchemaDefinition = {
-  createdBy: {
-    type: SchemaTypes.ObjectId,
-    required: true,
-    ref: User,
-    alias: 'createdById',
+const schema = new Schema(
+  {
+    createdBy: {
+      type: SchemaTypes.ObjectId,
+      required: true,
+      ref: User,
+      alias: 'createdById',
+    },
+    name: {
+      type: SchemaTypes.String,
+      required: true,
+      default: '',
+    },
+    status: {
+      type: SchemaTypes.String,
+      required: true,
+      default: TranscodeStatus.Pending,
+    },
+    manifest: {
+      type: [SchemaTypes.Array],
+      required: true,
+      default: [],
+    },
+    preset: {
+      type: SchemaTypes.ObjectId,
+      ref: TranscodePreset,
+      alias: 'presetId',
+    },
+    duration: SchemaTypes.Number,
+    thumbnailPath: SchemaTypes.String,
+    width: SchemaTypes.Number,
+    height: SchemaTypes.Number,
   },
-  name: {
-    type: SchemaTypes.String,
-    required: true,
-    default: '',
+  {
+    timestamps: true,
+    discriminatorKey: 'type',
   },
-  status: {
-    type: SchemaTypes.String,
-    required: true,
-    default: TranscodeStatus.Pending,
-  },
-  manifest: {
-    type: [SchemaTypes.Array],
-    required: true,
-    default: [],
-  },
-  preset: {
-    type: SchemaTypes.ObjectId,
-    ref: TranscodePreset,
-    alias: 'presetId',
-  },
-  duration: SchemaTypes.Number,
-  thumbnailPath: SchemaTypes.String,
-  width: SchemaTypes.Number,
-  height: SchemaTypes.Number,
-};
+);
+
+export const TranscodedSource = model<TranscodedSourceDocument>(
+  'TranscodedSource',
+  schema,
+);

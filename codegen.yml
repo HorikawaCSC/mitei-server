@@ -13,7 +13,7 @@ config:
   contextType: ../api/context#GqlContext
   mappers:
     FileSource: ../models/FileSource#FileSourceDocument
-    SourceBase: ../models/TranscodedSource#TranscodedSourceDocumentBase
+    TranscodedSource: ../models/TranscodedSource#TranscodedSourceDocument
     User: ../models/User#UserDocument
     RtmpInput: ../models/RtmpInput#RtmpInputDocument
     RecordSource: ../models/RecordSource#RecordSourceDocument

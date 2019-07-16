@@ -1,9 +1,9 @@
 import { FileSourceResolvers } from '../../generated/graphql';
 import { transcodeWorker } from '../../workers/transcode';
-import { sourceBaseResolvers } from './source-base';
+import { transcodedSourceResolvers } from './transcoded-source';
 
 export const fileSourceResolvers: FileSourceResolvers = {
-  ...sourceBaseResolvers,
+  ...transcodedSourceResolvers,
   transcodeProgress: async source => {
     return await transcodeWorker.getTranscodeJobProgress(source);
   },
