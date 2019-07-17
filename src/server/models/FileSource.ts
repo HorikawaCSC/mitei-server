@@ -1,5 +1,9 @@
 import { Schema, SchemaTypes } from 'mongoose';
-import { TranscodedSource, TranscodedSourceDocument } from './TranscodedSource';
+import {
+  TranscodedSource,
+  TranscodedSourceDocument,
+  TranscodeStatus,
+} from './TranscodedSource';
 
 export enum SourceStatus {
   Uploading = 'uploading',
@@ -16,6 +20,7 @@ export interface FileSourceDocument extends TranscodedSourceDocument {
     fileSize: number;
   };
   error?: string;
+  transcodable: boolean;
 }
 
 const sourceSchema = new Schema({
@@ -37,6 +42,15 @@ const sourceSchema = new Schema({
 const schema = new Schema({
   error: SchemaTypes.String,
   source: sourceSchema,
+});
+
+schema.virtual('transcodable').get(function(this: FileSourceDocument) {
+  return (
+    !!this.source.width &&
+    this.source.status === SourceStatus.Available &&
+    (this.status === TranscodeStatus.Pending ||
+      this.status === TranscodeStatus.Failed)
+  );
 });
 
 export const FileSource = TranscodedSource.discriminator<FileSourceDocument>(

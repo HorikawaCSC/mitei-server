@@ -9,6 +9,8 @@ export const transcodeMutationResolvers: MutationResolvers = {
     async (_parent, { sourceId, presetId }) => {
       const source = await FileSource.findById(sourceId);
       if (!source) throw new Error('source not found');
+      if (!source.transcodable)
+        throw new Error('source is not able to be transcoded');
 
       const preset = await TranscodePreset.findById(presetId);
       if (!preset) throw new Error('preset not found');

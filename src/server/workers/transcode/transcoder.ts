@@ -26,7 +26,12 @@ export class Transcoder extends EventEmitter {
 
   get progress() {
     if (!this.source || !this.source.duration) return 0;
-    return (this.transcodedDuration / this.source.duration) * 100;
+    if (this.source.status === TranscodeStatus.Success) return 100;
+
+    return Math.min(
+      Math.ceil((this.transcodedDuration / this.source.duration) * 100),
+      100,
+    );
   }
 
   constructor(private params: TranscodeWorkerParam) {
