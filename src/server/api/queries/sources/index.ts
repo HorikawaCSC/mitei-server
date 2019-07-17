@@ -17,7 +17,9 @@ export const sourcesQueryResolvers: QueryResolvers = {
       const total = await FileSource.countDocuments(conditions);
       const result = await FileSource.find(conditions)
         .skip(skip || 0)
-        .limit(take || 10);
+        .limit(take || 10)
+        .select('-manifest')
+        .exec();
 
       return {
         sources: result,
@@ -46,7 +48,9 @@ export const sourcesQueryResolvers: QueryResolvers = {
       const total = await RecordSource.countDocuments(conditions);
       const result = await RecordSource.find(conditions)
         .skip(skip || 0)
-        .limit(take || 10);
+        .limit(take || 10)
+        .select('-manifest')
+        .exec();
 
       return {
         sources: result,
@@ -61,7 +65,9 @@ export const sourcesQueryResolvers: QueryResolvers = {
       const total = await TranscodedSource.countDocuments(conditions);
       const result = await TranscodedSource.find(conditions)
         .skip(skip || 0)
-        .limit(take || 10);
+        .limit(take || 10)
+        .select('-manifest')
+        .exec();
 
       return {
         sources: result,
