@@ -1,12 +1,11 @@
 import { MutationResolvers } from '../../../../generated/graphql';
 import { Channel } from '../../../../models/streaming/Channel';
 import { Schedule } from '../../../../models/streaming/Schedule';
-import { TranscodedSource } from '../../../../models/TranscodedSource';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 
 export const scheduleMutationResolvers: MutationResolvers = {
   createSchedule: ensureLoggedInAsAdmin(
-    async (_parent, { channelId, startAt, endAt, sourceIds }, { userInfo }) => {
+    async (_parent, { channelId, startAt, endAt }, { userInfo }) => {
       if (startAt.getTime() < Date.now()) {
         throw new Error('startAt must be earlier than now');
       }
@@ -44,20 +43,6 @@ export const scheduleMutationResolvers: MutationResolvers = {
 
       const channel = await Channel.findById(channelId);
       if (!channel) throw new Error('channel not found');
-
-      if (sourceIds.length > 0) {
-        const sources = await TranscodedSource.find({
-          _id: {
-            $in: sourceIds,
-          },
-        });
-
-        if (sources.length !== sourceIds.length) {
-          throw new Error('invalid ids');
-        }
-
-        schedule.sourceIds = sources.map(source => source._id);
-      }
 
       schedule.channelId = channel._id;
       schedule.createdById = userInfo._id;

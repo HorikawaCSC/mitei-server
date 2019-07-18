@@ -1,11 +1,8 @@
 import { ObjectID } from 'bson';
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
-import {
-  TranscodedSource,
-  TranscodedSourceDocument,
-} from '../TranscodedSource';
 import { User, UserDocument } from '../User';
 import { Channel, ChannelDocument } from './Channel';
+import { SourceReference, sourceReferenceSchema } from './SourceReference';
 
 export interface ScheduleDocument extends Document {
   startAt: Date;
@@ -13,8 +10,7 @@ export interface ScheduleDocument extends Document {
   channel?: ChannelDocument;
   channelId: string;
   // primary, secondary, ...
-  sources?: TranscodedSourceDocument[];
-  sourceIds: ObjectID[];
+  sources: SourceReference[];
   createdBy?: UserDocument;
   createdById: ObjectID;
 }
@@ -36,10 +32,8 @@ const schema = new Schema(
       alias: 'channelId',
     },
     sources: {
-      type: [SchemaTypes.ObjectId],
-      ref: TranscodedSource,
+      type: [sourceReferenceSchema('sources')],
       required: true,
-      alias: 'sourceIds',
     },
     createdBy: {
       type: SchemaTypes.ObjectId,

@@ -137,11 +137,13 @@ enum FillerControl {
   sequential
 }
 
+union SourceReference = FileSource | RecordSource | RtmpInput
+
 type Channel {
   id: String!
   displayName: String!
   createdBy: User!
-  fillerSources: [TranscodedSource!]!
+  fillerSources: [SourceReference!]!
   fillerControl: FillerControl!
 }
 
@@ -154,7 +156,7 @@ type Schedule {
   startAt: Date!
   endAt: Date!
   channel: Channel!
-  sources: [TranscodedSource!]!
+  sources: [SourceReference!]!
 }
 
 type ScheduleList {
@@ -230,7 +232,6 @@ type Mutation {
     channelId: ID!,
     startAt: Date!,
     endAt: Date!,
-    sourceIds: [ID!]!
   ): Schedule!
 }
 
