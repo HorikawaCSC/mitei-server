@@ -143,7 +143,7 @@ type Channel {
   id: String!
   displayName: String!
   createdBy: User!
-  fillerSources: [SourceReference!]!
+  fillerSources: [TranscodedSource!]!
   fillerControl: FillerControl!
 }
 

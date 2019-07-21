@@ -1,7 +1,10 @@
 import { ObjectID } from 'bson';
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
+import {
+  TranscodedSource,
+  TranscodedSourceDocument,
+} from '../TranscodedSource';
 import { User, UserDocument } from '../User';
-import { SourceReference, sourceReferenceSchema } from './SourceReference';
 
 export enum FillerControl {
   Sequential = 'sequential',
@@ -13,7 +16,7 @@ export interface ChannelDocument extends Document {
   displayName: string;
   createdBy?: UserDocument;
   createdById: ObjectID;
-  fillerSources: SourceReference[];
+  fillerSources: TranscodedSourceDocument[];
   fillerControl: FillerControl;
 }
 
@@ -34,8 +37,9 @@ const schema = new Schema(
       alias: 'createdById',
     },
     fillerSources: {
-      type: [sourceReferenceSchema('fillerSources')],
+      type: [SchemaTypes.ObjectId],
       required: true,
+      ref: TranscodedSource,
     },
     fillerControl: {
       type: SchemaTypes.String,
