@@ -1,6 +1,10 @@
+import { Document } from 'mongoose';
 import { MutationResolvers } from '../../../../generated/graphql';
 import { Channel } from '../../../../models/streaming/Channel';
-import { Schedule } from '../../../../models/streaming/Schedule';
+import {
+  Schedule,
+  ScheduleDocument,
+} from '../../../../models/streaming/Schedule';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 
 export const scheduleMutationResolvers: MutationResolvers = {
@@ -49,7 +53,7 @@ export const scheduleMutationResolvers: MutationResolvers = {
       schedule.startAt = startAt;
       schedule.endAt = endAt;
 
-      return await schedule.save();
+      return (await (schedule as Document).save()) as ScheduleDocument;
     },
   ),
 };

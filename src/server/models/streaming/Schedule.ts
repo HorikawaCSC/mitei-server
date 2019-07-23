@@ -1,19 +1,38 @@
 import { ObjectID } from 'bson';
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
+import { RtmpInputDocument } from '../RtmpInput';
+import { TranscodedSourceDocument } from '../TranscodedSource';
 import { User, UserDocument } from '../User';
 import { Channel, ChannelDocument } from './Channel';
-import { SourceReference, sourceReferenceSchema } from './SourceReference';
 
-export interface ScheduleDocument extends Document {
+export enum SourceRefType {
+  RtmpInput = 'RtmpInput',
+  TranscodedSource = 'TranscodedSource',
+}
+
+interface ScheduleDocumentBase {
   startAt: Date;
   endAt: Date;
   channel?: ChannelDocument;
   channelId: string;
-  // primary, secondary, ...
-  sources: SourceReference[];
+  source: TranscodedSourceDocument | RtmpInputDocument;
+  sourceType: SourceRefType;
   createdBy?: UserDocument;
   createdById: ObjectID;
 }
+
+interface TranscodedScheduleDocument extends ScheduleDocumentBase {
+  source: TranscodedSourceDocument;
+  sourceType: SourceRefType.TranscodedSource;
+}
+
+interface RtmpScheduleDocument extends ScheduleDocumentBase {
+  source: RtmpInputDocument;
+  sourceType: SourceRefType.RtmpInput;
+}
+
+export type ScheduleDocument = Document &
+  (TranscodedScheduleDocument | RtmpScheduleDocument);
 
 const schema = new Schema(
   {
@@ -31,9 +50,16 @@ const schema = new Schema(
       required: true,
       alias: 'channelId',
     },
-    sources: {
-      type: [sourceReferenceSchema('sources')],
+    source: {
+      type: SchemaTypes.ObjectId,
       required: true,
+      refPath: 'sourceType',
+      alias: 'sourceId',
+    },
+    sourceType: {
+      type: SchemaTypes.String,
+      required: true,
+      enum: Object.values(SourceRefType),
     },
     createdBy: {
       type: SchemaTypes.ObjectId,

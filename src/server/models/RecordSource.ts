@@ -7,6 +7,7 @@ export interface RecordSourceDocument extends TranscodedSourceDocument {
   sourceId: ObjectID;
   source?: RtmpInputDocument;
   error?: string;
+  lastManifestAppend: Date;
 }
 
 const schema = new Schema(
@@ -17,6 +18,11 @@ const schema = new Schema(
       ref: RtmpInput,
       required: true,
       alias: 'sourceId',
+    },
+    lastManifestAppend: {
+      type: SchemaTypes.Date,
+      required: true,
+      default: Date.now,
     },
   },
   {

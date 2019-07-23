@@ -117,6 +117,7 @@ export class LiveHLSWorker extends EventEmitter {
             },
             $set: {
               updatedAt: new Date(),
+              lastManifestAppend: new Date(),
             },
           });
         }
