@@ -10,29 +10,16 @@ export enum SourceRefType {
   TranscodedSource = 'TranscodedSource',
 }
 
-interface ScheduleDocumentBase {
+export interface ScheduleDocument extends Document {
   startAt: Date;
   endAt: Date;
   channel?: ChannelDocument;
   channelId: string;
-  source: TranscodedSourceDocument | RtmpInputDocument;
+  source?: TranscodedSourceDocument | RtmpInputDocument;
   sourceType: SourceRefType;
   createdBy?: UserDocument;
   createdById: ObjectID;
 }
-
-interface TranscodedScheduleDocument extends ScheduleDocumentBase {
-  source: TranscodedSourceDocument;
-  sourceType: SourceRefType.TranscodedSource;
-}
-
-interface RtmpScheduleDocument extends ScheduleDocumentBase {
-  source: RtmpInputDocument;
-  sourceType: SourceRefType.RtmpInput;
-}
-
-export type ScheduleDocument = Document &
-  (TranscodedScheduleDocument | RtmpScheduleDocument);
 
 const schema = new Schema(
   {
@@ -52,14 +39,14 @@ const schema = new Schema(
     },
     source: {
       type: SchemaTypes.ObjectId,
-      required: true,
       refPath: 'sourceType',
       alias: 'sourceId',
     },
     sourceType: {
       type: SchemaTypes.String,
-      required: true,
       enum: Object.values(SourceRefType),
+      default: SourceRefType.TranscodedSource,
+      required: true,
     },
     createdBy: {
       type: SchemaTypes.ObjectId,

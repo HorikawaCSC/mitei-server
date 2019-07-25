@@ -36,11 +36,13 @@ const schema = new Schema(
       required: true,
       alias: 'createdById',
     },
-    fillerSources: {
-      type: [SchemaTypes.ObjectId],
-      required: true,
-      ref: TranscodedSource,
-    },
+    fillerSources: [
+      {
+        type: SchemaTypes.ObjectId,
+        required: true,
+        ref: TranscodedSource,
+      },
+    ],
     fillerControl: {
       type: SchemaTypes.String,
       enum: Object.values(FillerControl),

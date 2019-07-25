@@ -10,7 +10,7 @@ import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 export const scheduleMutationResolvers: MutationResolvers = {
   createSchedule: ensureLoggedInAsAdmin(
     async (_parent, { channelId, startAt, endAt }, { userInfo }) => {
-      if (startAt.getTime() < Date.now()) {
+      if (startAt.getTime() < Date.now() - 1000 * 60 * 60 * 24) {
         throw new Error('startAt must be earlier than now');
       }
 

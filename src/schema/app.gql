@@ -156,7 +156,7 @@ type Schedule {
   startAt: Date!
   endAt: Date!
   channel: Channel!
-  sources: [SourceReference!]!
+  source: SourceReference
 }
 
 type ScheduleList {
