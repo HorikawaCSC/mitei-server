@@ -13,6 +13,7 @@ export const config = {
   paths: {
     source: process.env.SOURCES_DIR || '/app/data/source',
     temp: process.env.UPLOAD_TEMP_DIR || '/app/data/tmp',
+    resource: process.env.RESOURCE_DIR || '/app/resource',
   },
   redis: {
     host: process.env.REDIS_HOST || 'redis',

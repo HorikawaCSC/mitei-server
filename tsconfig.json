@@ -19,5 +19,8 @@
     "removeComments": false,
     "pretty": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": [
+    "./resource"
+  ]
 }
