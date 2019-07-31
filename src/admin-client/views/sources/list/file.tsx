@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { Publish } from '@material-ui/icons';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { useGetFileSourcesSimpleQuery } from '../../../../api/generated/graphql';
+import { useGetFileSourcesSimpleQuery } from '../../../../client/api/generated/graphql';
 import { useErrorSnack } from '../../../components/errors/ErrorSnackbar';
 import { useCommonStyles } from '../../../styles/common';
 import { fileSourceSimpleDetailString } from '../../../utils/sources';

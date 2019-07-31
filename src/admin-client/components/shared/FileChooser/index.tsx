@@ -9,7 +9,7 @@ import {
 import { makeStyles } from '@material-ui/styles';
 import clsx from 'clsx';
 import * as React from 'react';
-import { convertFileSize } from '../../../../utils/filesize';
+import { convertFileSize } from '../../../../client/utils/filesize';
 
 const useStyles = makeStyles((theme: Theme) => ({
   inputOuter: {

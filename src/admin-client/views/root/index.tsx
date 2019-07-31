@@ -2,7 +2,7 @@ import { Container, CssBaseline } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { useGetMyselfSimpleQuery } from '../../../api/generated/graphql';
+import { useGetMyselfSimpleQuery } from '../../../client/api/generated/graphql';
 import { ErrorsView } from '../../components/errors';
 import { FullscreenProgress } from '../../components/shared/FullscreenProgress';
 import { HeaderMenu } from '../../components/shared/HeaderMenu';

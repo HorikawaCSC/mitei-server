@@ -2,7 +2,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { useGetFileSourceQuery } from '../../../../api/generated/graphql';
+import { useGetFileSourceQuery } from '../../../../client/api/generated/graphql';
 import { PageContainer } from '../../../components/shared/PageContainer';
 
 export const FileSourceDetails = ({

@@ -4,7 +4,7 @@ import { ApolloProvider } from 'react-apollo';
 import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import { apolloClient } from '../utils/gql-client';
+import { apolloClient } from '../client/utils/gql-client';
 import { ErrorsProvider } from './components/errors';
 import { theme } from './styles/theme';
 import { Root } from './views/root';

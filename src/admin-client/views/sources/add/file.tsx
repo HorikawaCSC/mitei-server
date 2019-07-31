@@ -11,9 +11,9 @@ import {
   useCreateFileSourceUploadMutation,
   useProbeFileSourceMutation,
   useUploadFileSourceChunkMutation,
-} from '../../../../api/generated/graphql';
-import { LabeledCheckbox } from '../../../../components/LabeledCheckbox';
-import { FILE_UPLOAD_CHUNK } from '../../../../constant';
+} from '../../../../client/api/generated/graphql';
+import { LabeledCheckbox } from '../../../../client/components/LabeledCheckbox';
+import { FILE_UPLOAD_CHUNK } from '../../../../client/constant';
 import { useErrorDialog } from '../../../components/errors/ErrorDialog';
 import { FileChooser } from '../../../components/shared/FileChooser';
 import { PageContainer } from '../../../components/shared/PageContainer';

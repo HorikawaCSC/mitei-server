@@ -5,7 +5,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import * as React from 'react';
-import { useAddRtmpInputMutation } from '../../../../api/generated/graphql';
+import { useAddRtmpInputMutation } from '../../../../client/api/generated/graphql';
 import { useErrorSnack } from '../../errors/ErrorSnackbar';
 
 type Props = { open: boolean; handleClose: () => void };

@@ -5,7 +5,7 @@ import {
   RtmpStatus,
   SourceStatus,
   TranscodeStatus,
-} from '../../api/generated/graphql';
+} from '../../client/api/generated/graphql';
 
 export const transcodeStatusText = {
   [TranscodeStatus.Pending]: '変換待ち/未変換',
@@ -24,9 +24,11 @@ export const fileSourceSimpleDetailString = (
   if (!info.duration) {
     return `${transcodeStatusText[info.status]}`;
   }
-  return `${transcodeStatusText[info.status]} 長さ: ${Duration.fromMillis(
-    info.duration * 1000,
-  ).toFormat('hh:mm:ss')}`;
+  return `${transcodeStatusText[info.status]} ${Math.ceil(
+    info.transcodeProgress || 0,
+  ) || ''} 長さ: ${Duration.fromMillis(info.duration * 1000).toFormat(
+    'hh:mm:ss',
+  )}`;
 };
 
 export const rtmpStatusText = {

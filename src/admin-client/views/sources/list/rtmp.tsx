@@ -12,7 +12,7 @@ import {
   RtmpStatus,
   useGetRtmpInputListSimpleQuery,
   useRemoveRtmpInputMutation,
-} from '../../../../api/generated/graphql';
+} from '../../../../client/api/generated/graphql';
 import { useErrorDialog } from '../../../components/errors/ErrorDialog';
 import { useErrorSnack } from '../../../components/errors/ErrorSnackbar';
 import { AddRtmpInputDialog } from '../../../components/sources/AddRtmpInputDialog';
