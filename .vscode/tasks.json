@@ -1,9 +1,9 @@
 {
   "tasks": [
     {
-      "label": "build",
+      "label": "build-server-media",
       "type": "typescript",
-      "tsconfig": "src/server/tsconfig.json",
+      "tsconfig": "packages/server-media/tsconfig.json",
       "problemMatcher": [
         "$tsc"
       ],
