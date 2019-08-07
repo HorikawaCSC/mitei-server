@@ -42,7 +42,6 @@ const schema = new Schema(
         type: SchemaTypes.ObjectId,
         required: true,
         ref: TranscodedSource,
-        alias: 'fillerSourceIds',
       },
     ],
     fillerControl: {
@@ -59,5 +58,15 @@ const schema = new Schema(
     },
   },
 );
+
+schema
+  .virtual('fillerSourceIds')
+  .get(function(this: ChannelDocument): ObjectID[] {
+    if (this.populated('fillerSources')) {
+      return this.fillerSources.map(source => source._id);
+    } else {
+      return (this.fillerSources as unknown) as ObjectID[];
+    }
+  });
 
 export const Channel = model<ChannelDocument>('Channel', schema);

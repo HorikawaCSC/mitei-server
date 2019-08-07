@@ -152,11 +152,24 @@ type ChannelList {
   channels: [Channel!]!
 }
 
+enum ProgramType {
+  rtmp,
+  transcoded,
+  empty,
+}
+
+type Program {
+  id: ID!
+  type: ProgramType!
+  duration: Float!
+  source: SourceReference
+}
+
 type Schedule {
   startAt: Date!
   endAt: Date!
   channel: Channel!
-  source: SourceReference
+  programs: [Program!]!
 }
 
 type ScheduleList {
@@ -227,11 +240,48 @@ type Mutation {
     fillerSources: [ID!],
     fillerControl: FillerControl,
   ): Channel!
+  updateChannel(
+    id: String!,
+    displayName: String,
+    fillerControl: FillerControl
+  ): Channel!
+  addFillerToChannel(
+    id: String!,
+    sources: [ID!]!,
+  ): [ID!]!
+  removeFillerFromChannel(
+    id: String!,
+    sources: [ID!]!,
+  ): [ID!]!
 
   createSchedule(
     channelId: ID!,
     startAt: Date!,
     endAt: Date!,
+  ): Schedule!
+  updateSchedule(
+    scheduleId: ID!,
+    startAt: Date,
+    endAt: Date,
+  ): Schedule!
+
+  addProgramToSchedule(
+    scheduleId: ID!,
+    after: ID,
+    duration: Float!,
+    type: ProgramType!,
+    sourceId: ID,
+  ): Schedule!
+  removeProgramFromSchedule(
+    scheduleId: ID!,
+    programId: ID!
+  ): Schedule!
+  updateProgram(
+    scheduleId: ID!,
+    programId: ID!,
+    duration: Float,
+    type: ProgramType,
+    sourceId: ID!
   ): Schedule!
 }
 
