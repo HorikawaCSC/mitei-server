@@ -166,10 +166,12 @@ type Program {
 }
 
 type Schedule {
+  id: ID!
   startAt: Date!
   endAt: Date!
   channel: Channel!
   programs: [Program!]!
+  isValid: Boolean!
 }
 
 type ScheduleList {
@@ -267,7 +269,7 @@ type Mutation {
 
   addProgramToSchedule(
     scheduleId: ID!,
-    after: ID,
+    before: ID,
     duration: Float!,
     type: ProgramType!,
     sourceId: ID,
@@ -281,7 +283,11 @@ type Mutation {
     programId: ID!,
     duration: Float,
     type: ProgramType,
-    sourceId: ID!
+    sourceId: ID,
+  ): Schedule!
+  updateProgramOrder(
+    scheduleId: ID!,
+    order: [ID!]!
   ): Schedule!
 }
 

@@ -6,6 +6,7 @@ import {
   ScheduleDocument,
 } from '../../../../models/streaming/Schedule';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
+import { checkOverlappedSchedule } from '../../../../utils/schedule/validate';
 
 export const scheduleMutationResolvers: MutationResolvers = {
   createSchedule: ensureLoggedInAsAdmin(
@@ -22,24 +23,7 @@ export const scheduleMutationResolvers: MutationResolvers = {
         throw new Error('duration must be longer than a minute');
       }
 
-      const overlappedSchedule = await Schedule.find({
-        $or: [
-          {
-            startAt: {
-              $gte: startAt,
-              $lt: endAt,
-            },
-          },
-          {
-            endAt: {
-              $gt: startAt,
-              $lte: endAt,
-            },
-          },
-        ],
-      });
-
-      if (overlappedSchedule.length > 0) {
+      if (await checkOverlappedSchedule(startAt, endAt)) {
         throw new Error('schedule overlapping found');
       }
 
@@ -52,8 +36,28 @@ export const scheduleMutationResolvers: MutationResolvers = {
       schedule.createdById = userInfo._id;
       schedule.startAt = startAt;
       schedule.endAt = endAt;
+      schedule.programs = [];
 
       return (await (schedule as Document).save()) as ScheduleDocument;
+    },
+  ),
+  updateSchedule: ensureLoggedInAsAdmin(
+    async (_parent, { scheduleId, startAt, endAt }) => {
+      const schedule = await Schedule.findById(scheduleId);
+      if (!schedule) throw new Error('schedule not found');
+
+      if (startAt) schedule.startAt = startAt;
+      if (endAt) schedule.endAt = endAt;
+
+      if (!schedule.isProgramValid()) {
+        throw new Error('schedule contains too long program');
+      }
+
+      if (await checkOverlappedSchedule(schedule.startAt, schedule.endAt)) {
+        throw new Error('schedule overlapping found');
+      }
+
+      return await schedule.save();
     },
   ),
 };

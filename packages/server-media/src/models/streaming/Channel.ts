@@ -67,6 +67,13 @@ schema
     } else {
       return (this.fillerSources as unknown) as ObjectID[];
     }
+  })
+  .set(function(this: ChannelDocument, value: ObjectID[]) {
+    if (this.populated('fillerSources')) {
+      throw new Error('populated field not supported');
+    } else {
+      (this.fillerSources as unknown) = value;
+    }
   });
 
 export const Channel = model<ChannelDocument>('Channel', schema);

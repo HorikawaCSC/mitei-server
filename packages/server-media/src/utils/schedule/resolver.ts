@@ -6,9 +6,9 @@ import { RtmpInput } from '../../models/RtmpInput';
 import { ChannelDocument, FillerControl } from '../../models/streaming/Channel';
 import {
   Program,
+  ProgramType,
   Schedule,
   ScheduleDocument,
-  SourceType,
 } from '../../models/streaming/Schedule';
 import {
   TranscodedSource,
@@ -437,19 +437,19 @@ export class ScheduleResolver {
     program: Program,
     programEndAt: Date,
   ) {
-    if (program.type === SourceType.Rtmp) {
+    if (program.type === ProgramType.Rtmp) {
       return await this.createRtmpInputProgramManifest(
         schedule,
         program,
         programEndAt,
       );
-    } else if (program.type === SourceType.Transcoded) {
+    } else if (program.type === ProgramType.Transcoded) {
       return await this.createTranscodedProgramManifest(
         schedule,
         program,
         programEndAt,
       );
-    } else if (program.type === SourceType.Empty) {
+    } else if (program.type === ProgramType.Empty) {
       return await this.createEmptyProgramManifest(schedule, program);
     } else {
       throw new Error('unknown source');

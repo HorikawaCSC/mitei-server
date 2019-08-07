@@ -3,14 +3,15 @@ import { Document, model, Schema, SchemaTypes } from 'mongoose';
 import { User, UserDocument } from '../User';
 import { Channel, ChannelDocument } from './Channel';
 
-export enum SourceType {
+export enum ProgramType {
   Rtmp = 'rtmp',
   Transcoded = 'transcoded',
   Empty = 'empty',
 }
 
 export interface Program {
-  type: SourceType;
+  _id: ObjectID;
+  type: ProgramType;
   duration: number;
   sourceId?: ObjectID;
 }
@@ -47,8 +48,8 @@ const schema = new Schema(
       new Schema({
         type: {
           type: SchemaTypes.String,
-          enum: Object.values(SourceType),
-          default: SourceType.Transcoded,
+          enum: Object.values(ProgramType),
+          default: ProgramType.Transcoded,
           required: true,
         },
         sourceId: {
