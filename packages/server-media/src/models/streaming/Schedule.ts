@@ -1,13 +1,18 @@
 import { ObjectID } from 'bson';
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
-import { RtmpInputDocument } from '../RtmpInput';
-import { TranscodedSourceDocument } from '../TranscodedSource';
 import { User, UserDocument } from '../User';
 import { Channel, ChannelDocument } from './Channel';
 
-export enum SourceRefType {
-  RtmpInput = 'RtmpInput',
-  TranscodedSource = 'TranscodedSource',
+export enum SourceType {
+  Rtmp = 'rtmp',
+  Transcoded = 'transcoded',
+  Empty = 'empty',
+}
+
+export interface Program {
+  type: SourceType;
+  duration: number;
+  sourceId?: ObjectID;
 }
 
 export interface ScheduleDocument extends Document {
@@ -15,10 +20,11 @@ export interface ScheduleDocument extends Document {
   endAt: Date;
   channel?: ChannelDocument;
   channelId: string;
-  source?: TranscodedSourceDocument | RtmpInputDocument;
-  sourceType: SourceRefType;
+  programs: Program[];
   createdBy?: UserDocument;
   createdById: ObjectID;
+
+  isProgramValid(): boolean;
 }
 
 const schema = new Schema(
@@ -37,17 +43,23 @@ const schema = new Schema(
       required: true,
       alias: 'channelId',
     },
-    source: {
-      type: SchemaTypes.ObjectId,
-      refPath: 'sourceType',
-      alias: 'sourceId',
-    },
-    sourceType: {
-      type: SchemaTypes.String,
-      enum: Object.values(SourceRefType),
-      default: SourceRefType.TranscodedSource,
-      required: true,
-    },
+    programs: [
+      new Schema({
+        type: {
+          type: SchemaTypes.String,
+          enum: Object.values(SourceType),
+          default: SourceType.Transcoded,
+          required: true,
+        },
+        sourceId: {
+          type: SchemaTypes.ObjectId,
+        },
+        duration: {
+          type: SchemaTypes.Number,
+          required: true,
+        },
+      }),
+    ],
     createdBy: {
       type: SchemaTypes.ObjectId,
       ref: User,
@@ -59,5 +71,17 @@ const schema = new Schema(
     timestamps: true,
   },
 );
+
+schema.method('isValidProgram', function(this: ScheduleDocument): boolean {
+  const duration = this.programs.reduce(
+    (duration, program) => duration + program.duration,
+    0,
+  );
+  const scheduleDuration =
+    (this.endAt.getTime() - this.startAt.getTime()) / 1000;
+  if (duration - scheduleDuration > 2) return false;
+
+  return true;
+});
 
 export const Schedule = model<ScheduleDocument>('Schedule', schema);

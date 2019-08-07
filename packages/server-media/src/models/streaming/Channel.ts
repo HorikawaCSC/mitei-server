@@ -17,6 +17,7 @@ export interface ChannelDocument extends Document {
   createdBy?: UserDocument;
   createdById: ObjectID;
   fillerSources: TranscodedSourceDocument[];
+  fillerSourceIds: ObjectID[];
   fillerControl: FillerControl;
 }
 
@@ -41,6 +42,7 @@ const schema = new Schema(
         type: SchemaTypes.ObjectId,
         required: true,
         ref: TranscodedSource,
+        alias: 'fillerSourceIds',
       },
     ],
     fillerControl: {

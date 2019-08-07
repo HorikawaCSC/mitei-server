@@ -2,13 +2,16 @@ import { ObjectID } from 'bson';
 import { crc32 } from 'crc';
 import { config } from '../../config';
 import { RecordSource } from '../../models/RecordSource';
+import { RtmpInput } from '../../models/RtmpInput';
 import { ChannelDocument, FillerControl } from '../../models/streaming/Channel';
 import {
+  Program,
   Schedule,
   ScheduleDocument,
-  SourceRefType,
+  SourceType,
 } from '../../models/streaming/Schedule';
 import {
+  TranscodedSource,
   TranscodedSourceDocument,
   TranscodeStatus,
 } from '../../models/TranscodedSource';
@@ -164,8 +167,7 @@ export class ScheduleResolver {
         $gt: now,
       },
     })
-      .populate('source')
-      .limit(3)
+      .limit(2)
       .exec();
 
     return schedules;
@@ -307,17 +309,27 @@ export class ScheduleResolver {
     };
   }
 
-  private async createRtmpInputManifest(schedule: ScheduleDocument) {
-    const { startAt, endAt } = schedule;
-    const sources = schedule.source
-      ? await this.resolveRtmpInputs(schedule.source._id, startAt, endAt)
+  private async createRtmpInputProgramManifest(
+    schedule: ScheduleDocument,
+    program: Program,
+    programStartAt: Date,
+  ) {
+    const rtmp = program.sourceId
+      ? await RtmpInput.findById(program.sourceId)
+      : null;
+
+    const programEndAt = new Date(
+      programStartAt.getTime() + program.duration * 1000,
+    );
+    const sources = rtmp
+      ? await this.resolveRtmpInputs(rtmp._id, programStartAt, programEndAt)
       : [];
     const manifestList = new ManifestList();
-    const scheduleDuration = dateDiffSec(endAt, startAt);
+    const programDuration = dateDiffSec(programEndAt, programStartAt);
 
     if (sources.length === 0) {
       manifestList.loadFromList(
-        this.createFillerManifest(schedule.id, scheduleDuration),
+        this.createFillerManifest(schedule.id, programDuration),
       );
 
       return manifestList;
@@ -329,8 +341,11 @@ export class ScheduleResolver {
         source.createdAt!.getTime() - LIVE_DELAY_SEC * 1000,
       );
 
-      // (source begin date) - (schedule start date)
-      const durationBetweenStartAndSource = dateDiffSec(sourceStartAt, startAt);
+      // (source begin date) - (program start date)
+      const durationBetweenStartAndSource = dateDiffSec(
+        sourceStartAt,
+        programStartAt,
+      );
       if (durationBetweenStartAndSource > 0) {
         const fillerDuration =
           durationBetweenStartAndSource - manifestList.totalDuration;
@@ -347,11 +362,11 @@ export class ScheduleResolver {
 
       manifestList.loadFromSource(
         source,
-        this.filterRtmpManifest(startAt, endAt),
+        this.filterRtmpManifest(programStartAt, programEndAt),
       );
     }
 
-    const lastFillerDuration = scheduleDuration - manifestList.totalDuration;
+    const lastFillerDuration = programDuration - manifestList.totalDuration;
     if (lastFillerDuration > 1) {
       schedulerLogger.debug(
         `insert filler after last source, duration: ${lastFillerDuration}`,
@@ -370,25 +385,32 @@ export class ScheduleResolver {
     return manifestList;
   }
 
-  private createTranscodedManifest(schedule: ScheduleDocument) {
-    const { startAt, endAt } = schedule;
+  private async createTranscodedProgramManifest(
+    schedule: ScheduleDocument,
+    program: Program,
+    programStartAt: Date,
+  ) {
+    // const { startAt, endAt } = schedule;
     const manifestList = new ManifestList();
+    const programEndAt = new Date(
+      programStartAt.getTime() + program.duration * 1000,
+    );
+    const programDuration = dateDiffSec(programEndAt, programStartAt);
+    const source = program.sourceId
+      ? await TranscodedSource.findById(program.sourceId)
+      : null;
 
-    const scheduleDuration = dateDiffSec(endAt, startAt);
-
-    if (schedule.source) {
-      const source = schedule.source as TranscodedSourceDocument;
-
+    if (source) {
       manifestList.loadFromSource(
         source,
         (nextDuration, _loaded, total) => {
-          return total + nextDuration < scheduleDuration;
+          return total + nextDuration < programDuration;
         },
         true,
       );
     }
 
-    const remain = scheduleDuration - manifestList.totalDuration;
+    const remain = programDuration - manifestList.totalDuration;
     if (remain > 0) {
       manifestList.loadFromList(this.createFillerManifest(schedule.id, remain));
     }
@@ -396,14 +418,68 @@ export class ScheduleResolver {
     return manifestList;
   }
 
-  private async createManifestForSchedule(schedule: ScheduleDocument) {
-    if (schedule.sourceType === SourceRefType.RtmpInput) {
-      return await this.createRtmpInputManifest(schedule);
-    } else if (schedule.sourceType === SourceRefType.TranscodedSource) {
-      return this.createTranscodedManifest(schedule);
+  private async createEmptyProgramManifest(
+    schedule: ScheduleDocument,
+    program: Program,
+  ) {
+    const manifestList = new ManifestList();
+    if (program.duration > 0) {
+      manifestList.loadFromList(
+        this.createFillerManifest(schedule.id, program.duration),
+      );
+    }
+
+    return manifestList;
+  }
+
+  private async createProgramManifest(
+    schedule: ScheduleDocument,
+    program: Program,
+    programEndAt: Date,
+  ) {
+    if (program.type === SourceType.Rtmp) {
+      return await this.createRtmpInputProgramManifest(
+        schedule,
+        program,
+        programEndAt,
+      );
+    } else if (program.type === SourceType.Transcoded) {
+      return await this.createTranscodedProgramManifest(
+        schedule,
+        program,
+        programEndAt,
+      );
+    } else if (program.type === SourceType.Empty) {
+      return await this.createEmptyProgramManifest(schedule, program);
     } else {
       throw new Error('unknown source');
     }
+  }
+
+  private async createManifestForSchedule(schedule: ScheduleDocument) {
+    const manifestList = new ManifestList();
+    let programStartAt = schedule.startAt;
+    for (let index = 0; index < schedule.programs.length; index++) {
+      const program = schedule.programs[index];
+      manifestList.loadFromList(
+        await this.createProgramManifest(schedule, program, programStartAt),
+      );
+      programStartAt = new Date(
+        programStartAt.getTime() + program.duration * 1000,
+      );
+    }
+
+    const scheduleDuration = dateDiffSec(schedule.endAt, schedule.startAt);
+    if (scheduleDuration - manifestList.totalDuration > 2) {
+      manifestList.loadFromList(
+        this.createFillerManifest(
+          schedule.id,
+          scheduleDuration - manifestList.totalDuration,
+        ),
+      );
+    }
+
+    return manifestList;
   }
 
   private async createFutureManifest(
@@ -413,6 +489,7 @@ export class ScheduleResolver {
     const manifest = await this.createManifestForSchedule(schedule);
     const elapsed = dateDiffSec(new Date(), schedule.startAt);
 
+    schedulerLogger.debug('manifest duration', manifest.totalDuration);
     return manifest.select(elapsed, maxDuration);
   }
 
@@ -426,9 +503,7 @@ export class ScheduleResolver {
         $gte: new Date(currentSchedule.startAt.getTime() - 1000),
         $lte: currentSchedule.startAt,
       },
-    })
-      .populate('source')
-      .exec();
+    }).exec();
 
     if (!previousSchedule) {
       this.sequenceMap.set(currentSchedule.id, 0);
