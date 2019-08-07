@@ -1,0 +1,241 @@
+scalar Date
+
+input UploadFileInfo {
+  filename: String!
+  size: Int!
+}
+
+input UploadFileChunk {
+  chunk: Upload!
+  begin: Int!
+  size: Int!
+}
+
+enum TranscodeStatus {
+  pending
+  running
+  success
+  failed
+}
+
+enum SourceType {
+  file
+  record
+}
+
+interface TranscodedSource {
+  id: ID!
+  status: TranscodeStatus!
+  duration: Float
+  thumbnailUrl: String
+  width: Int
+  height: Int
+  name: String!
+  createdAt: Date!
+  updatedAt: Date!
+  createdBy: User!
+  preset: TranscodePreset
+  type: SourceType!
+}
+
+type SourceList {
+  sources: [TranscodedSource!]!
+  total: Int!
+}
+
+enum SourceStatus {
+  uploading
+  available
+  deleted
+}
+
+type FileSourceOrignalInfo {
+  status: SourceStatus!
+  extension: String!
+  width: Int
+  height: Int
+  fileSize: Int!
+}
+
+type FileSource implements TranscodedSource {
+  id: ID!
+  status: TranscodeStatus!
+  duration: Float
+  thumbnailUrl: String
+  width: Int
+  height: Int
+  name: String!
+  createdAt: Date!
+  updatedAt: Date!
+  createdBy: User!
+  preset: TranscodePreset
+  type: SourceType!
+
+  # additional props
+  source: FileSourceOrignalInfo!
+  error: String
+  transcodeProgress: Float
+}
+
+type FileSourceList {
+  sources: [FileSource!]!
+  total: Int!
+}
+
+enum RtmpStatus {
+  live
+  unused
+}
+
+type RtmpInput {
+  id: ID!
+  name: String!
+  status: RtmpStatus!
+  publishUrl: String!
+  preset: TranscodePreset!
+  createdBy: User!
+}
+
+type RtmpInputList {
+  inputs: [RtmpInput!]!
+  total: Int!
+}
+
+type RecordSource implements TranscodedSource {
+  id: ID!
+  status: TranscodeStatus!
+  duration: Float
+  thumbnailUrl: String
+  width: Int
+  height: Int
+  name: String!
+  createdAt: Date!
+  updatedAt: Date!
+  createdBy: User!
+  preset: TranscodePreset!
+  type: SourceType!
+
+  # additional props
+  source: RtmpInput!
+  error: String
+}
+
+type RecordSourceList {
+  sources: [RecordSource!]!
+  total: Int!
+}
+
+type TranscodePreset {
+  id: ID!
+  name: String!
+  parameter: [String!]!
+}
+
+
+enum FillerControl {
+  random
+  sequential
+}
+
+union SourceReference = FileSource | RecordSource | RtmpInput
+
+type Channel {
+  id: String!
+  displayName: String!
+  createdBy: User!
+  fillerSources: [TranscodedSource!]!
+  fillerControl: FillerControl!
+}
+
+type ChannelList {
+  total: Int!
+  channels: [Channel!]!
+}
+
+type Schedule {
+  startAt: Date!
+  endAt: Date!
+  channel: Channel!
+  source: SourceReference
+}
+
+type ScheduleList {
+  total: Int!
+  schedules: [Schedule!]!
+}
+
+enum UserKind {
+  normal
+  admin
+}
+
+enum IdPType {
+  twitter
+}
+
+type User {
+  id: ID!
+  userId: ID!
+  screenName: String!
+  iconUrl: String
+  kind: UserKind!
+  type: IdPType!
+}
+
+type Users {
+  users: [User!]!
+  total: Int!
+}
+
+type Query {
+  # admin func
+  fileSource(sourceId: ID!): FileSource
+  fileSourceList(status: TranscodeStatus, skip: Int!, take: Int!): FileSourceList!
+
+  recordSource(sourceId: ID!): RecordSource
+  recordSourceList(skip: Int!, take: Int!): RecordSourceList!
+
+  sourceList(type: SourceType, skip: Int!, take: Int!): SourceList!
+
+  rtmpInputList(skip: Int!, take: Int!): RtmpInputList!
+
+  users(kind: UserKind, type: IdPType, skip: Int!, take: Int!): Users!
+
+  channelList(skip: Int!, take: Int!): ChannelList!
+
+  # normal func
+  me: User
+}
+
+type Mutation {
+  # admin func
+  createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource!
+  uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean!
+  probeFileSource(sourceId: String!): Boolean!
+  transcodeFileSource(sourceId: String!, presetId: String!): Boolean!
+
+  createRtmpInput(name: String!, presetId: ID!): RtmpInput!
+  removeRtmpInput(id: ID!): Boolean!
+
+  createTranscodePreset(name: String!, parameter: [String!]!): TranscodePreset!
+
+  enqueueFileSourceTranscode(sourceId: ID!, presetId: ID!): Boolean!
+
+  createChannel(
+    id: String!,
+    displayName: String!,
+    fillerSources: [ID!],
+    fillerControl: FillerControl,
+  ): Channel!
+
+  createSchedule(
+    channelId: ID!,
+    startAt: Date!,
+    endAt: Date!,
+  ): Schedule!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

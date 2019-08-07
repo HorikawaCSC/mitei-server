@@ -1,0 +1,76 @@
+mutation createFileSourceUpload($fileInfo: UploadFileInfo!) {
+  createFileSourceUpload(fileInfo: $fileInfo) {
+    id
+  }
+}
+
+mutation uploadFileSourceChunk($sourceId: String!, $file: UploadFileChunk!) {
+  uploadFileSourceChunk(sourceId: $sourceId, file: $file)
+}
+
+mutation probeFileSource($sourceId: String!) {
+  probeFileSource(sourceId: $sourceId)
+}
+
+mutation addRtmpInput($name: String!, $presetId: ID!) {
+  createRtmpInput(name: $name, presetId: $presetId) {
+    id
+  }
+}
+
+mutation removeRtmpInput($id: ID!) {
+  removeRtmpInput(id: $id)
+}
+
+query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
+  fileSourceList(skip: $skip, take: $take, status: $status) {
+    total
+    sources {
+      id
+      duration
+      name
+      thumbnailUrl
+      status
+      createdAt
+      transcodeProgress
+      source {
+        status
+      }
+    }
+  }
+}
+
+query getFileSource($id: ID!) {
+  fileSource(sourceId: $id) {
+    duration
+    name
+    thumbnailUrl
+    status
+    createdAt
+    width
+    height
+    error
+    source {
+      extension
+      width
+      height
+      status
+      fileSize
+    }
+  }
+}
+
+query getRtmpInputListSimple($skip: Int!, $take: Int!) {
+  rtmpInputList(skip: $skip, take: $take) {
+    inputs {
+      id
+      status
+      name
+      publishUrl
+      preset {
+        name
+      }
+    }
+    total
+  }
+}

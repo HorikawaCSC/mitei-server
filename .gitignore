@@ -1,7 +1,7 @@
 dist/
-packs/
-node_modules/
+packages/*/packs/
+node_modules
 *.env
 .DS_Store
 data/
-src/**/generated/*
+packages/**/src/**/generated

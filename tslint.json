@@ -102,6 +102,6 @@
     ]
   },
   "linterOptions": {
-    "exclude": ["src/**/generated/*"]
+    "exclude": ["packages/**/generated/*"]
   }
 }
