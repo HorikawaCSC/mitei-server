@@ -12,10 +12,10 @@ import {
   Typography,
 } from '@material-ui/core';
 import {
-  Add,
-  CloudUpload,
+  CalendarToday,
   ListAlt,
   Menu as MenuIcon,
+  MovieCreation,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import * as React from 'react';
@@ -68,31 +68,32 @@ export const HeaderMenu = () => {
           <Divider />
 
           <List subheader={<ListSubheader>ソース管理</ListSubheader>}>
-            <ListItem button component={Link} to='/sources/file/upload'>
-              <ListItemIcon>
-                <CloudUpload />
-              </ListItemIcon>
-              <ListItemText
-                primary='アップロード'
-                secondary='動画ファイルのアップロード'
-              />
-            </ListItem>
-
-            <ListItem button component={Link} to='/sources/rtmp-input'>
-              <ListItemIcon>
-                <Add />
-              </ListItemIcon>
-              <ListItemText
-                primary='生配信元追加'
-                secondary='RTMPソースの追加'
-              />
-            </ListItem>
-
             <ListItem button component={Link} to='/sources'>
               <ListItemIcon>
                 <ListAlt />
               </ListItemIcon>
               <ListItemText>ソース一覧</ListItemText>
+            </ListItem>
+            <ListItem button component={Link} to='/encode-presets'>
+              <ListItemIcon>
+                <MovieCreation />
+              </ListItemIcon>
+              <ListItemText>エンコード設定</ListItemText>
+            </ListItem>
+          </List>
+
+          <List subheader={<ListSubheader>配信管理</ListSubheader>}>
+            <ListItem button component={Link} to='/channels'>
+              <ListItemIcon>
+                <ListAlt />
+              </ListItemIcon>
+              <ListItemText>チャンネル一覧</ListItemText>
+            </ListItem>
+            <ListItem button component={Link} to='/schedules'>
+              <ListItemIcon>
+                <CalendarToday />
+              </ListItemIcon>
+              <ListItemText>配信予定一覧</ListItemText>
             </ListItem>
           </List>
         </div>
