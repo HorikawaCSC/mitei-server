@@ -1,0 +1,15 @@
+mutation createChannelSimple($id: String!, $displayName: String!) {
+  createChannel(id: $id, displayName: $displayName) {
+    id
+  }
+}
+
+query getChannelsSimple($skip: Int!, $take: Int!) {
+  channelList(skip: $skip, take: $take) {
+    total
+    channels {
+      id
+      displayName
+    }
+  }
+}

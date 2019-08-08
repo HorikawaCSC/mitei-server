@@ -131,6 +131,10 @@ type TranscodePreset {
   parameter: [String!]!
 }
 
+type TranscodePresetList {
+  presets: [TranscodePreset!]!
+  total: Int!
+}
 
 enum FillerControl {
   random
@@ -219,6 +223,8 @@ type Query {
   channelList(skip: Int!, take: Int!): ChannelList!
 
   scheduleList(skip: Int!, take: Int!): ScheduleList!
+
+  transcodePresetList(skip: Int!, take: Int!): TranscodePresetList!
 
   # normal func
   me: User

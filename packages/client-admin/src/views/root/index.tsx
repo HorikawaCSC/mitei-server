@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { useGetMyselfSimpleQuery } from '../../api/generated/graphql';
 import { HeaderMenu } from '../../components/shared/HeaderMenu';
+import { ChannelsRoot } from '../channels';
 import { LoginView } from '../login';
 import { SourcesRoot } from '../sources';
 
@@ -42,6 +43,7 @@ export const Root = () => {
       <Container fixed className={styles.content}>
         <Switch>
           <Route path='/sources' component={SourcesRoot} />
+          <Route path='/channels' component={ChannelsRoot} />
         </Switch>
       </Container>
       <ErrorsView />
