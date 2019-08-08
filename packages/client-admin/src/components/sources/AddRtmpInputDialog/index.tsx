@@ -19,8 +19,11 @@ export const AddRtmpInputDialog = (props: Props) => {
     setName(e.target.value);
   };
   const handleAddClick = async () => {
+    setName('');
+
     const { data, errors } = await addRtmpInput({
       variables: { name, presetId: '' },
+      errorPolicy: 'all',
     });
 
     if (errors || !data || !data.createRtmpInput) {
@@ -28,7 +31,6 @@ export const AddRtmpInputDialog = (props: Props) => {
       return;
     }
 
-    setName('');
     props.handleClose();
   };
 
