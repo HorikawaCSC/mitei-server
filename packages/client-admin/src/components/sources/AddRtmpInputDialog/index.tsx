@@ -14,24 +14,34 @@ export const AddRtmpInputDialog = (props: Props) => {
   const showErrorMessage = useErrorSnack();
 
   const [name, setName] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
 
   const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
-  const handleAddClick = async () => {
+
+  const handleClose = () => {
     setName('');
+    setLoading(false);
+    props.handleClose();
+  };
+
+  const handleAddClick = async () => {
+    setLoading(true);
 
     const { data, errors } = await addRtmpInput({
       variables: { name, presetId: '' },
       errorPolicy: 'all',
     });
 
+    setLoading(false);
+
     if (errors || !data || !data.createRtmpInput) {
       showErrorMessage(errors ? errors[0].message : '作成に失敗しました');
       return;
     }
 
-    props.handleClose();
+    handleClose();
   };
 
   return (
@@ -51,10 +61,14 @@ export const AddRtmpInputDialog = (props: Props) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button color='primary' onClick={props.handleClose}>
+        <Button color='primary' onClick={handleClose} disabled={loading}>
           キャンセル
         </Button>
-        <Button color='primary' onClick={handleAddClick} disabled={name === ''}>
+        <Button
+          color='primary'
+          onClick={handleAddClick}
+          disabled={name === '' || loading}
+        >
           追加
         </Button>
       </DialogActions>
