@@ -218,6 +218,8 @@ type Query {
 
   channelList(skip: Int!, take: Int!): ChannelList!
 
+  scheduleList(skip: Int!, take: Int!): ScheduleList!
+
   # normal func
   me: User
 }

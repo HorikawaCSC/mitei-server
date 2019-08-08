@@ -20,5 +20,6 @@ config:
     TranscodePreset: ../models/TranscodePreset#TranscodePresetDocument
     Channel: ../models/streaming/Channel#ChannelDocument
     Schedule: ../models/streaming/Schedule#ScheduleDocument
+    Program: ../models/streaming/Schedule#Program
   scalars:
     Date: Date

@@ -73,7 +73,7 @@ const schema = new Schema(
   },
 );
 
-schema.method('isValidProgram', function(this: ScheduleDocument): boolean {
+schema.method('isProgramValid', function(this: ScheduleDocument): boolean {
   const duration = this.programs.reduce(
     (duration, program) => duration + program.duration,
     0,
