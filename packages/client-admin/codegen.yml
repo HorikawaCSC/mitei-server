@@ -11,9 +11,6 @@ generates:
       - "typescript"
       - "typescript-operations"
       - "typescript-react-apollo"
-  ./src/api/generated/graphql.d.ts:
-    plugins:
-      - "typescript-graphql-files-modules"
   ./src/api/generated/introspection-result.ts:
     plugins:
       - "fragment-matcher"
