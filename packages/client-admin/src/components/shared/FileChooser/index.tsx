@@ -6,27 +6,29 @@ import {
   InputLabel,
   Theme,
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import { createStyles, makeStyles } from '@material-ui/styles';
 import clsx from 'clsx';
 import * as React from 'react';
 import { convertFileSize } from '../../../utils/filesize';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  inputOuter: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginTop: '16px',
-  },
-  input: {
-    cursor: 'default',
-  },
-  inputNoSelect: {
-    color: theme.palette.grey[700],
-  },
-  fileInput: {
-    display: 'none',
-  },
-}));
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    inputOuter: {
+      display: 'flex',
+      flexDirection: 'row',
+      marginTop: '16px',
+    },
+    input: {
+      cursor: 'default',
+    },
+    inputNoSelect: {
+      color: theme.palette.grey[700],
+    },
+    fileInput: {
+      display: 'none',
+    },
+  }),
+);
 
 type Props = {
   accept?: string;
