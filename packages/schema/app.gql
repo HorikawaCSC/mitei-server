@@ -224,6 +224,7 @@ type Query {
 
   scheduleList(skip: Int!, take: Int!): ScheduleList!
 
+  transcodePreset(id: ID!): TranscodePreset!
   transcodePresetList(skip: Int!, take: Int!): TranscodePresetList!
 
   # normal func
