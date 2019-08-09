@@ -1,4 +1,5 @@
 import { Paper, Tab, Tabs } from '@material-ui/core';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 import {
   Link,
@@ -9,6 +10,14 @@ import {
 } from 'react-router-dom';
 import { FileSourceList } from './file';
 import { RtmpInputList } from './rtmp';
+
+const useStyles = makeStyles(theme =>
+  createStyles({
+    paper: {
+      margin: theme.spacing(1, 0),
+    },
+  }),
+);
 
 const renderTabs = (props: RouteComponentProps<{ type: string }>) => {
   return (
@@ -26,8 +35,10 @@ const renderTabs = (props: RouteComponentProps<{ type: string }>) => {
 };
 
 export const SourcesListView = () => {
+  const styles = useStyles();
+
   return (
-    <Paper>
+    <Paper className={styles.paper}>
       <Route path='/sources/:type?' render={renderTabs} exact />
       <Switch>
         <Route

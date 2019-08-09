@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { Publish } from '@material-ui/icons';
 import { useErrorSnack } from '@mitei/client-common';
 import * as React from 'react';
+import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import { useGetFileSourcesSimpleQuery } from '../../../api/generated/graphql';
 import { useCommonStyles } from '../../../styles/common';
@@ -14,11 +15,36 @@ import { fileSourceSimpleDetailString } from '../../../utils/sources';
 
 export const FileSourceList = () => {
   const commonStyles = useCommonStyles();
-  const { loading, data, error } = useGetFileSourcesSimpleQuery({
+  const { loading, data, error, fetchMore } = useGetFileSourcesSimpleQuery({
     variables: { skip: 0, take: 10 },
-    fetchPolicy: 'no-cache',
   });
   const openErrorMessage = useErrorSnack();
+  const [scrollRef, inView] = useInView();
+
+  React.useEffect(() => {
+    if (inView && !loading && data) {
+      const { sources } = data.fileSourceList;
+      fetchMore({
+        variables: {
+          skip: sources.length,
+          take: 10,
+        },
+        updateQuery(prev, { fetchMoreResult }) {
+          if (!fetchMoreResult) return prev;
+          return {
+            fileSourceList: {
+              total: fetchMoreResult.fileSourceList.total,
+              sources: [
+                ...prev.fileSourceList.sources,
+                ...fetchMoreResult.fileSourceList.sources,
+              ],
+              __typename: prev.fileSourceList.__typename,
+            },
+          };
+        },
+      });
+    }
+  }, [inView]);
 
   if (loading) return <CircularProgress />;
 
@@ -27,11 +53,13 @@ export const FileSourceList = () => {
     return null;
   }
 
+  const { total, sources } = data.fileSourceList;
+  const hasMore = total > sources.length;
   return (
     <>
-      <Typography>{data.fileSourceList.total} 件</Typography>
+      <Typography>{total} 件</Typography>
       <List>
-        {data.fileSourceList.sources.map(source => {
+        {sources.map(source => {
           return (
             <ListItem
               key={source.id}
@@ -46,6 +74,7 @@ export const FileSourceList = () => {
             </ListItem>
           );
         })}
+        {hasMore && <div ref={scrollRef} />}
       </List>
       <Fab
         component={Link}
