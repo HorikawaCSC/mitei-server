@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { Add, Delete } from '@material-ui/icons';
 import { useErrorDialog, useErrorSnack } from '@mitei/client-common';
 import * as React from 'react';
+import { useInView } from 'react-intersection-observer';
 import {
   RtmpStatus,
   useGetRtmpInputListSimpleQuery,
@@ -23,11 +24,42 @@ export const RtmpInputList = () => {
   const [addDialogOpen, setAddDialogOpen] = React.useState(false);
   const openErrorMessage = useErrorSnack();
   const openErrorMessageDialog = useErrorDialog();
-  const { data, error, loading, refetch } = useGetRtmpInputListSimpleQuery({
+  const {
+    data,
+    error,
+    loading,
+    refetch,
+    fetchMore,
+  } = useGetRtmpInputListSimpleQuery({
     variables: { skip: 0, take: 10 },
-    fetchPolicy: 'network-only',
   });
   const removeRtmpInput = useRemoveRtmpInputMutation();
+  const [scrollRef, inView] = useInView();
+
+  React.useEffect(() => {
+    if (inView && !loading && data) {
+      const { inputs } = data.rtmpInputList;
+      fetchMore({
+        variables: {
+          skip: inputs.length,
+          take: 10,
+        },
+        updateQuery(prev, { fetchMoreResult }) {
+          if (!fetchMoreResult) return prev;
+          return {
+            rtmpInputList: {
+              total: fetchMoreResult.rtmpInputList.total,
+              inputs: [
+                ...prev.rtmpInputList.inputs,
+                ...fetchMoreResult.rtmpInputList.inputs,
+              ],
+              __typename: prev.rtmpInputList.__typename,
+            },
+          };
+        },
+      });
+    }
+  }, [inView]);
 
   if (loading) return <CircularProgress />;
 
@@ -41,9 +73,11 @@ export const RtmpInputList = () => {
 
     refetch();
   };
+
   const handleDialogOpen = () => {
     setAddDialogOpen(true);
   };
+
   const createDeleteHandle = (id: string) => async () => {
     const { errors } = await removeRtmpInput({ variables: { id } });
 
@@ -54,11 +88,13 @@ export const RtmpInputList = () => {
     refetch();
   };
 
+  const { inputs, total } = data.rtmpInputList;
+  const hasMore = total > inputs.length;
   return (
     <>
-      <Typography>{data.rtmpInputList.total} 件</Typography>
+      <Typography>{total} 件</Typography>
       <List>
-        {data.rtmpInputList.inputs.map(input => {
+        {inputs.map(input => {
           return (
             <ListItem key={input.id}>
               <ListItemText
@@ -77,6 +113,7 @@ export const RtmpInputList = () => {
             </ListItem>
           );
         })}
+        {hasMore && <div ref={scrollRef} />}
       </List>
       <AddRtmpInputDialog
         open={addDialogOpen}
