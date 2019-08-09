@@ -4,6 +4,7 @@ import * as React from 'react';
 export const useStyles = makeStyles((theme: Theme) => ({
   paper: {
     padding: theme.spacing(3, 2),
+    margin: theme.spacing(1, 0),
   },
 }));
 

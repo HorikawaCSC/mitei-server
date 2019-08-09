@@ -42,6 +42,7 @@ query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
 
 query getFileSource($id: ID!) {
   fileSource(sourceId: $id) {
+    id
     duration
     name
     thumbnailUrl

@@ -8,7 +8,8 @@ import {
 } from '../api/generated/graphql';
 
 export const transcodeStatusText = {
-  [TranscodeStatus.Pending]: '変換待ち/未変換',
+  [TranscodeStatus.Pending]: '未変換',
+  [TranscodeStatus.Waiting]: '変換待機中',
   [TranscodeStatus.Running]: '変換中',
   [TranscodeStatus.Failed]: '変換エラー',
   [TranscodeStatus.Success]: '変換済み',
@@ -42,4 +43,10 @@ export const rtmpInputSimpleString = (
   return `${rtmpStatusText[input.status]} / 配信先: ${
     input.publishUrl
   } / エンコ設定: ${input.preset.name}`;
+};
+
+export const fileStatusText = {
+  [SourceStatus.Available]: 'ファイルあり',
+  [SourceStatus.Uploading]: 'アップロード待機中/エラー',
+  [SourceStatus.Deleted]: '削除済み',
 };
