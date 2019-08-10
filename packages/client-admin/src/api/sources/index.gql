@@ -75,3 +75,13 @@ query getRtmpInputListSimple($skip: Int!, $take: Int!) {
     total
   }
 }
+
+query getTranscodePresetList($skip: Int!, $take: Int!) {
+  transcodePresetList(skip: $skip, take: $take) {
+    presets {
+      id
+      name
+    }
+    total
+  }
+}
