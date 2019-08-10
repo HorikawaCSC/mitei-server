@@ -6,6 +6,7 @@ import { User, UserDocument } from './User';
 export enum TranscodeStatus {
   Pending = 'pending',
   Running = 'running',
+  Waiting = 'waiting',
   Success = 'success',
   Failed = 'failed',
 }
