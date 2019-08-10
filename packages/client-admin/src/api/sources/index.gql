@@ -22,6 +22,10 @@ mutation removeRtmpInput($id: ID!) {
   removeRtmpInput(id: $id)
 }
 
+mutation enqueueTranscode($sourceId: ID!, $presetId: ID!) {
+  enqueueFileSourceTranscode(sourceId: $sourceId, presetId: $presetId)
+}
+
 query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
   fileSourceList(skip: $skip, take: $take, status: $status) {
     total

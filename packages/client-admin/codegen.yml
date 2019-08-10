@@ -19,5 +19,5 @@ config:
   withComponent: false
   withHOC: false
   scalars:
-    Date: Date
+    Date: string
     Upload: Blob
