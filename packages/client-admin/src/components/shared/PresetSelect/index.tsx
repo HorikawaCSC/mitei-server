@@ -4,8 +4,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import * as React from 'react';
-import { useGetTranscodePresetListQuery } from '../../../api/generated/graphql';
 import { useInView } from 'react-intersection-observer';
+import { useGetTranscodePresetListQuery } from '../../../api/generated/graphql';
 
 const useStyles = makeStyles({
   root: {
