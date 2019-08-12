@@ -1,9 +1,5 @@
 import { Duration } from 'luxon';
 import {
-  GetFileSourcesSimpleQuery,
-  GetRecordSourcesSimpleQuery,
-  GetRtmpInputListSimpleQuery,
-  GetSourcesSimpleQuery,
   RtmpStatus,
   SourceStatus,
   TranscodeStatus,
@@ -21,9 +17,16 @@ export const transcodeStatusText = {
   [TranscodeStatus.Success]: '変換済み',
 };
 
-export const fileSourceSimpleDetailString = (
-  info: GetFileSourcesSimpleQuery['sourceList']['sources'][0],
-) => {
+type FileSourceSimpleData = {
+  duration?: number | null;
+  status: TranscodeStatus;
+  transcodeProgress?: number | null;
+  source: {
+    status: SourceStatus;
+  };
+};
+
+export const fileSourceSimpleDetailString = (info: FileSourceSimpleData) => {
   if (info.source.status === SourceStatus.Uploading) {
     return 'アップロード待機中/エラー';
   }
@@ -38,8 +41,13 @@ export const fileSourceSimpleDetailString = (
   )}`;
 };
 
+type RecordSourceSimpleData = {
+  duration?: number | null;
+  status: TranscodeStatus;
+};
+
 export const recordSourceSimpleDetailString = (
-  info: GetRecordSourcesSimpleQuery['sourceList']['sources'][0],
+  info: RecordSourceSimpleData,
 ) => {
   if (!info.duration) {
     return `${transcodeStatusText[info.status]}`;
@@ -49,9 +57,13 @@ export const recordSourceSimpleDetailString = (
   ).toFormat('hh:mm:ss')}`;
 };
 
-export const sourceSimpleString = (
-  info: GetSourcesSimpleQuery['sourceList']['sources'][0],
-) => {
+type SourceSimpleData = {
+  __typename?: 'FileSource' | 'RecordSource';
+  duration?: number | null;
+  status: TranscodeStatus;
+};
+
+export const sourceSimpleString = (info: SourceSimpleData) => {
   const sourceType = info.__typename ? sourceTypeText[info.__typename] : '不明';
   if (!info.duration) {
     return `[${sourceType}] ${transcodeStatusText[info.status]}`;
@@ -66,17 +78,21 @@ export const rtmpStatusText = {
   [RtmpStatus.Live]: '配信中',
 };
 
-export const rtmpInputSimpleWithUrlString = (
-  input: GetRtmpInputListSimpleQuery['rtmpInputList']['inputs'][0],
-) => {
+type RtmpInputSimpleData = {
+  status: RtmpStatus;
+  publishUrl: string;
+  preset: {
+    name: string;
+  };
+};
+
+export const rtmpInputSimpleWithUrlString = (input: RtmpInputSimpleData) => {
   return `${rtmpStatusText[input.status]} / 配信先: ${
     input.publishUrl
   } / エンコ設定: ${input.preset.name}`;
 };
 
-export const rtmpInputSimpleString = (
-  input: GetRtmpInputListSimpleQuery['rtmpInputList']['inputs'][0],
-) => {
+export const rtmpInputSimpleString = (input: RtmpInputSimpleData) => {
   return `${rtmpStatusText[input.status]} / エンコ設定: ${input.preset.name}`;
 };
 
