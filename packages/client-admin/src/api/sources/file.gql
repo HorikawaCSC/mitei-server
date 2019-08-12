@@ -17,7 +17,7 @@ mutation enqueueTranscode($sourceId: ID!, $presetId: ID!) {
 }
 
 query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
-  sourceList(skip: $skip, take: $take, status: $status) {
+  sourceList(skip: $skip, take: $take, status: $status, type: file) {
     total
     sources {
       id
