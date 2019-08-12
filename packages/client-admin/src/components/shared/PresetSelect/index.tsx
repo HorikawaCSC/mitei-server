@@ -16,7 +16,11 @@ const useStyles = makeStyles({
   },
 });
 
-type Props = { value: string; handleChange: (value: string) => void };
+type Props = {
+  value: string;
+  handleChange: (value: string) => void;
+  disabled?: boolean;
+};
 export const PresetSelect = (props: Props) => {
   const styles = useStyles();
   const { data, loading, fetchMore } = useGetTranscodePresetListQuery({
@@ -60,7 +64,7 @@ export const PresetSelect = (props: Props) => {
     data && data.transcodePresetList ? data.transcodePresetList.presets : [];
   const hasMore = total > presets.length;
   return (
-    <FormControl className={styles.root}>
+    <FormControl className={styles.root} disabled={props.disabled}>
       <InputLabel htmlFor='preset'>プリセット選択</InputLabel>
       <Select
         value={props.value}
@@ -68,7 +72,7 @@ export const PresetSelect = (props: Props) => {
         inputProps={{
           id: 'preset',
         }}
-        disabled={loading && total === 0}
+        disabled={(loading && total === 0) || props.disabled}
         MenuProps={{
           MenuListProps: {
             className: styles.list,

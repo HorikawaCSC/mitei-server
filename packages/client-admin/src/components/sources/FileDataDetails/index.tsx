@@ -1,55 +1,65 @@
 import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { PageContainer, useErrorDialog } from '@mitei/client-common';
 import * as React from 'react';
 import {
   GetFileSourceQuery,
   SourceStatus,
+  useProbeFileSourceMutation,
 } from '../../../api/generated/graphql';
 import { convertFileSize } from '../../../utils/filesize';
 import { fileStatusText } from '../../../utils/sources';
 
-export const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    paper: {
-      padding: theme.spacing(3, 2),
-      margin: theme.spacing(1, 0),
-    },
-  }),
-);
-
 export const FileDataDetails = ({
-  data,
-  handleProbeFile,
+  source,
 }: {
-  data: NonNullable<GetFileSourceQuery['fileSource']>;
-  handleProbeFile: () => unknown;
+  source: NonNullable<GetFileSourceQuery['fileSource']>;
 }) => {
-  const styles = useStyles();
+  const showError = useErrorDialog();
+  const probeFileSource = useProbeFileSourceMutation({
+    errorPolicy: 'all',
+    variables: { sourceId: source.id },
+  });
+  const [isProbeRequested, setProbeRequested] = React.useState(false);
+
+  const handleProbeFile = async () => {
+    setProbeRequested(true);
+    const { errors } = await probeFileSource();
+    if (errors) {
+      showError('エラー発生', errors[0].message);
+      setProbeRequested(false);
+    }
+  };
 
   const probable =
-    !data.source.width && data.source.status === SourceStatus.Available;
-  const fileSize = convertFileSize(data.source.fileSize);
+    !source.source.width && source.source.status === SourceStatus.Available;
+  const fileSize = convertFileSize(source.source.fileSize);
 
   return (
-    <Paper className={styles.paper}>
-      <Typography variant='h6'>元データ</Typography>
-      <Typography>ステータス: {fileStatusText[data.source.status]}</Typography>
+    <PageContainer title='元データ' mini>
+      <Typography>
+        ステータス: {fileStatusText[source.source.status]}
+      </Typography>
       <Typography>
         解像度:{' '}
-        {data.source.width
-          ? `${data.source.width}x${data.source.height}`
+        {source.source.width
+          ? `${source.source.width}x${source.source.height}`
           : '不明'}
       </Typography>
       <Typography>
-        ファイル情報: {data.source.extension} / {fileSize}
+        ファイル情報: {source.source.extension} / {fileSize}
       </Typography>
       {probable ? (
-        <Button color='primary' onClick={handleProbeFile}>
-          <Typography component='span'>ファイル内容の読み取り</Typography>
+        <Button
+          color='primary'
+          onClick={handleProbeFile}
+          disabled={isProbeRequested}
+        >
+          <Typography component='span'>
+            {isProbeRequested ? 'お待ち下さい' : 'ファイル内容の読み取り'}
+          </Typography>
         </Button>
       ) : null}
-    </Paper>
+    </PageContainer>
   );
 };

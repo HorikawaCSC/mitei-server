@@ -10,13 +10,14 @@ export const useStyles = makeStyles((theme: Theme) => ({
 
 type Props = {
   title: string;
+  mini?: boolean;
 };
 
-export const PageContainer: React.SFC<Props> = ({ title, children }) => {
+export const PageContainer: React.SFC<Props> = ({ title, children, mini }) => {
   const styles = useStyles();
   return (
     <Paper className={styles.paper}>
-      <Typography component='h3' variant='h5'>
+      <Typography component={mini ? 'h6' : 'h5'} variant={mini ? 'h6' : 'h5'}>
         {title}
       </Typography>
       {children}
