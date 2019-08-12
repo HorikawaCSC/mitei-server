@@ -54,12 +54,18 @@ export const rtmpStatusText = {
   [RtmpStatus.Live]: '配信中',
 };
 
-export const rtmpInputSimpleString = (
+export const rtmpInputSimpleWithUrlString = (
   input: GetRtmpInputListSimpleQuery['rtmpInputList']['inputs'][0],
 ) => {
   return `${rtmpStatusText[input.status]} / 配信先: ${
     input.publishUrl
   } / エンコ設定: ${input.preset.name}`;
+};
+
+export const rtmpInputSimpleString = (
+  input: GetRtmpInputListSimpleQuery['rtmpInputList']['inputs'][0],
+) => {
+  return `${rtmpStatusText[input.status]} / エンコ設定: ${input.preset.name}`;
 };
 
 export const fileStatusText = {

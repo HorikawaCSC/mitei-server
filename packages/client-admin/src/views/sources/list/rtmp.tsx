@@ -17,7 +17,7 @@ import {
 } from '../../../api/generated/graphql';
 import { AddRtmpInputDialog } from '../../../components/sources/AddRtmpInputDialog';
 import { useCommonStyles } from '../../../styles/common';
-import { rtmpInputSimpleString } from '../../../utils/sources';
+import { rtmpInputSimpleWithUrlString } from '../../../utils/sources';
 
 export const RtmpInputList = () => {
   const commonStyles = useCommonStyles();
@@ -99,7 +99,7 @@ export const RtmpInputList = () => {
             <ListItem key={input.id}>
               <ListItemText
                 primary={input.name}
-                secondary={rtmpInputSimpleString(input)}
+                secondary={rtmpInputSimpleWithUrlString(input)}
               />
               <ListItemSecondaryAction>
                 <IconButton
