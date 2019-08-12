@@ -7,6 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import { useErrorSnack } from '@mitei/client-common';
 import * as React from 'react';
 import { useAddRtmpInputMutation } from '../../../api/generated/graphql';
+import { PresetSelect } from '../../shared/PresetSelect';
 
 type Props = { open: boolean; handleClose: () => void };
 export const AddRtmpInputDialog = (props: Props) => {
@@ -15,6 +16,7 @@ export const AddRtmpInputDialog = (props: Props) => {
 
   const [name, setName] = React.useState('');
   const [loading, setLoading] = React.useState(false);
+  const [presetId, setPresetId] = React.useState('');
 
   const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -30,7 +32,7 @@ export const AddRtmpInputDialog = (props: Props) => {
     setLoading(true);
 
     const { data, errors } = await addRtmpInput({
-      variables: { name, presetId: '' },
+      variables: { name, presetId },
       errorPolicy: 'all',
     });
 
@@ -58,6 +60,12 @@ export const AddRtmpInputDialog = (props: Props) => {
           value={name}
           onChange={handleChangeName}
           fullWidth
+          disabled={loading}
+        />
+        <PresetSelect
+          value={presetId}
+          handleChange={setPresetId}
+          disabled={loading}
         />
       </DialogContent>
       <DialogActions>
