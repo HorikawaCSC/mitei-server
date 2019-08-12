@@ -13,3 +13,18 @@ query getChannelsSimple($skip: Int!, $take: Int!) {
     }
   }
 }
+
+query getChannelDetail($id: String!) {
+  channel(id: $id) {
+    id
+    displayName
+    fillerControl
+    fillerSources {
+      id
+      duration
+      status
+      name
+      type
+    }
+  }
+}
