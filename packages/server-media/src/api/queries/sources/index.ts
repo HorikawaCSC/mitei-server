@@ -58,10 +58,6 @@ export const sourcesQueryResolvers: QueryResolvers = {
       };
     },
   ),
-  // @ts-ignore
-  source: ensureLoggedInAsAdmin(async (_parent, { sourceId }) => {
-    return (await TranscodedSource.findById(sourceId)) || null;
-  }),
   sourceList: ensureLoggedInAsAdmin(
     async (_parent, { take, skip, ...query }) => {
       const conditions = omitUndefined(query);

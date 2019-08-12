@@ -1,6 +1,6 @@
 overwrite: true
 schema:
-  - "./node_modules/@mitei/schema/*.gql"
+  - "./node_modules/@mitei/schema/app.gql"
   - |
    scalar Upload
 documents: null
