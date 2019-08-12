@@ -223,18 +223,18 @@ type Query {
     take: Int!,
   ): SourceList!
 
-  rtmpInput(id: ID!): RtmpInput!
+  rtmpInput(id: ID!): RtmpInput
   rtmpInputList(skip: Int!, take: Int!): RtmpInputList!
 
   users(kind: UserKind, type: IdPType, skip: Int!, take: Int!): Users!
 
-  channel(id: String!): Channel!
+  channel(id: String!): Channel
   channelList(skip: Int!, take: Int!): ChannelList!
 
-  schedule(id: ID!): Schedule!
+  schedule(id: ID!): Schedule
   scheduleList(skip: Int!, take: Int!): ScheduleList!
 
-  transcodePreset(id: ID!): TranscodePreset!
+  transcodePreset(id: ID!): TranscodePreset
   transcodePresetList(skip: Int!, take: Int!): TranscodePresetList!
 
   # normal func

@@ -14,4 +14,7 @@ export const channelQueryResolvers: QueryResolvers = {
       total,
     };
   }),
+  channel: ensureLoggedInAsAdmin(async (_parent, { id }) => {
+    return (await Channel.findById(id)) || null;
+  }),
 };
