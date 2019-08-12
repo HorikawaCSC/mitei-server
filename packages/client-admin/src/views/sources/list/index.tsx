@@ -9,6 +9,7 @@ import {
   Switch,
 } from 'react-router-dom';
 import { FileSourceList } from './file';
+import { RecordSourceList } from './record';
 import { RtmpInputList } from './rtmp';
 
 const useStyles = makeStyles(theme =>
@@ -25,9 +26,9 @@ const renderTabs = (props: RouteComponentProps<{ type: string }>) => {
       <Tab component={Link} to='/sources/file' label='ファイル' value='file' />
       <Tab
         component={Link}
-        to='/sources/recorded'
+        to='/sources/record'
         label='生放送録画'
-        value='recorded'
+        value='record'
       />
       <Tab component={Link} to='/sources/rtmp' label='RTMP' value='rtmp' />
     </Tabs>
@@ -48,6 +49,7 @@ export const SourcesListView = () => {
         />
         <Route path='/sources/file' component={FileSourceList} exact />
         <Route path='/sources/rtmp' component={RtmpInputList} exact />
+        <Route path='/sources/record' component={RecordSourceList} exact />
       </Switch>
     </Paper>
   );

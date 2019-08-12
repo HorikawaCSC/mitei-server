@@ -1,6 +1,7 @@
 import { Duration } from 'luxon';
 import {
   GetFileSourcesSimpleQuery,
+  GetRecordSourcesSimpleQuery,
   GetRtmpInputListSimpleQuery,
   GetSourcesSimpleQuery,
   RtmpStatus,
@@ -35,6 +36,17 @@ export const fileSourceSimpleDetailString = (
   ) || ''} 長さ: ${Duration.fromMillis(info.duration * 1000).toFormat(
     'hh:mm:ss',
   )}`;
+};
+
+export const recordSourceSimpleDetailString = (
+  info: GetRecordSourcesSimpleQuery['sourceList']['sources'][0],
+) => {
+  if (!info.duration) {
+    return `${transcodeStatusText[info.status]}`;
+  }
+  return `${transcodeStatusText[info.status]} 長さ: ${Duration.fromMillis(
+    info.duration * 1000,
+  ).toFormat('hh:mm:ss')}`;
 };
 
 export const sourceSimpleString = (

@@ -215,14 +215,23 @@ type Query {
   recordSource(sourceId: ID!): RecordSource
   recordSourceList(skip: Int!, take: Int!): RecordSourceList!
 
-  sourceList(type: SourceType, skip: Int!, take: Int!): SourceList!
+  source(sourceId: ID!): SourceReference!
+  sourceList(
+    type: SourceType,
+    status: TranscodeStatus,
+    skip: Int!,
+    take: Int!,
+  ): SourceList!
 
+  rtmpInput(id: ID!): RtmpInput!
   rtmpInputList(skip: Int!, take: Int!): RtmpInputList!
 
   users(kind: UserKind, type: IdPType, skip: Int!, take: Int!): Users!
 
+  channel(id: String!): Channel!
   channelList(skip: Int!, take: Int!): ChannelList!
 
+  schedule(id: ID!): Schedule!
   scheduleList(skip: Int!, take: Int!): ScheduleList!
 
   transcodePreset(id: ID!): TranscodePreset!

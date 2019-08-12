@@ -1,0 +1,18 @@
+query getRecordSourcesSimple($skip: Int!, $take: Int!) {
+  sourceList(skip: $skip, take: $take, type: record) {
+    total
+    sources {
+      id
+      duration
+      name
+      thumbnailUrl
+      status
+      createdAt
+      ... on RecordSource {
+        source {
+          name
+        }
+      }
+    }
+  }
+}
