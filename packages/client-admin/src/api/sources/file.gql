@@ -12,22 +12,12 @@ mutation probeFileSource($sourceId: String!) {
   probeFileSource(sourceId: $sourceId)
 }
 
-mutation addRtmpInput($name: String!, $presetId: ID!) {
-  createRtmpInput(name: $name, presetId: $presetId) {
-    id
-  }
-}
-
-mutation removeRtmpInput($id: ID!) {
-  removeRtmpInput(id: $id)
-}
-
 mutation enqueueTranscode($sourceId: ID!, $presetId: ID!) {
   enqueueFileSourceTranscode(sourceId: $sourceId, presetId: $presetId)
 }
 
 query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
-  fileSourceList(skip: $skip, take: $take, status: $status) {
+  sourceList(skip: $skip, take: $take, status: $status) {
     total
     sources {
       id
@@ -36,9 +26,11 @@ query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
       thumbnailUrl
       status
       createdAt
-      transcodeProgress
-      source {
-        status
+      ... on FileSource {
+        transcodeProgress
+        source {
+          status
+        }
       }
     }
   }
@@ -62,30 +54,5 @@ query getFileSource($id: ID!) {
       status
       fileSize
     }
-  }
-}
-
-query getRtmpInputListSimple($skip: Int!, $take: Int!) {
-  rtmpInputList(skip: $skip, take: $take) {
-    inputs {
-      id
-      status
-      name
-      publishUrl
-      preset {
-        name
-      }
-    }
-    total
-  }
-}
-
-query getTranscodePresetList($skip: Int!, $take: Int!) {
-  transcodePresetList(skip: $skip, take: $take) {
-    presets {
-      id
-      name
-    }
-    total
   }
 }

@@ -93,6 +93,21 @@ class LiveHLSManager {
         },
       });
     }
+
+    const notUpdatedRunningSources = await RecordSource.find({
+      status: TranscodeStatus.Running,
+      lastManifestAppend: {
+        $lte: new Date(now - 1000 * 60 * 2),
+      },
+    });
+    for (const source of notUpdatedRunningSources) {
+      liveHlsLogger.warn('record:', source.id, ' seems to be failed');
+      await source.updateOne({
+        $set: {
+          status: TranscodeStatus.Failed,
+        },
+      });
+    }
   }
 }
 

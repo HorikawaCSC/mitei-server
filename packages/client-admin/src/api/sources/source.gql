@@ -1,0 +1,12 @@
+query getSourcesSimple($skip: Int!, $take: Int!) {
+  sourceList(skip: $skip, take: $take) {
+    total
+    sources {
+      id
+      duration
+      name
+      thumbnailUrl
+      status
+    }
+  }
+}

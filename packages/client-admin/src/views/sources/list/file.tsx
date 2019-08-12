@@ -23,7 +23,7 @@ export const FileSourceList = () => {
 
   React.useEffect(() => {
     if (inView && !loading && data) {
-      const { sources } = data.fileSourceList;
+      const { sources } = data.sourceList;
       fetchMore({
         variables: {
           skip: sources.length,
@@ -32,13 +32,13 @@ export const FileSourceList = () => {
         updateQuery(prev, { fetchMoreResult }) {
           if (!fetchMoreResult) return prev;
           return {
-            fileSourceList: {
-              total: fetchMoreResult.fileSourceList.total,
+            sourceList: {
+              total: fetchMoreResult.sourceList.total,
               sources: [
-                ...prev.fileSourceList.sources,
-                ...fetchMoreResult.fileSourceList.sources,
+                ...prev.sourceList.sources,
+                ...fetchMoreResult.sourceList.sources,
               ],
-              __typename: prev.fileSourceList.__typename,
+              __typename: prev.sourceList.__typename,
             },
           };
         },
@@ -53,7 +53,7 @@ export const FileSourceList = () => {
     return null;
   }
 
-  const { total, sources } = data.fileSourceList;
+  const { total, sources } = data.sourceList;
   const hasMore = total > sources.length;
   return (
     <>

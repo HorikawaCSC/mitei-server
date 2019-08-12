@@ -1,0 +1,9 @@
+query getTranscodePresetList($skip: Int!, $take: Int!) {
+  transcodePresetList(skip: $skip, take: $take) {
+    presets {
+      id
+      name
+    }
+    total
+  }
+}

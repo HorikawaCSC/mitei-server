@@ -16,7 +16,7 @@ export const transcodeStatusText = {
 };
 
 export const fileSourceSimpleDetailString = (
-  info: GetFileSourcesSimpleQuery['fileSourceList']['sources'][0],
+  info: GetFileSourcesSimpleQuery['sourceList']['sources'][0],
 ) => {
   if (info.source.status === SourceStatus.Uploading) {
     return 'アップロード待機中/エラー';
