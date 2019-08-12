@@ -10,8 +10,28 @@ query getRecordSourcesSimple($skip: Int!, $take: Int!) {
       createdAt
       ... on RecordSource {
         source {
+          id
           name
         }
+      }
+    }
+  }
+}
+
+query getRecordSource($id: ID!) {
+  source(sourceId: $id) {
+    ... on RecordSource {
+      id
+      duration
+      name
+      thumbnailUrl
+      status
+      createdAt
+      width
+      height
+      source {
+        id
+        name
       }
     }
   }
