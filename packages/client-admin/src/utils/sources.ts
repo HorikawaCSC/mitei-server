@@ -2,11 +2,16 @@ import { Duration } from 'luxon';
 import {
   GetFileSourcesSimpleQuery,
   GetRtmpInputListSimpleQuery,
+  GetSourcesSimpleQuery,
   RtmpStatus,
   SourceStatus,
   TranscodeStatus,
 } from '../api/generated/graphql';
 
+export const sourceTypeText = {
+  FileSource: 'ファイル',
+  RecordSource: '録画',
+};
 export const transcodeStatusText = {
   [TranscodeStatus.Pending]: '未変換',
   [TranscodeStatus.Waiting]: '変換待機中',
@@ -30,6 +35,18 @@ export const fileSourceSimpleDetailString = (
   ) || ''} 長さ: ${Duration.fromMillis(info.duration * 1000).toFormat(
     'hh:mm:ss',
   )}`;
+};
+
+export const sourceSimpleString = (
+  info: GetSourcesSimpleQuery['sourceList']['sources'][0],
+) => {
+  const sourceType = info.__typename ? sourceTypeText[info.__typename] : '不明';
+  if (!info.duration) {
+    return `[${sourceType}] ${transcodeStatusText[info.status]}`;
+  }
+  return `[${sourceType}] ${
+    transcodeStatusText[info.status]
+  } 長さ: ${Duration.fromMillis(info.duration * 1000).toFormat('hh:mm:ss')}`;
 };
 
 export const rtmpStatusText = {
