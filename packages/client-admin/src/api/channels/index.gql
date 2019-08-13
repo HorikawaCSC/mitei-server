@@ -4,6 +4,13 @@ mutation createChannelSimple($id: String!, $displayName: String!) {
   }
 }
 
+mutation updateChannelFillerControl($id: String!, $mode: FillerControl) {
+  updateChannel(id: $id, fillerControl: $mode) {
+    id
+    fillerControl
+  }
+}
+
 query getChannelsSimple($skip: Int!, $take: Int!) {
   channelList(skip: $skip, take: $take) {
     total
