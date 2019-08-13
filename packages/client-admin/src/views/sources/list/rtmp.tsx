@@ -7,7 +7,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 import { Add, Delete } from '@material-ui/icons';
-import { useErrorDialog, useErrorSnack } from '@mitei/client-common';
+import { NotFoundView, useErrorDialog } from '@mitei/client-common';
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import {
@@ -22,7 +22,6 @@ import { rtmpInputSimpleWithUrlString } from '../../../utils/sources';
 export const RtmpInputList = () => {
   const commonStyles = useCommonStyles();
   const [addDialogOpen, setAddDialogOpen] = React.useState(false);
-  const openErrorMessage = useErrorSnack();
   const openErrorMessageDialog = useErrorDialog();
   const {
     data,
@@ -64,8 +63,7 @@ export const RtmpInputList = () => {
   if (loading) return <CircularProgress />;
 
   if (!data || error) {
-    openErrorMessage(error ? error.message : '一覧の取得に失敗');
-    return null;
+    return <NotFoundView error={error ? error.message : ''} />;
   }
 
   const handleDialogClose = () => {

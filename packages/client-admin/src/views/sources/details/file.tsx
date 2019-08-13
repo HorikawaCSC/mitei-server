@@ -1,4 +1,5 @@
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { NotFoundView } from '@mitei/client-common';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useGetFileSourceQuery } from '../../../api/generated/graphql';
@@ -10,15 +11,15 @@ export const FileSourceDetails = ({
   match,
 }: RouteComponentProps<{ id: string }>) => {
   const fileId = match.params.id;
-  const { data, loading } = useGetFileSourceQuery({
+  const { data, loading, error } = useGetFileSourceQuery({
     variables: { id: fileId },
   });
 
   if (loading) {
     return <CircularProgress />;
   }
-  if (!data || !data.fileSource) {
-    return <p>error</p>;
+  if (!data || !data.fileSource || error) {
+    return <NotFoundView error={error ? error.message : ''} />;
   }
 
   const { fileSource: source } = data;

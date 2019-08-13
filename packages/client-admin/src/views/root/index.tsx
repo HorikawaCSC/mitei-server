@@ -1,6 +1,6 @@
 import { Container, CssBaseline } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import { ErrorsView, FullscreenProgress } from '@mitei/client-common';
+import { FullscreenProgress, MessageView } from '@mitei/client-common';
 import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { useGetMyselfSimpleQuery } from '../../api/generated/graphql';
@@ -46,7 +46,7 @@ export const Root = () => {
           <Route path='/channels' component={ChannelsRoot} />
         </Switch>
       </Container>
-      <ErrorsView />
+      <MessageView />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { MuiThemeProvider } from '@material-ui/core/styles';
-import { ErrorsProvider } from '@mitei/client-common';
+import { MessageProvider } from '@mitei/client-common';
 import * as React from 'react';
 import { ApolloProvider } from 'react-apollo';
 import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
@@ -16,11 +16,11 @@ if (target) {
     <MuiThemeProvider theme={theme}>
       <ApolloProvider client={apolloClient}>
         <ApolloHooksProvider client={apolloClient}>
-          <ErrorsProvider>
+          <MessageProvider>
             <BrowserRouter>
               <Root />
             </BrowserRouter>
-          </ErrorsProvider>
+          </MessageProvider>
         </ApolloHooksProvider>
       </ApolloProvider>
     </MuiThemeProvider>,

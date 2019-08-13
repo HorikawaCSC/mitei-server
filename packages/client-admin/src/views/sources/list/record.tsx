@@ -3,7 +3,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
-import { useErrorSnack } from '@mitei/client-common';
+import { NotFoundView } from '@mitei/client-common';
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
@@ -14,7 +14,6 @@ export const RecordSourceList = () => {
   const { loading, data, error, fetchMore } = useGetRecordSourcesSimpleQuery({
     variables: { skip: 0, take: 10 },
   });
-  const openErrorMessage = useErrorSnack();
   const [scrollRef, inView] = useInView();
 
   React.useEffect(() => {
@@ -45,8 +44,7 @@ export const RecordSourceList = () => {
   if (loading) return <CircularProgress />;
 
   if (!data || error) {
-    openErrorMessage(error ? error.message : 'ファイル一覧の取得に失敗');
-    return null;
+    return <NotFoundView error={error ? error.message : ''} />;
   }
 
   const { total, sources } = data.sourceList;
