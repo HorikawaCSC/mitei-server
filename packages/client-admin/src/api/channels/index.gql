@@ -11,6 +11,10 @@ mutation updateChannelFillerControl($id: String!, $mode: FillerControl) {
   }
 }
 
+mutation removeFiller($id: String!, $source: ID!) {
+  removeFillerFromChannel(id: $id, sources: [$source])
+}
+
 query getChannelsSimple($skip: Int!, $take: Int!) {
   channelList(skip: $skip, take: $take) {
     total

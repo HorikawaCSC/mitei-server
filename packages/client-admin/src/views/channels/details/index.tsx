@@ -13,6 +13,7 @@ export const ChannelDetailView = ({
   const { loading, error, data, refetch } = useGetChannelDetailQuery({
     variables: { id },
     errorPolicy: 'all',
+    fetchPolicy: 'no-cache',
   });
 
   if (loading) return <CircularProgress />;
@@ -26,7 +27,7 @@ export const ChannelDetailView = ({
   return (
     <>
       <ChannelInfoSection channel={channel} refetch={refetch} />
-      <FillerListSection channel={channel} />
+      <FillerListSection channel={channel} refetch={refetch} />
     </>
   );
 };
