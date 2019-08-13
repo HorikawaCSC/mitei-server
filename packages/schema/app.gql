@@ -232,7 +232,13 @@ type Query {
   channelList(skip: Int!, take: Int!): ChannelList!
 
   schedule(id: ID!): Schedule
-  scheduleList(skip: Int!, take: Int!): ScheduleList!
+  scheduleList(
+    skip: Int!,
+    take: Int!,
+    startAt: Date,
+    endAt: Date,
+    channel: [String!],
+  ): ScheduleList!
 
   transcodePreset(id: ID!): TranscodePreset
   transcodePresetList(skip: Int!, take: Int!): TranscodePresetList!
