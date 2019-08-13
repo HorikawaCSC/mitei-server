@@ -6,7 +6,10 @@ import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useGetSourcesSimpleQuery } from '../../../api/generated/graphql';
+import {
+  GetSourcesSimpleQuery,
+  useGetSourcesSimpleQuery,
+} from '../../../api/generated/graphql';
 import { sourceSimpleString } from '../../../utils/sources';
 
 const useStyles = makeStyles({
@@ -21,6 +24,9 @@ const useStyles = makeStyles({
 type Props = {
   value: string;
   handleChange: (value: string) => void;
+  filterItem?: (
+    value: GetSourcesSimpleQuery['sourceList']['sources'][0],
+  ) => boolean;
   disabled?: boolean;
 };
 export const SourceSelect = (props: Props) => {
@@ -79,7 +85,7 @@ export const SourceSelect = (props: Props) => {
           },
         }}
       >
-        {sources.map(info => (
+        {sources.filter(props.filterItem || (() => true)).map(info => (
           <MenuItem value={info.id} key={info.id}>
             <ListItemText
               primary={info.name}

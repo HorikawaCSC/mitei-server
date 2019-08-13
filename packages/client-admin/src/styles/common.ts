@@ -7,4 +7,7 @@ export const useCommonStyles = makeStyles({
     bottom: theme.spacing(4),
     right: theme.spacing(4),
   },
+  centerBox: {
+    display: 'flex',
+  },
 });
