@@ -1,0 +1,32 @@
+query getScheduleListSimple($skip: Int!, $take: Int!, $channel: String!, $start: Date, $end: Date) {
+  scheduleList(
+    skip: $skip,
+    take: $take,
+    startAt: $start,
+    endAt: $end,
+    channel: [$channel],
+  ) {
+    total
+    schedules {
+      id
+      startAt
+      endAt
+      isValid
+      programs {
+        id
+        type
+        duration
+        source {
+          ... on TranscodedSource {
+            id
+            name
+          }
+          ... on RtmpInput {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}

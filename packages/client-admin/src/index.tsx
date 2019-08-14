@@ -8,6 +8,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { theme } from './styles/theme';
 import { apolloClient } from './utils/gql-client';
 import { Root } from './views/root';
+import LuxonUtils from '@date-io/luxon';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 const target = document.querySelector('main');
 
@@ -17,9 +19,11 @@ if (target) {
       <ApolloProvider client={apolloClient}>
         <ApolloHooksProvider client={apolloClient}>
           <MessageProvider>
-            <BrowserRouter>
-              <Root />
-            </BrowserRouter>
+            <MuiPickersUtilsProvider utils={LuxonUtils}>
+              <BrowserRouter>
+                <Root />
+              </BrowserRouter>
+            </MuiPickersUtilsProvider>
           </MessageProvider>
         </ApolloHooksProvider>
       </ApolloProvider>
