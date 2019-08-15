@@ -1,9 +1,11 @@
+import { ExecutionResult } from '@apollo/react-common';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { PageContainer, useErrorDialog } from '@mitei/client-common';
 import * as React from 'react';
 import {
   GetFileSourceQuery,
+  ProbeFileSourceMutation,
   SourceStatus,
   useProbeFileSourceMutation,
 } from '../../../api/generated/graphql';
@@ -16,7 +18,7 @@ export const FileDataDetails = ({
   source: NonNullable<GetFileSourceQuery['fileSource']>;
 }) => {
   const showError = useErrorDialog();
-  const probeFileSource = useProbeFileSourceMutation({
+  const [probeFileSource] = useProbeFileSourceMutation({
     errorPolicy: 'all',
     variables: { sourceId: source.id },
   });
@@ -24,7 +26,9 @@ export const FileDataDetails = ({
 
   const handleProbeFile = async () => {
     setProbeRequested(true);
-    const { errors } = await probeFileSource();
+    const { errors } = (await probeFileSource()) as ExecutionResult<
+      ProbeFileSourceMutation
+    >;
     if (errors) {
       showError('エラー発生', errors[0].message);
       setProbeRequested(false);

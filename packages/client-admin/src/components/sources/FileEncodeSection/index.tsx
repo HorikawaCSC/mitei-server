@@ -1,3 +1,4 @@
+import { ExecutionResult } from '@apollo/react-common';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { PageContainer, useErrorDialog } from '@mitei/client-common';
@@ -15,7 +16,7 @@ type Props = {
 };
 
 export const FileEncodeSection = ({ source }: Props) => {
-  const enqueueTranscode = useEnqueueTranscodeMutation({
+  const [enqueueTranscode] = useEnqueueTranscodeMutation({
     errorPolicy: 'all',
   });
   const showError = useErrorDialog();
@@ -29,12 +30,12 @@ export const FileEncodeSection = ({ source }: Props) => {
 
   const handleEncode = async () => {
     setRequested(true);
-    const { errors } = await enqueueTranscode({
+    const { errors } = (await enqueueTranscode({
       variables: {
         sourceId: source.id,
         presetId,
       },
-    });
+    })) as ExecutionResult<{}>;
 
     if (errors) {
       showError('エラー発生', errors[0].message);

@@ -29,8 +29,8 @@ export const FillerListSection = ({
   refetch: () => Promise<unknown>;
 }) => {
   const commonStyles = useCommonStyles();
-  const removeFiller = useRemoveFillerMutation({ errorPolicy: 'all' });
-  const addFiller = useAddFillerMutation({ errorPolicy: 'all' });
+  const [removeFiller] = useRemoveFillerMutation({ errorPolicy: 'all' });
+  const [addFiller] = useAddFillerMutation({ errorPolicy: 'all' });
   const showMessageSnack = useMessageSnack();
   const [sourceId, setSourceId] = React.useState('');
 

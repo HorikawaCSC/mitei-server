@@ -1,3 +1,4 @@
+import { ExecutionResult } from '@apollo/react-common';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import {
@@ -20,7 +21,7 @@ export const ChannelInfoSection = ({
   channel: NonNullable<GetChannelDetailQuery['channel']>;
   refetch: () => Promise<unknown>;
 }) => {
-  const updateFillerControl = useUpdateChannelFillerControlMutation({
+  const [updateFillerControl] = useUpdateChannelFillerControlMutation({
     errorPolicy: 'all',
   });
   const [fillerControl, setFillerControl] = React.useState(
@@ -33,10 +34,9 @@ export const ChannelInfoSection = ({
 
   const handleFillerControlChange = async (value: FillerControl) => {
     setUpdating(true);
-    const { errors } = await updateFillerControl({
+    const { errors } = (await updateFillerControl({
       variables: { id: channel.id, mode: value },
-      errorPolicy: 'all',
-    });
+    })) as ExecutionResult<{}>;
     if (errors) {
       showErrorDialog(...errors.map(error => error.message));
       return;

@@ -1,3 +1,4 @@
+import { ExecutionResult } from '@apollo/react-common';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Fab from '@material-ui/core/Fab';
 import IconButton from '@material-ui/core/IconButton';
@@ -32,7 +33,7 @@ export const RtmpInputList = () => {
   } = useGetRtmpInputListSimpleQuery({
     variables: { skip: 0, take: 10 },
   });
-  const removeRtmpInput = useRemoveRtmpInputMutation();
+  const [removeRtmpInput] = useRemoveRtmpInputMutation({ errorPolicy: 'all' });
   const [scrollRef, inView] = useInView();
 
   React.useEffect(() => {
@@ -77,7 +78,9 @@ export const RtmpInputList = () => {
   };
 
   const createDeleteHandle = (id: string) => async () => {
-    const { errors } = await removeRtmpInput({ variables: { id } });
+    const { errors } = (await removeRtmpInput({
+      variables: { id },
+    })) as ExecutionResult<{}>;
 
     if (errors) {
       openErrorMessageDialog(errors[0].message);

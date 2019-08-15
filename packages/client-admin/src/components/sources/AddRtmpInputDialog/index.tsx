@@ -1,3 +1,4 @@
+import { ExecutionResult } from '@apollo/react-common';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -6,12 +7,15 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import { useErrorSnack } from '@mitei/client-common';
 import * as React from 'react';
-import { useAddRtmpInputMutation } from '../../../api/generated/graphql';
+import {
+  AddRtmpInputMutation,
+  useAddRtmpInputMutation,
+} from '../../../api/generated/graphql';
 import { PresetSelect } from '../../shared/PresetSelect';
 
 type Props = { open: boolean; handleClose: () => void };
 export const AddRtmpInputDialog = (props: Props) => {
-  const addRtmpInput = useAddRtmpInputMutation();
+  const [addRtmpInput] = useAddRtmpInputMutation({ errorPolicy: 'all' });
   const showErrorMessage = useErrorSnack();
 
   const [name, setName] = React.useState('');
@@ -31,10 +35,9 @@ export const AddRtmpInputDialog = (props: Props) => {
   const handleAddClick = async () => {
     setLoading(true);
 
-    const { data, errors } = await addRtmpInput({
+    const { data, errors } = (await addRtmpInput({
       variables: { name, presetId },
-      errorPolicy: 'all',
-    });
+    })) as ExecutionResult<AddRtmpInputMutation>;
 
     setLoading(false);
 

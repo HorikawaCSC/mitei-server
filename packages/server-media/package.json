@@ -37,9 +37,9 @@
     "passport-twitter": "^1.0.4"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.2.1",
-    "@graphql-codegen/typescript": "^1.2.1",
-    "@graphql-codegen/typescript-resolvers": "^1.2.1",
+    "@graphql-codegen/cli": "^1.5.0",
+    "@graphql-codegen/typescript": "^1.5.0",
+    "@graphql-codegen/typescript-resolvers": "^1.5.0",
     "@mitei/schema": "^0.0.1",
     "@types/base-x": "^3.0.0",
     "@types/body-parser": "^1.17.0",

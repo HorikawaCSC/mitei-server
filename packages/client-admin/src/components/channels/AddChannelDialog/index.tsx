@@ -1,3 +1,4 @@
+import { ExecutionResult } from '@apollo/react-common';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -6,11 +7,16 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import { useErrorSnack } from '@mitei/client-common';
 import * as React from 'react';
-import { useCreateChannelSimpleMutation } from '../../../api/generated/graphql';
+import {
+  CreateChannelSimpleMutation,
+  useCreateChannelSimpleMutation,
+} from '../../../api/generated/graphql';
 
 type Props = { open: boolean; handleClose: () => void };
 export const AddChannelDialog = (props: Props) => {
-  const createChannel = useCreateChannelSimpleMutation({ errorPolicy: 'all' });
+  const [createChannel] = useCreateChannelSimpleMutation({
+    errorPolicy: 'all',
+  });
   const showErrorMessage = useErrorSnack();
 
   const [displayName, setDisplayName] = React.useState('');
@@ -34,10 +40,9 @@ export const AddChannelDialog = (props: Props) => {
   const handleAddClick = async () => {
     setLoading(true);
 
-    const { data, errors } = await createChannel({
+    const { data, errors } = (await createChannel({
       variables: { displayName, id: channelId },
-      errorPolicy: 'all',
-    });
+    })) as ExecutionResult<CreateChannelSimpleMutation>;
 
     setLoading(false);
 

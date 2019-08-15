@@ -1,0 +1,5 @@
+node_modules/
+dist/
+packs/
+.git/
+src/**/generated/*

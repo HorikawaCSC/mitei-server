@@ -1,3 +1,4 @@
+import { ExecutionResult } from '@apollo/react-common';
 import {
   Button,
   FormGroup,
@@ -13,6 +14,8 @@ import {
 import * as React from 'react';
 import useRouter from 'use-react-router';
 import {
+  CreateFileSourceUploadMutation,
+  UploadFileSourceChunkMutation,
   useCreateFileSourceUploadMutation,
   useProbeFileSourceMutation,
   useUploadFileSourceChunkMutation,
@@ -26,9 +29,13 @@ export const FileSourceUploadView = () => {
   const [bufferProgress, setBufferProgress] = React.useState(0);
   const [probeFile, setProbeFile] = React.useState(true);
   const [file, setFile] = React.useState<File | null>(null);
-  const createUpload = useCreateFileSourceUploadMutation();
-  const uploadChunk = useUploadFileSourceChunkMutation();
-  const probeFileSource = useProbeFileSourceMutation();
+  const [createUpload] = useCreateFileSourceUploadMutation({
+    errorPolicy: 'all',
+  });
+  const [uploadChunk] = useUploadFileSourceChunkMutation({
+    errorPolicy: 'all',
+  });
+  const [probeFileSource] = useProbeFileSourceMutation({ errorPolicy: 'all' });
   const openErrorMessage = useErrorDialog();
   const { history } = useRouter();
 
@@ -37,15 +44,14 @@ export const FileSourceUploadView = () => {
 
     setUploading(true);
 
-    const { data: sourceData, errors } = await createUpload({
+    const { data: sourceData, errors } = (await createUpload({
       variables: {
         fileInfo: {
           filename: file.name,
           size: file.size,
         },
       },
-      errorPolicy: 'all',
-    });
+    })) as ExecutionResult<CreateFileSourceUploadMutation>;
     if (errors || !sourceData) {
       openErrorMessage(
         errors ? errors[0].message : 'アップロードを開始できません',
@@ -63,7 +69,7 @@ export const FileSourceUploadView = () => {
 
       const blob = file.slice(offset, end);
 
-      const { data: result, errors } = await uploadChunk({
+      const { data: result, errors } = (await uploadChunk({
         variables: {
           file: {
             chunk: blob,
@@ -72,8 +78,7 @@ export const FileSourceUploadView = () => {
           },
           sourceId,
         },
-        errorPolicy: 'all',
-      });
+      })) as ExecutionResult<UploadFileSourceChunkMutation>;
 
       setUploadProgress((end / file.size) * 100);
 
@@ -89,10 +94,9 @@ export const FileSourceUploadView = () => {
     }
     if (uploadSuccess) {
       if (probeFile) {
-        const { errors } = await probeFileSource({
+        const { errors } = (await probeFileSource({
           variables: { sourceId },
-          errorPolicy: 'all',
-        });
+        })) as ExecutionResult<{}>;
         if (errors) {
           openErrorMessage(
             errors ? errors[0].message : 'ファイル確認処理を開始できません',
