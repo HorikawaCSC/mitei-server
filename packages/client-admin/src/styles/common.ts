@@ -9,5 +9,6 @@ export const useCommonStyles = makeStyles({
   },
   centerBox: {
     display: 'flex',
+    alignItems: 'center',
   },
 });

@@ -1,0 +1,48 @@
+fragment scheduleUpdate on Schedule {
+  id
+  isValid
+  programs {
+    id
+    duration
+    type
+    source {
+      ...programSource
+    }
+  }
+}
+mutation updateProgram(
+  $scheduleId: ID!,
+  $programId: ID!,
+  $duration: Float,
+  $type: ProgramType,
+  $sourceId: ID,
+) {
+  updateProgram(
+    scheduleId: $scheduleId,
+    programId: $programId,
+    duration: $duration,
+    type: $type,
+    sourceId: $sourceId,
+  ) {
+    ...scheduleUpdate
+  }
+}
+
+mutation addEmptyProgram($scheduleId: ID!) {
+  addProgramToSchedule(
+    scheduleId: $scheduleId,
+    duration: 0,
+    type: empty,
+  ) {
+    ...scheduleUpdate
+  }
+}
+
+mutation removeProgram($scheduleId: ID!, $programId: ID!) {
+  removeProgramFromSchedule(
+    scheduleId: $scheduleId,
+    programId: $programId,
+  ) {
+    ...scheduleUpdate
+  }
+}

@@ -3,6 +3,7 @@ import { NotFoundView } from '@mitei/client-common';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { useGetScheduleQuery } from '../../../api/generated/graphql';
+import { ProgramListSection } from '../../../components/schedules/ProgramListSection';
 import { ScheduleInfoSection } from '../../../components/schedules/ScheduleInfoSection';
 
 export const ScheduleDetailView = ({
@@ -26,6 +27,7 @@ export const ScheduleDetailView = ({
   return (
     <>
       <ScheduleInfoSection schedule={schedule} />
+      <ProgramListSection schedule={schedule} />
     </>
   );
 };

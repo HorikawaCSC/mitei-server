@@ -31,6 +31,24 @@ query getScheduleListSimple($skip: Int!, $take: Int!, $channel: String!, $start:
   }
 }
 
+fragment programSource on SourceReference {
+  ... on TranscodedSource {
+    id
+    type
+    duration
+    name
+    thumbnailUrl
+    status
+    createdAt
+    width
+    height
+  }
+  ... on RtmpInput {
+    id
+    name
+  }
+}
+
 query getSchedule($id: ID!) {
   schedule(id: $id) {
     id
@@ -46,22 +64,17 @@ query getSchedule($id: ID!) {
       type
       duration
       source {
-        ... on TranscodedSource {
-          id
-          type
-          duration
-          name
-          thumbnailUrl
-          status
-          createdAt
-          width
-          height
-        }
-        ... on RtmpInput {
-          id
-          name
-        }
+        ...programSource
       }
+    }
+  }
+}
+
+query getSourceDuration($id: ID!) {
+  source(sourceId: $id) {
+    ... on TranscodedSource {
+      id
+      duration
     }
   }
 }
