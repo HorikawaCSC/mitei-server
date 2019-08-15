@@ -30,3 +30,38 @@ query getScheduleListSimple($skip: Int!, $take: Int!, $channel: String!, $start:
     }
   }
 }
+
+query getSchedule($id: ID!) {
+  schedule(id: $id) {
+    id
+    startAt
+    endAt
+    isValid
+    channel {
+      id
+      displayName
+    }
+    programs {
+      id
+      type
+      duration
+      source {
+        ... on TranscodedSource {
+          id
+          type
+          duration
+          name
+          thumbnailUrl
+          status
+          createdAt
+          width
+          height
+        }
+        ... on RtmpInput {
+          id
+          name
+        }
+      }
+    }
+  }
+}
