@@ -8,6 +8,7 @@ import {
   SourceStatus,
   TranscodeStatus,
   useEnqueueTranscodeMutation,
+  useGetFileTranscodeStatusQuery,
 } from '../../../api/generated/graphql';
 import { PresetSelect } from '../../shared/PresetSelect';
 
@@ -19,17 +20,31 @@ export const FileEncodeSection = ({ source }: Props) => {
   const [enqueueTranscode] = useEnqueueTranscodeMutation({
     errorPolicy: 'all',
   });
+  const { startPolling, stopPolling } = useGetFileTranscodeStatusQuery({
+    variables: { id: source.id },
+  });
   const showError = useErrorDialog();
   const [presetId, setPresetId] = React.useState('');
   const [isRequested, setRequested] = React.useState(false);
 
   const encodable =
     source.source.width &&
-    source.status === TranscodeStatus.Pending &&
+    (source.status === TranscodeStatus.Pending ||
+      source.status === TranscodeStatus.Failed) &&
     source.source.status === SourceStatus.Available;
+
+  React.useEffect(() => {
+    if (
+      source.status !== TranscodeStatus.Running &&
+      source.status !== TranscodeStatus.Waiting
+    ) {
+      stopPolling();
+    }
+  }, [source]);
 
   const handleEncode = async () => {
     setRequested(true);
+    startPolling(100);
     const { errors } = (await enqueueTranscode({
       variables: {
         sourceId: source.id,
@@ -63,7 +78,15 @@ export const FileEncodeSection = ({ source }: Props) => {
           </Button>
         </>
       ) : (
-        <Typography component='p'>すでに変換済みです</Typography>
+        <Typography component='p'>
+          {source.status === TranscodeStatus.Waiting
+            ? '変換待機中です'
+            : source.status === TranscodeStatus.Running
+            ? `変換中です (${source.transcodeProgress || 0}%)`
+            : source.status === TranscodeStatus.Success
+            ? '変換済みです'
+            : 'ファイル内容不明です'}
+        </Typography>
       )}
     </PageContainer>
   );

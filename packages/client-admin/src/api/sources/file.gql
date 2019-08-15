@@ -16,6 +16,16 @@ mutation enqueueTranscode($sourceId: ID!, $presetId: ID!) {
   enqueueFileSourceTranscode(sourceId: $sourceId, presetId: $presetId)
 }
 
+query getFileTranscodeStatus($id: ID!) {
+  source(sourceId: $id) {
+    ... on FileSource {
+      id
+      status
+      transcodeProgress
+    }
+  }
+}
+
 query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
   sourceList(skip: $skip, take: $take, status: $status, type: file) {
     total
@@ -47,6 +57,7 @@ query getFileSource($id: ID!) {
     width
     height
     error
+    transcodeProgress
     source {
       extension
       width
