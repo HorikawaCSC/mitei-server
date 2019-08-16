@@ -1,5 +1,9 @@
 import * as React from 'react';
 import {
+  ConfirmDialogContextProvider,
+  ConfirmDialogView,
+} from './ConfirmDialog';
+import {
   MessageDialogContextProvider,
   MessageDialogView,
 } from './MessageDialog';
@@ -10,6 +14,7 @@ export const MessageView = () => {
     <>
       <MessageSnackView />
       <MessageDialogView />
+      <ConfirmDialogView />
     </>
   );
 };
@@ -17,7 +22,9 @@ export const MessageView = () => {
 export const MessageProvider: React.SFC = ({ children }) => {
   return (
     <MessageSnackContextProvider>
-      <MessageDialogContextProvider>{children}</MessageDialogContextProvider>
+      <MessageDialogContextProvider>
+        <ConfirmDialogContextProvider>{children}</ConfirmDialogContextProvider>
+      </MessageDialogContextProvider>
     </MessageSnackContextProvider>
   );
 };
