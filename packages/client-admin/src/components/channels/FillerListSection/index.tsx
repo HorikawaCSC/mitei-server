@@ -7,7 +7,11 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 import { Add, Delete } from '@material-ui/icons';
-import { PageContainer, useMessageSnack } from '@mitei/client-common';
+import {
+  PageContainer,
+  useConfirmDialog,
+  useMessageSnack,
+} from '@mitei/client-common';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -33,8 +37,10 @@ export const FillerListSection = ({
   const [addFiller] = useAddFillerMutation();
   const showMessageSnack = useMessageSnack();
   const [sourceId, setSourceId] = React.useState('');
+  const confirm = useConfirmDialog();
 
   const createFillerDelete = (sourceId: string) => async () => {
+    if (!(await confirm('確認', '削除しますか'))) return;
     await removeFiller({
       variables: { id: channel.id, source: sourceId },
     });

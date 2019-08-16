@@ -8,7 +8,11 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 import { Add, Delete } from '@material-ui/icons';
-import { NotFoundView, useErrorDialog } from '@mitei/client-common';
+import {
+  NotFoundView,
+  useConfirmDialog,
+  useErrorDialog,
+} from '@mitei/client-common';
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import {
@@ -35,6 +39,7 @@ export const RtmpInputList = () => {
   });
   const [removeRtmpInput] = useRemoveRtmpInputMutation();
   const [scrollRef, inView] = useInView();
+  const confirm = useConfirmDialog();
 
   React.useEffect(() => {
     if (inView && !loading && data) {
@@ -78,6 +83,8 @@ export const RtmpInputList = () => {
   };
 
   const createDeleteHandle = (id: string) => async () => {
+    if (!(await confirm('確認', '削除しますか'))) return;
+
     const { errors } = (await removeRtmpInput({
       variables: { id },
     })) as ExecutionResult<{}>;

@@ -7,6 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import { Delete, Save, SettingsBackupRestore } from '@material-ui/icons';
 import {
   PageContainer,
+  useConfirmDialog,
   useErrorDialog,
   useMessageSnack,
 } from '@mitei/client-common';
@@ -53,6 +54,7 @@ export const ProgramItem = ({
   ] = useGetSourceDurationLazyQuery();
   const [updateProgram] = useUpdateProgramMutation();
   const [removeProgram] = useRemoveProgramMutation();
+  const confirm = useConfirmDialog();
 
   const program = schedule.programs[index];
   const [programType, setProgramType] = React.useState(program.type);
@@ -125,12 +127,18 @@ export const ProgramItem = ({
   }, [schedule, program, duration, programType, sourceId]);
 
   const handleRemove = React.useCallback(async () => {
-    await removeProgram({
+    if (!(await confirm('確認', '削除しますか'))) return;
+    const { errors } = (await removeProgram({
       variables: {
         scheduleId: schedule.id,
         programId: program.id,
       },
-    });
+    })) as ExecutionResult<{}>;
+    if (errors) {
+      showError(errors[0].message);
+    } else {
+      showMessage('削除しました');
+    }
   }, [schedule, program]);
 
   const sourceSelector = React.useMemo(
