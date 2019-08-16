@@ -9,6 +9,7 @@ import { ProgramType } from '../../../api/generated/graphql';
 type Props = {
   value: ProgramType;
   onChange: (value: ProgramType) => void;
+  disabled?: boolean;
 };
 
 export const SourceTypeSelect = (props: Props) => {
@@ -17,7 +18,7 @@ export const SourceTypeSelect = (props: Props) => {
   };
 
   return (
-    <FormControl component='fieldset'>
+    <FormControl component='fieldset' disabled={props.disabled}>
       <FormLabel component='legend'>ソース種別</FormLabel>
       <RadioGroup value={props.value} onChange={handleChange} row>
         <FormControlLabel

@@ -5,7 +5,11 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { Delete, Save, SettingsBackupRestore } from '@material-ui/icons';
-import { PageContainer, useErrorDialog } from '@mitei/client-common';
+import {
+  PageContainer,
+  useErrorDialog,
+  useMessageSnack,
+} from '@mitei/client-common';
 import * as React from 'react';
 import {
   GetScheduleQuery,
@@ -31,11 +35,18 @@ type Props = {
   index: number;
   schedule: NonNullable<GetScheduleQuery['schedule']>;
   scheduleDuration: number;
+  disabled?: boolean;
 };
-export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
+export const ProgramItem = ({
+  index,
+  schedule,
+  scheduleDuration,
+  disabled,
+}: Props) => {
   const commonStyles = useCommonStyles();
   const styles = useStyles();
   const showError = useErrorDialog();
+  const showMessage = useMessageSnack();
   const [
     getSourceDuration,
     { data: durationData },
@@ -108,6 +119,8 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
     if (errors) {
       showError(errors[0].message);
       handleReset();
+    } else {
+      showMessage('保存しました');
     }
   }, [schedule, program, duration, programType, sourceId]);
 
@@ -123,11 +136,19 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
   const sourceSelector = React.useMemo(
     () =>
       programType === ProgramType.Transcoded ? (
-        <SourceSelect value={sourceId} handleChange={setSourceId} />
+        <SourceSelect
+          value={sourceId}
+          handleChange={setSourceId}
+          disabled={disabled}
+        />
       ) : programType === ProgramType.Rtmp ? (
-        <RtmpInputSelect value={sourceId} handleChange={setSourceId} />
+        <RtmpInputSelect
+          value={sourceId}
+          handleChange={setSourceId}
+          disabled={disabled}
+        />
       ) : null,
-    [programType, sourceId],
+    [programType, sourceId, disabled],
   );
 
   const timeAppliable = React.useMemo(
@@ -153,6 +174,7 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
         <SourceTypeSelect
           value={programType}
           onChange={handleChangeProgramType}
+          disabled={disabled}
         />
         {sourceSelector}
       </Box>
@@ -163,15 +185,20 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
           value={duration}
           error={duration > maxDuration}
           onChange={handleDurationChange}
+          disabled={disabled}
         />
         <Button
-          disabled={!timeAppliable}
+          disabled={!timeAppliable || disabled}
           onClick={handleApplyTimeFromSource}
           color='secondary'
         >
           長さをソースから適用
         </Button>
-        <Button onClick={handleApplyTimeFromMax} color='secondary'>
+        <Button
+          onClick={handleApplyTimeFromMax}
+          disabled={disabled}
+          color='secondary'
+        >
           長さを最大に
         </Button>
       </Box>
@@ -179,6 +206,7 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
         color='primary'
         variant='contained'
         className={styles.buttonGroup}
+        disabled={disabled}
       >
         <Button onClick={handleSave} disabled={!saveEnable}>
           <Save />
