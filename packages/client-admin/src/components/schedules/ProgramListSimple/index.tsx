@@ -26,7 +26,7 @@ export const ProgramListSimple = ({ schedule }: Props) => {
       ))}
       {lastFillerDuration.as('second') > 0 && (
         <Typography component='p'>
-          自動フィラー {lastFillerDuration.toFormat('HH:mm:ss')}
+          自動フィラー {lastFillerDuration.toFormat('hh:mm:ss')}
         </Typography>
       )}
     </>

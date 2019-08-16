@@ -9,6 +9,7 @@ query getScheduleListSimple($skip: Int!, $take: Int!, $channel: String!, $start:
     total
     schedules {
       id
+      title
       startAt
       endAt
       isValid
@@ -52,6 +53,7 @@ fragment programSource on SourceReference {
 query getSchedule($id: ID!) {
   schedule(id: $id) {
     id
+    title
     startAt
     endAt
     isValid

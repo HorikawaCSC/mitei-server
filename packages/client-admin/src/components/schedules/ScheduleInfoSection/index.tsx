@@ -35,6 +35,7 @@ export const ScheduleInfoSection = ({ schedule }: Props) => {
   const channelUrl = `/channels/${channel.id}`;
   return (
     <PageContainer title='スケジュール詳細'>
+      <Typography variant='h6'>{schedule.title}</Typography>
       <Typography>{dateTimeText}</Typography>
       <Typography>
         チャンネル:{' '}

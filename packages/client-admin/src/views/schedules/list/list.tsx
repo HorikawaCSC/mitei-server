@@ -73,6 +73,7 @@ export const ScheduleList = ({ channelId, day }: Props) => {
         <TableHead>
           <TableRow>
             <TableCell>日時</TableCell>
+            <TableCell>タイトル</TableCell>
             <TableCell>内容</TableCell>
             <TableCell align='right'>操作</TableCell>
           </TableRow>
@@ -91,6 +92,9 @@ export const ScheduleList = ({ channelId, day }: Props) => {
                     'HH:mm:ss',
                   )} - ${toStringDate(schedule.endAt, 'HH:mm:ss')}`}
                 </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography>{schedule.title}</Typography>
               </TableCell>
               <TableCell>
                 <ProgramListSimple schedule={schedule} />
