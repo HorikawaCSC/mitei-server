@@ -10,7 +10,7 @@ import { checkOverlappedSchedule } from '../../../../utils/schedule/validate';
 
 export const scheduleMutationResolvers: MutationResolvers = {
   createSchedule: ensureLoggedInAsAdmin(
-    async (_parent, { channelId, startAt, endAt }, { userInfo }) => {
+    async (_parent, { channelId, startAt, endAt, title }, { userInfo }) => {
       if (startAt.getTime() < Date.now() - 1000 * 60 * 60 * 24) {
         throw new Error('startAt must be earlier than now');
       }
@@ -34,6 +34,7 @@ export const scheduleMutationResolvers: MutationResolvers = {
 
       schedule.channelId = channel._id;
       schedule.createdById = userInfo._id;
+      schedule.title = title;
       schedule.startAt = startAt;
       schedule.endAt = endAt;
       schedule.programs = [];
@@ -42,12 +43,13 @@ export const scheduleMutationResolvers: MutationResolvers = {
     },
   ),
   updateSchedule: ensureLoggedInAsAdmin(
-    async (_parent, { scheduleId, startAt, endAt }) => {
+    async (_parent, { scheduleId, startAt, endAt, title }) => {
       const schedule = await Schedule.findById(scheduleId);
       if (!schedule) throw new Error('schedule not found');
 
       if (startAt) schedule.startAt = startAt;
       if (endAt) schedule.endAt = endAt;
+      if (title) schedule.title = title;
 
       if (!schedule.isProgramValid()) {
         throw new Error('schedule contains too long program');

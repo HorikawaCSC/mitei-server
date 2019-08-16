@@ -17,6 +17,7 @@ export interface Program {
 }
 
 export interface ScheduleDocument extends Document {
+  title: string;
   startAt: Date;
   endAt: Date;
   channel?: ChannelDocument;
@@ -30,6 +31,10 @@ export interface ScheduleDocument extends Document {
 
 const schema = new Schema(
   {
+    title: {
+      type: SchemaTypes.String,
+      required: true,
+    },
     startAt: {
       type: SchemaTypes.Date,
       required: true,

@@ -172,6 +172,7 @@ type Program {
 
 type Schedule {
   id: ID!
+  title: String!
   startAt: Date!
   endAt: Date!
   channel: Channel!
@@ -282,12 +283,14 @@ type Mutation {
   ): [ID!]!
 
   createSchedule(
-    channelId: ID!,
+    channelId: String!,
     startAt: Date!,
     endAt: Date!,
+    title: String!,
   ): Schedule!
   updateSchedule(
     scheduleId: ID!,
+    title: String,
     startAt: Date,
     endAt: Date,
   ): Schedule!
