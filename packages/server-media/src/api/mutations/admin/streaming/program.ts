@@ -92,10 +92,10 @@ export const programMutationResolvers: MutationResolvers = {
       if (type) schedule.programs[targetIndex].type = type;
 
       if (
-        !checkTypeAndSource(
+        !(await checkTypeAndSource(
           schedule.programs[targetIndex].type,
           schedule.programs[targetIndex].sourceId,
-        )
+        ))
       ) {
         throw new Error('source invalid');
       }

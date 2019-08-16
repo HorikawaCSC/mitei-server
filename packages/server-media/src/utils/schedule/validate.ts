@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import { TranscodeStatus } from '../../generated/graphql';
 import { RtmpInput } from '../../models/RtmpInput';
 import { ProgramType, Schedule } from '../../models/streaming/Schedule';
 import { TranscodedSource } from '../../models/TranscodedSource';
@@ -29,7 +30,10 @@ export const checkTypeAndSource = async (
   if (type === ProgramType.Empty) {
     return true;
   } else if (type === ProgramType.Transcoded && sourceId) {
-    return await TranscodedSource.exists({ _id: sourceId });
+    return await TranscodedSource.exists({
+      _id: sourceId,
+      status: TranscodeStatus.Success,
+    });
   } else if (type === ProgramType.Rtmp && sourceId) {
     return await RtmpInput.exists({ _id: sourceId });
   } else {
