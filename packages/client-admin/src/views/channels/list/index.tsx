@@ -21,7 +21,6 @@ export const ChannelsListView = () => {
     refetch,
     fetchMore,
   } = useGetChannelsSimpleQuery({
-    errorPolicy: 'all',
     variables: { skip: 0, take: 10 },
   });
   const commonStyles = useCommonStyles();

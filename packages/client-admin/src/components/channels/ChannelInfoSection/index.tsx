@@ -21,9 +21,7 @@ export const ChannelInfoSection = ({
   channel: NonNullable<GetChannelDetailQuery['channel']>;
   refetch: () => Promise<unknown>;
 }) => {
-  const [updateFillerControl] = useUpdateChannelFillerControlMutation({
-    errorPolicy: 'all',
-  });
+  const [updateFillerControl] = useUpdateChannelFillerControlMutation();
   const [fillerControl, setFillerControl] = React.useState(
     FillerControl.Random,
   );

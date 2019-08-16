@@ -29,15 +29,9 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
   const [
     getSourceDuration,
     { data: durationData },
-  ] = useGetSourceDurationLazyQuery({
-    errorPolicy: 'all',
-  });
-  const [updateProgram] = useUpdateProgramMutation({
-    errorPolicy: 'all',
-  });
-  const [removeProgram] = useRemoveProgramMutation({
-    errorPolicy: 'all',
-  });
+  ] = useGetSourceDurationLazyQuery();
+  const [updateProgram] = useUpdateProgramMutation();
+  const [removeProgram] = useRemoveProgramMutation();
 
   const program = schedule.programs[index];
   const [programType, setProgramType] = React.useState(program.type);

@@ -29,13 +29,9 @@ export const FileSourceUploadView = () => {
   const [bufferProgress, setBufferProgress] = React.useState(0);
   const [probeFile, setProbeFile] = React.useState(true);
   const [file, setFile] = React.useState<File | null>(null);
-  const [createUpload] = useCreateFileSourceUploadMutation({
-    errorPolicy: 'all',
-  });
-  const [uploadChunk] = useUploadFileSourceChunkMutation({
-    errorPolicy: 'all',
-  });
-  const [probeFileSource] = useProbeFileSourceMutation({ errorPolicy: 'all' });
+  const [createUpload] = useCreateFileSourceUploadMutation();
+  const [uploadChunk] = useUploadFileSourceChunkMutation();
+  const [probeFileSource] = useProbeFileSourceMutation();
   const openErrorMessage = useErrorDialog();
   const { history } = useRouter();
 

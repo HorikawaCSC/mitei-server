@@ -25,7 +25,6 @@ export const ChannelSelect = (props: Props) => {
   const styles = useStyles();
   const { data, loading, fetchMore } = useGetChannelsSimpleQuery({
     variables: { skip: 0, take: 10 },
-    errorPolicy: 'all',
   });
   const [scrollRef, inView] = useInView();
 

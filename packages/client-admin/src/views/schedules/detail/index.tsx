@@ -12,7 +12,6 @@ export const ScheduleDetailView = ({
   const { scheduleId } = match.params;
   const { data, loading, error } = useGetScheduleQuery({
     variables: { id: scheduleId },
-    errorPolicy: 'all',
   });
 
   if (loading) {

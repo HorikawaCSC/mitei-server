@@ -19,7 +19,6 @@ export const ProgramListSection = ({ schedule }: Props) => {
     addEmptyProgram,
     { error: addEmptyProgramError },
   ] = useAddEmptyProgramMutation({
-    errorPolicy: 'all',
     variables: {
       scheduleId: schedule.id,
     },

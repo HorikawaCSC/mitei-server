@@ -14,9 +14,7 @@ import {
 
 type Props = { open: boolean; handleClose: () => void };
 export const AddChannelDialog = (props: Props) => {
-  const [createChannel] = useCreateChannelSimpleMutation({
-    errorPolicy: 'all',
-  });
+  const [createChannel] = useCreateChannelSimpleMutation();
   const showErrorMessage = useErrorSnack();
 
   const [displayName, setDisplayName] = React.useState('');

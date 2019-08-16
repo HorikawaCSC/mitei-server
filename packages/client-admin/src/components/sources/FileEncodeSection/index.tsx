@@ -17,9 +17,7 @@ type Props = {
 };
 
 export const FileEncodeSection = ({ source }: Props) => {
-  const [enqueueTranscode] = useEnqueueTranscodeMutation({
-    errorPolicy: 'all',
-  });
+  const [enqueueTranscode] = useEnqueueTranscodeMutation();
   const { startPolling, stopPolling } = useGetFileTranscodeStatusQuery({
     variables: { id: source.id },
   });

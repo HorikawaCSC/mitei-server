@@ -27,7 +27,6 @@ export const RtmpInputSelect = (props: Props) => {
   const styles = useStyles();
   const { data, loading, fetchMore } = useGetRtmpInputListSimpleQuery({
     variables: { skip: 0, take: 10 },
-    errorPolicy: 'all',
   });
   const [scrollRef, inView] = useInView();
 

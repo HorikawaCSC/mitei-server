@@ -19,7 +19,6 @@ export const FileDataDetails = ({
 }) => {
   const showError = useErrorDialog();
   const [probeFileSource] = useProbeFileSourceMutation({
-    errorPolicy: 'all',
     variables: { sourceId: source.id },
   });
   const [isProbeRequested, setProbeRequested] = React.useState(false);

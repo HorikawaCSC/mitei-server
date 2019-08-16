@@ -15,7 +15,7 @@ import { PresetSelect } from '../../shared/PresetSelect';
 
 type Props = { open: boolean; handleClose: () => void };
 export const AddRtmpInputDialog = (props: Props) => {
-  const [addRtmpInput] = useAddRtmpInputMutation({ errorPolicy: 'all' });
+  const [addRtmpInput] = useAddRtmpInputMutation();
   const showErrorMessage = useErrorSnack();
 
   const [name, setName] = React.useState('');

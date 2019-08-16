@@ -38,7 +38,6 @@ export const ScheduleList = ({ channelId, day }: Props) => {
   };
 
   const { loading, data, error } = useGetScheduleListSimpleQuery({
-    errorPolicy: 'all',
     variables: {
       ...param,
       skip: 0,

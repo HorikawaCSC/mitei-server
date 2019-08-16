@@ -33,7 +33,7 @@ export const RtmpInputList = () => {
   } = useGetRtmpInputListSimpleQuery({
     variables: { skip: 0, take: 10 },
   });
-  const [removeRtmpInput] = useRemoveRtmpInputMutation({ errorPolicy: 'all' });
+  const [removeRtmpInput] = useRemoveRtmpInputMutation();
   const [scrollRef, inView] = useInView();
 
   React.useEffect(() => {

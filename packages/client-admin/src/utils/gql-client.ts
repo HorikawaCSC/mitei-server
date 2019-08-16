@@ -56,4 +56,12 @@ const cache = new InMemoryCache({ fragmentMatcher });
 export const apolloClient = new ApolloClient({
   link,
   cache,
+  defaultOptions: {
+    query: {
+      errorPolicy: 'all',
+    },
+    mutate: {
+      errorPolicy: 'all',
+    },
+  },
 });

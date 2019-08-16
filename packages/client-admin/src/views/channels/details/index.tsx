@@ -12,7 +12,6 @@ export const ChannelDetailView = ({
   const { id } = match.params;
   const { loading, error, data, refetch } = useGetChannelDetailQuery({
     variables: { id },
-    errorPolicy: 'all',
     fetchPolicy: 'no-cache',
   });
 
