@@ -37,7 +37,6 @@ fragment programSource on SourceReference {
     id
     type
     duration
-    name
     thumbnailUrl
     status
     createdAt
@@ -46,7 +45,6 @@ fragment programSource on SourceReference {
   }
   ... on RtmpInput {
     id
-    name
   }
 }
 

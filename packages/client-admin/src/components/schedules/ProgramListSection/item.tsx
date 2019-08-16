@@ -2,8 +2,9 @@ import { ExecutionResult } from '@apollo/react-common';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { Delete, Save } from '@material-ui/icons';
+import { Delete, Save, SettingsBackupRestore } from '@material-ui/icons';
 import { PageContainer, useErrorDialog } from '@mitei/client-common';
 import * as React from 'react';
 import {
@@ -18,6 +19,14 @@ import { RtmpInputSelect } from '../../shared/RtmpInputSelect';
 import { SourceSelect } from '../../shared/SourceSelect';
 import { SourceTypeSelect } from '../../shared/SourceTypeSelect';
 
+const useStyles = makeStyles(theme =>
+  createStyles({
+    buttonGroup: {
+      margin: theme.spacing(1, 0, 0, 0),
+    },
+  }),
+);
+
 type Props = {
   index: number;
   schedule: NonNullable<GetScheduleQuery['schedule']>;
@@ -25,6 +34,7 @@ type Props = {
 };
 export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
   const commonStyles = useCommonStyles();
+  const styles = useStyles();
   const showError = useErrorDialog();
   const [
     getSourceDuration,
@@ -79,6 +89,12 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
     [],
   );
 
+  const handleReset = React.useCallback(() => {
+    setProgramType(program.type);
+    setSourceId(program.source ? program.source.id : '');
+    setDuration(program.duration);
+  }, [program]);
+
   const handleSave = React.useCallback(async () => {
     const { errors } = (await updateProgram({
       variables: {
@@ -91,6 +107,7 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
     })) as ExecutionResult<{}>;
     if (errors) {
       showError(errors[0].message);
+      handleReset();
     }
   }, [schedule, program, duration, programType, sourceId]);
 
@@ -112,11 +129,24 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
       ) : null,
     [programType, sourceId],
   );
-  const timeAppliable =
-    !!durationData &&
-    !!durationData.source &&
-    durationData.source.id === sourceId &&
-    !!durationData.source.duration;
+
+  const timeAppliable = React.useMemo(
+    () =>
+      !!durationData &&
+      !!durationData.source &&
+      durationData.source.id === sourceId &&
+      !!durationData.source.duration,
+    [durationData, sourceId],
+  );
+
+  const saveEnable = React.useMemo(() => {
+    if (
+      programType === ProgramType.Rtmp ||
+      programType === ProgramType.Transcoded
+    )
+      return !!sourceId;
+    return true;
+  }, [programType, sourceId]);
   return (
     <PageContainer title={`プログラム #${index}`} mini>
       <Box className={commonStyles.centerBox}>
@@ -145,10 +175,18 @@ export const ProgramItem = ({ index, schedule, scheduleDuration }: Props) => {
           長さを最大に
         </Button>
       </Box>
-      <ButtonGroup color='primary' variant='contained'>
-        <Button onClick={handleSave}>
+      <ButtonGroup
+        color='primary'
+        variant='contained'
+        className={styles.buttonGroup}
+      >
+        <Button onClick={handleSave} disabled={!saveEnable}>
           <Save />
           保存
+        </Button>
+        <Button onClick={handleReset}>
+          <SettingsBackupRestore />
+          リセット
         </Button>
         <Button onClick={handleRemove}>
           <Delete />
