@@ -10,6 +10,23 @@ fragment scheduleUpdate on Schedule {
     }
   }
 }
+
+mutation addSchedule(
+  $channelId: String!,
+  $startAt: Date!,
+  $endAt: Date!,
+  $title: String!
+) {
+  createSchedule(
+    channelId: $channelId,
+    startAt: $startAt,
+    endAt: $endAt,
+    title: $title,
+  ) {
+    id
+  }
+}
+
 mutation updateProgram(
   $scheduleId: ID!,
   $programId: ID!,
