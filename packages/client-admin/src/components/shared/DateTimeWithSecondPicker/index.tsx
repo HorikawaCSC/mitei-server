@@ -15,8 +15,14 @@ type Props = {
   value: DateTime;
   onChange: (value: DateTime) => void;
   label?: string;
+  disabled?: boolean;
 };
-export const DateTimeWithSecondPicker = ({ onChange, value, label }: Props) => {
+export const DateTimeWithSecondPicker = ({
+  onChange,
+  value,
+  label,
+  disabled,
+}: Props) => {
   const styles = useStyles();
   const handleSecondChange = React.useCallback(
     (e: React.ChangeEvent<{ value: unknown }>) => {
@@ -34,13 +40,15 @@ export const DateTimeWithSecondPicker = ({ onChange, value, label }: Props) => {
         onChange={onChange as (value: unknown) => void}
         format='yyyy/MM/dd HH:mm'
         ampm={false}
+        disabled={disabled}
       />
       <TextField
         className={styles.second}
-        label={label}
+        label={`${label}(秒)`}
         type='number'
         value={value.second}
         onChange={handleSecondChange}
+        disabled={disabled}
       />
     </Box>
   );

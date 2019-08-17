@@ -1,12 +1,10 @@
 import { ExecutionResult } from '@apollo/react-common';
-import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { Add } from '@material-ui/icons';
 import { PageContainer, useErrorDialog } from '@mitei/client-common';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import useRouter from 'use-react-router';
@@ -14,8 +12,7 @@ import {
   AddScheduleMutation,
   useAddScheduleMutation,
 } from '../../../api/generated/graphql';
-import { DateTimeWithSecondPicker } from '../../../components/shared/DateTimeWithSecondPicker';
-import { useCommonStyles } from '../../../styles/common';
+import { ScheduleEdit } from '../../../components/schedules/ScheduleEdit';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -39,17 +36,10 @@ export const ScheduleCreateView = ({
       .plus({ minute: 30 })
       .set({ second: 0, millisecond: 0 }),
   );
+  const [duration, setDuration] = React.useState(() => Duration.fromMillis(0));
   const styles = useStyles();
-  const commonStyles = useCommonStyles();
   const showError = useErrorDialog();
   const { history } = useRouter();
-
-  const handleChangeTitle = React.useCallback(
-    (e: React.ChangeEvent<{ value: unknown }>) => {
-      setTitle(e.target.value as string);
-    },
-    [],
-  );
 
   React.useEffect(() => {
     if (endAt.diff(startAt).as('second') < 0) {
@@ -75,10 +65,6 @@ export const ScheduleCreateView = ({
     history.push(`/schedules/-/${data.createSchedule.id}`);
   }, [startAt, endAt, title]);
 
-  const duration = React.useMemo(() => {
-    return endAt.diff(startAt);
-  }, [startAt, endAt]);
-
   const addable = React.useMemo<boolean>(
     () => !!title && duration.as('second') > 60,
     [title, duration],
@@ -86,26 +72,15 @@ export const ScheduleCreateView = ({
 
   return (
     <PageContainer title='スケジュール追加'>
-      <TextField
-        fullWidth
-        label='タイトル'
-        value={title}
-        onChange={handleChangeTitle}
+      <ScheduleEdit
+        title={title}
+        onChangeTitle={setTitle}
+        startAt={startAt}
+        onChangeStartAt={setStartAt}
+        endAt={endAt}
+        onChangeEndAt={setEndAt}
+        onChangeDuration={setDuration}
       />
-      <Box className={commonStyles.centerBox}>
-        <DateTimeWithSecondPicker
-          value={startAt}
-          onChange={setStartAt}
-          label='開始'
-        />
-        <Typography>〜</Typography>
-        <DateTimeWithSecondPicker
-          value={endAt}
-          onChange={setEndAt}
-          label='終了'
-        />
-        <Typography>長さ: {duration.toFormat('hh:mm:ss')}</Typography>
-      </Box>
       <Button
         variant='contained'
         color='primary'
