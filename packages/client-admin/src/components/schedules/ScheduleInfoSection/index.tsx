@@ -1,15 +1,28 @@
+import { ExecutionResult } from '@apollo/react-common';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
+import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 import { CheckCircle, Error } from '@material-ui/icons';
-import { PageContainer } from '@mitei/client-common';
+import {
+  PageContainer,
+  useErrorDialog,
+  useMessageSnack,
+} from '@mitei/client-common';
 import clsx from 'clsx';
+import { Duration } from 'luxon';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { GetScheduleQuery } from '../../../api/generated/graphql';
+import {
+  GetScheduleQuery,
+  useUpdateScheduleMutation,
+} from '../../../api/generated/graphql';
 import { useCommonStyles } from '../../../styles/common';
-import { dateDiffText, toStringDate } from '../../../utils/datetime';
+import { toDate } from '../../../utils/datetime';
+import { ScheduleEdit } from '../ScheduleEdit';
 
 const useStyles = makeStyles({
   invalid: {
@@ -26,23 +39,76 @@ type Props = {
 export const ScheduleInfoSection = ({ schedule }: Props) => {
   const styles = useStyles();
   const commonStyles = useCommonStyles();
+  const [updateSchedule] = useUpdateScheduleMutation();
+  const showError = useErrorDialog();
+  const showMessage = useMessageSnack();
 
-  const { startAt, endAt, channel, isValid } = schedule;
-  const dateTimeText = `日時: ${toStringDate(startAt)} - ${toStringDate(
-    endAt,
-    'HH:mm:ss',
-  )} (長さ: ${dateDiffText(endAt, startAt)})`;
+  const { channel, isValid } = schedule;
+  const [title, setTitle] = React.useState(schedule.title);
+  const [startAt, setStartAt] = React.useState(() => toDate(schedule.startAt));
+  const [endAt, setEndAt] = React.useState(() => toDate(schedule.endAt));
+  const [duration, setDuration] = React.useState(() => Duration.fromMillis(0));
   const channelUrl = `/channels/${channel.id}`;
+  const [editMode, setEditMode] = React.useState(false);
+
+  const handleChangeEditMode = React.useCallback(
+    (_e: React.ChangeEvent, value: boolean) => setEditMode(value),
+    [editMode],
+  );
+
+  const handleSave = React.useCallback(async () => {
+    const { errors } = (await updateSchedule({
+      variables: {
+        scheduleId: schedule.id,
+        title,
+        startAt: startAt.toISO(),
+        endAt: endAt.toISO(),
+      },
+    })) as ExecutionResult;
+
+    if (errors) {
+      showError(errors[0].message);
+      return;
+    }
+
+    showMessage('保存しました');
+  }, [title, startAt, endAt]);
+
+  const valid = React.useMemo<boolean>(
+    () => !!title && duration.as('second') > 60,
+    [title, duration],
+  );
+
   return (
     <PageContainer title='スケジュール詳細'>
-      <Typography variant='h6'>{schedule.title}</Typography>
-      <Typography>{dateTimeText}</Typography>
+      <FormControlLabel
+        control={<Switch checked={editMode} onChange={handleChangeEditMode} />}
+        label='編集'
+      />
+      <ScheduleEdit
+        title={title}
+        onChangeTitle={setTitle}
+        startAt={startAt}
+        onChangeStartAt={setStartAt}
+        endAt={endAt}
+        onChangeEndAt={setEndAt}
+        disabled={!editMode}
+        onChangeDuration={setDuration}
+      />
       <Typography>
         チャンネル:{' '}
         <Link component={RouterLink} to={channelUrl}>
           {channel.displayName}
         </Link>
       </Typography>
+      <Button
+        variant='contained'
+        color='primary'
+        disabled={!editMode || !valid}
+        onClick={handleSave}
+      >
+        保存
+      </Button>
       <Box
         className={clsx(
           { [styles.invalid]: !isValid, [styles.valid]: isValid },

@@ -27,6 +27,22 @@ mutation addSchedule(
   }
 }
 
+mutation updateSchedule(
+  $scheduleId: ID!,
+  $startAt: Date,
+  $endAt: Date,
+  $title: String
+) {
+  updateSchedule(
+    scheduleId: $scheduleId,
+    startAt: $startAt,
+    endAt: $endAt,
+    title: $title,
+  ) {
+    ...scheduleUpdate
+  }
+}
+
 mutation updateProgram(
   $scheduleId: ID!,
   $programId: ID!,
