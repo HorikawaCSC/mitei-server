@@ -5,7 +5,6 @@ import { createStyles, makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { Add } from '@material-ui/icons';
-import { DateTimePicker } from '@material-ui/pickers';
 import { PageContainer, useErrorDialog } from '@mitei/client-common';
 import { DateTime } from 'luxon';
 import * as React from 'react';
@@ -15,13 +14,11 @@ import {
   AddScheduleMutation,
   useAddScheduleMutation,
 } from '../../../api/generated/graphql';
+import { DateTimeWithSecondPicker } from '../../../components/shared/DateTimeWithSecondPicker';
 import { useCommonStyles } from '../../../styles/common';
 
 const useStyles = makeStyles(theme =>
   createStyles({
-    secondBox: {
-      width: 60,
-    },
     button: {
       margin: theme.spacing(1, 0, 0, 0),
     },
@@ -60,22 +57,6 @@ export const ScheduleCreateView = ({
     }
   }, [startAt]);
 
-  const handleChangeStartAtSec = React.useCallback(
-    (e: React.ChangeEvent<{ value: unknown }>) => {
-      const second = Math.min(Number(e.target.value), 59);
-      setStartAt(startAt.set({ second }));
-    },
-    [startAt],
-  );
-
-  const handleChangeEndAtSec = React.useCallback(
-    (e: React.ChangeEvent<{ value: unknown }>) => {
-      const second = Math.min(Number(e.target.value), 59);
-      setEndAt(endAt.set({ second }));
-    },
-    [startAt],
-  );
-
   const handleAddSchedule = React.useCallback(async () => {
     const { errors, data } = (await addSchedule({
       variables: {
@@ -112,40 +93,17 @@ export const ScheduleCreateView = ({
         onChange={handleChangeTitle}
       />
       <Box className={commonStyles.centerBox}>
-        <Box>
-          <DateTimePicker
-            label='開始(分)'
-            value={startAt}
-            onChange={setStartAt as (value: unknown) => void}
-            format='yyyy/MM/dd HH:mm'
-            ampm={false}
-          />
-          <TextField
-            className={styles.secondBox}
-            label='開始(秒)'
-            type='number'
-            value={startAt.second}
-            onChange={handleChangeStartAtSec}
-          />
-        </Box>
+        <DateTimeWithSecondPicker
+          value={startAt}
+          onChange={setStartAt}
+          label='開始'
+        />
         <Typography>〜</Typography>
-        <Box>
-          <DateTimePicker
-            label='終了'
-            value={endAt}
-            onChange={setEndAt as (value: unknown) => void}
-            format='yyyy/MM/dd HH:mm'
-            minDate={startAt}
-            ampm={false}
-          />
-          <TextField
-            className={styles.secondBox}
-            label='終了(秒)'
-            type='number'
-            value={endAt.second}
-            onChange={handleChangeEndAtSec}
-          />
-        </Box>
+        <DateTimeWithSecondPicker
+          value={endAt}
+          onChange={setEndAt}
+          label='終了'
+        />
         <Typography>長さ: {duration.toFormat('hh:mm:ss')}</Typography>
       </Box>
       <Button
