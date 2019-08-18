@@ -55,7 +55,13 @@ export const scheduleMutationResolvers: MutationResolvers = {
         throw new Error('schedule contains too long program');
       }
 
-      if (await checkOverlappedSchedule(schedule.startAt, schedule.endAt)) {
+      if (
+        await checkOverlappedSchedule(
+          schedule.startAt,
+          schedule.endAt,
+          schedule._id,
+        )
+      ) {
         throw new Error('schedule overlapping found');
       }
 

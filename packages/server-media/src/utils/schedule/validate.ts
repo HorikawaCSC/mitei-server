@@ -4,8 +4,12 @@ import { RtmpInput } from '../../models/RtmpInput';
 import { ProgramType, Schedule } from '../../models/streaming/Schedule';
 import { TranscodedSource } from '../../models/TranscodedSource';
 
-export const checkOverlappedSchedule = async (startAt: Date, endAt: Date) => {
-  return await Schedule.exists({
+export const checkOverlappedSchedule = async (
+  startAt: Date,
+  endAt: Date,
+  excludeId?: ObjectId,
+) => {
+  const baseCondition = {
     $or: [
       {
         startAt: {
@@ -20,7 +24,19 @@ export const checkOverlappedSchedule = async (startAt: Date, endAt: Date) => {
         },
       },
     ],
-  });
+  };
+  return await Schedule.exists(
+    excludeId
+      ? {
+          $and: [
+            baseCondition,
+            {
+              _id: { $ne: excludeId },
+            },
+          ],
+        }
+      : baseCondition,
+  );
 };
 
 export const checkTypeAndSource = async (
