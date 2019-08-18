@@ -253,7 +253,6 @@ type Mutation {
   createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource!
   uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean!
   probeFileSource(sourceId: String!): Boolean!
-  transcodeFileSource(sourceId: String!, presetId: String!): Boolean!
 
   createRtmpInput(name: String!, presetId: ID!): RtmpInput!
   removeRtmpInput(id: ID!): Boolean!
