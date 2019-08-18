@@ -144,12 +144,18 @@ enum FillerControl {
 
 union SourceReference = FileSource | RecordSource | RtmpInput
 
+enum ChannelPermission {
+  public
+  viewerOnly
+}
+
 type Channel {
   id: String!
   displayName: String!
   createdBy: User!
   fillerSources: [TranscodedSource!]!
   fillerControl: FillerControl!
+  permission: ChannelPermission!
 }
 
 type ChannelList {
@@ -266,11 +272,13 @@ type Mutation {
     displayName: String!,
     fillerSources: [ID!],
     fillerControl: FillerControl,
+    permission: ChannelPermission,
   ): Channel!
   updateChannel(
     id: String!,
     displayName: String,
-    fillerControl: FillerControl
+    fillerControl: FillerControl,
+    permission: ChannelPermission,
   ): Channel!
   addFillerToChannel(
     id: String!,

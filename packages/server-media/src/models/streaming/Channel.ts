@@ -11,6 +11,11 @@ export enum FillerControl {
   Random = 'random',
 }
 
+export enum ChannelPermission {
+  Public = 'public',
+  ViewerOnly = 'viewerOnly',
+}
+
 export interface ChannelDocument extends Document {
   _id: string;
   displayName: string;
@@ -19,6 +24,7 @@ export interface ChannelDocument extends Document {
   fillerSources: TranscodedSourceDocument[];
   fillerSourceIds: ObjectID[];
   fillerControl: FillerControl;
+  permission: ChannelPermission;
 }
 
 const schema = new Schema(
@@ -49,6 +55,12 @@ const schema = new Schema(
       enum: Object.values(FillerControl),
       required: true,
       default: FillerControl.Random,
+    },
+    permission: {
+      type: SchemaTypes.String,
+      enum: Object.values(ChannelPermission),
+      required: true,
+      default: ChannelPermission.ViewerOnly,
     },
   },
   {

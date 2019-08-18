@@ -1,6 +1,10 @@
 import { ObjectID } from 'bson';
 import { MutationResolvers } from '../../../../generated/graphql';
-import { Channel, FillerControl } from '../../../../models/streaming/Channel';
+import {
+  Channel,
+  ChannelPermission,
+  FillerControl,
+} from '../../../../models/streaming/Channel';
 import { TranscodedSource } from '../../../../models/TranscodedSource';
 import { findIdCondition } from '../../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
@@ -9,7 +13,7 @@ export const channelMutationResolvers: MutationResolvers = {
   createChannel: ensureLoggedInAsAdmin(
     async (
       _parent,
-      { id, displayName, fillerControl, fillerSources },
+      { id, displayName, fillerControl, fillerSources, permission },
       { userInfo },
     ) => {
       if (await Channel.findById(id)) {
@@ -21,6 +25,7 @@ export const channelMutationResolvers: MutationResolvers = {
       channel.displayName = displayName;
       channel.createdById = userInfo._id;
       channel.fillerControl = fillerControl || FillerControl.Random;
+      channel.permission = permission || ChannelPermission.ViewerOnly;
 
       if (fillerSources) {
         if (
@@ -40,7 +45,7 @@ export const channelMutationResolvers: MutationResolvers = {
     },
   ),
   updateChannel: ensureLoggedInAsAdmin(
-    async (_parent, { id, displayName, fillerControl }) => {
+    async (_parent, { id, displayName, fillerControl, permission }) => {
       const channel = await Channel.findById(id);
 
       if (!channel) throw new Error('channel not found');
@@ -51,6 +56,10 @@ export const channelMutationResolvers: MutationResolvers = {
 
       if (fillerControl) {
         channel.fillerControl = fillerControl;
+      }
+
+      if (permission) {
+        channel.permission = permission;
       }
 
       return await channel.save();
