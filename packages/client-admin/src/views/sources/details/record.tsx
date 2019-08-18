@@ -3,6 +3,7 @@ import { NotFoundView } from '@mitei/client-common';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useGetRecordSourceQuery } from '../../../api/generated/graphql';
+import { PreviewSection } from '../../../components/sources/PreviewSection';
 import { SourceDetails } from '../../../components/sources/SourceDetails';
 
 export const RecordSourceDetails = ({
@@ -25,6 +26,7 @@ export const RecordSourceDetails = ({
   return (
     <>
       <SourceDetails source={source} />
+      <PreviewSection source={source} />
     </>
   );
 };

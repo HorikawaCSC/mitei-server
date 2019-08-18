@@ -7,4 +7,5 @@ export * from './message';
 export * from './FullscreenProgress';
 export * from './LabeledCheckbox';
 export * from './PageContainer';
+export * from './HLSPlayer';
 export * from './NotFoundView';
