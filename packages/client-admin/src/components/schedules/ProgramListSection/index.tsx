@@ -61,12 +61,13 @@ export const ProgramListSection = ({ schedule }: Props) => {
         control={<Switch checked={!disabled} onChange={handleDisabledChange} />}
         label='編集'
       />
-      {schedule.programs.map((_program, index) => (
+      {schedule.programs.map((program, index) => (
         <ProgramItem
           index={index}
           schedule={schedule}
           scheduleDuration={scheduleDuration}
           disabled={disabled}
+          key={program.id}
         />
       ))}
       {scheduleDuration > programsDuration ? (

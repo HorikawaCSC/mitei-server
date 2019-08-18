@@ -56,6 +56,12 @@ export const ScheduleInfoSection = ({ schedule }: Props) => {
     [editMode],
   );
 
+  const handleReset = React.useCallback(() => {
+    setTitle(schedule.title);
+    setStartAt(toDate(schedule.startAt));
+    setEndAt(toDate(schedule.endAt));
+  }, [schedule, title, startAt, endAt]);
+
   const handleSave = React.useCallback(async () => {
     const { errors } = (await updateSchedule({
       variables: {
@@ -68,6 +74,7 @@ export const ScheduleInfoSection = ({ schedule }: Props) => {
 
     if (errors) {
       showError(errors[0].message);
+      handleReset();
       return;
     }
 
