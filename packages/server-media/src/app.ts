@@ -11,6 +11,7 @@ import { arenaApp } from './routes/arena';
 import { router as authRouter } from './routes/auth';
 import { router as callbackRouter } from './routes/callback';
 import { gqlServer } from './routes/gql';
+import { redis } from './utils/redis';
 import { liveHlsManager } from './workers/live-hls';
 
 (async () => {
@@ -18,6 +19,7 @@ import { liveHlsManager } from './workers/live-hls';
     config.mongo,
     { useNewUrlParser: true },
   );
+  await redis.connect();
 
   await liveHlsManager.cleanUpUnused();
 

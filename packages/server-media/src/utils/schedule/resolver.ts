@@ -3,32 +3,37 @@ import { crc32 } from 'crc';
 import { config } from '../../config';
 import { RecordSource } from '../../models/RecordSource';
 import { RtmpInput } from '../../models/RtmpInput';
-import { ChannelDocument, FillerControl } from '../../models/streaming/Channel';
 import {
-  Program,
-  ProgramType,
-  Schedule,
-  ScheduleDocument,
-} from '../../models/streaming/Schedule';
+  Channel,
+  ChannelDocument,
+  FillerControl,
+} from '../../models/streaming/Channel';
+import { ProgramType, Schedule } from '../../models/streaming/Schedule';
 import {
   TranscodedSource,
-  TranscodedSourceDocument,
   TranscodeStatus,
 } from '../../models/TranscodedSource';
 import { ManifestInput } from '../hls/manifest';
 import { encodeSegmentRef } from '../hls/segment-ref';
 import { schedulerLogger } from '../logging';
+import { EMPTY_FILLER_MAX_DURATION } from './empty-filler';
+import { getChannelFillerList, setChannelFillerList } from './filler';
+import { ManifestList } from './manifest-list';
 import {
-  EMPTY_FILLER_MAX_DURATION,
-  EMPTY_FILLER_OFFSET,
-  EMPTY_FILLER_SEGMENT_DURATION,
-} from './empty-filler';
+  entityToData as convertScheduleDoc,
+  getScheduleCache,
+  ProgramData,
+  ScheduleData,
+  updateScheduleCache,
+} from './schedule';
+import { getSequenceStart, setSequenceStart } from './sequence';
 
-const SCHEDULE_CACHE_EXPIRES = 1000 * 60 * 1;
-const LIVE_DELAY_SEC = 30;
-const MANIFEST_DURATION = 20;
+const SCHEDULE_CACHE_UPDATE_INTERVAL = 1000 * 30;
+const LIVE_DELAY_SEC = 20;
+const MANIFEST_DURATION = 15;
+const MANIFEST_MIN_SIZE = 4;
 
-interface ManifestRef {
+export interface ManifestRef {
   type: 'source' | 'empty';
   sourceId: string;
   offset: number;
@@ -37,177 +42,31 @@ interface ManifestRef {
   discontiniuity: boolean;
 }
 
-const dateDiffSec = (big: Date, small: Date) =>
-  (big.getTime() - small.getTime()) / 1000;
-
-class ManifestList {
-  private _manifest: ManifestRef[] = [];
-  private _totalDurationCache = 0;
-
-  get manifest() {
-    return this._manifest;
-  }
-
-  get totalDuration() {
-    return this._totalDurationCache;
-  }
-
-  loadFromSource(
-    source: TranscodedSourceDocument,
-    condition?: (
-      itemDuration: number,
-      loadedDuration: number,
-      totalDuration: number,
-      itemCreated?: number,
-    ) => boolean,
-    breakAtFalseCondition?: boolean,
-  ) {
-    let duration = 0;
-    let isBegin = true;
-    for (const item of source.manifest) {
-      if (
-        condition &&
-        !condition(
-          item[2],
-          duration,
-          this._totalDurationCache + duration,
-          item[3],
-        )
-      ) {
-        if (breakAtFalseCondition) {
-          break;
-        } else {
-          continue;
-        }
-      }
-
-      duration += item[2];
-      this._manifest.push({
-        type: 'source',
-        sourceId: source.id,
-        offset: item[0],
-        length: item[1],
-        duration: item[2],
-        discontiniuity: isBegin,
-      });
-
-      isBegin = false;
-    }
-
-    this._totalDurationCache += duration;
-
-    return duration;
-  }
-
-  loadFromList(list: ManifestList) {
-    this._manifest.push(...list.manifest);
-    this._totalDurationCache += list.totalDuration;
-  }
-
-  loadEmptyFiller(duration: number) {
-    if (duration > EMPTY_FILLER_MAX_DURATION)
-      throw new Error('requested duration is too long');
-    if (duration < EMPTY_FILLER_SEGMENT_DURATION)
-      return EMPTY_FILLER_SEGMENT_DURATION;
-
-    const count = Math.floor(duration / EMPTY_FILLER_SEGMENT_DURATION);
-    const actualDuration = EMPTY_FILLER_SEGMENT_DURATION * count;
-    this._manifest.push({
-      type: 'empty',
-      sourceId: '',
-      offset: 0,
-      length: EMPTY_FILLER_OFFSET[count - 1],
-      duration: actualDuration,
-      discontiniuity: true,
-    });
-    this._totalDurationCache += actualDuration;
-
-    return actualDuration;
-  }
-
-  select(skipDuration: number, maxDuration = MANIFEST_DURATION) {
-    let duration = 0;
-    let skips = 0;
-    let selectedDuration = 0;
-
-    const manifest: ManifestRef[] = [];
-
-    for (const item of this._manifest) {
-      duration += item.duration;
-
-      if (duration >= skipDuration) {
-        selectedDuration += item.duration;
-        manifest.push(item);
-
-        if (selectedDuration > maxDuration) break;
-      } else {
-        skips++;
-      }
-    }
-
-    return { skips, manifest, duration: selectedDuration };
-  }
-}
+const dateDiffSec = (big: number, small: number) => (big - small) / 1000;
 
 export class ScheduleResolver {
-  private scheduleCache: ScheduleDocument[] = [];
   private lastScheduleCacheUpdated = 0;
-  private sequenceMap: Map<string, number> = new Map();
 
-  constructor(private channel: ChannelDocument) {}
+  constructor(private channelId: string) {}
 
-  async initialize() {
-    await this.channel.populate('fillerSources').execPopulate();
-  }
-
-  private async fetchFutureSchedules() {
-    const now = new Date();
-    const schedules = await Schedule.find({
-      endAt: {
-        $gt: now,
-      },
-    })
-      .limit(2)
-      .exec();
-
-    return schedules;
-  }
-
-  private async updateScheduleCache() {
-    const futureSchedules = await this.fetchFutureSchedules();
-    this.scheduleCache.push(
-      ...futureSchedules.filter(schedule =>
-        this.scheduleCache.every(cached => cached.id !== schedule.id),
-      ),
-    );
-
+  private async getRecentSchedule() {
     const now = Date.now();
-    const futureOrCurrentScheduleBegin = this.scheduleCache.findIndex(
-      schedule => schedule.endAt.getTime() >= now - 1000 * 60,
-    );
+    let schedule = await getScheduleCache(this.channelId, true);
 
-    if (futureOrCurrentScheduleBegin !== 0) {
-      this.scheduleCache.splice(0, futureOrCurrentScheduleBegin);
-      schedulerLogger.debug(
-        futureOrCurrentScheduleBegin,
-        'past schedules was removed from cache',
-      );
+    if (!schedule) {
+      schedule = await updateScheduleCache(this.channelId);
+
+      if (!schedule) {
+        throw new Error('no current schedule');
+      }
     }
-  }
 
-  private getRecentSchedule() {
-    const now = Date.now();
-    const futureOrCurrentScheduleBegin = this.scheduleCache.findIndex(
-      schedule => schedule.endAt.getTime() >= now,
+    const current = schedule.find(
+      value => value.startAt <= now && value.endAt >= now,
     );
+    if (!current) throw new Error('no current schedule');
 
-    if (futureOrCurrentScheduleBegin === -1)
-      throw new Error('no current schedule');
-    const current = this.scheduleCache[futureOrCurrentScheduleBegin];
-    if (current.startAt.getTime() >= now)
-      throw new Error('no current schedule');
-
-    const next = this.scheduleCache[futureOrCurrentScheduleBegin + 1];
+    const next = schedule.find(value => value.startAt >= now);
 
     return { current, next };
   }
@@ -224,22 +83,43 @@ export class ScheduleResolver {
     return manifestList;
   }
 
-  private createFillerManifest(scheduleId: string, duration: number) {
+  private async updateFillerCache() {
+    const channel = await Channel.findById(this.channelId);
+    if (!channel) throw new Error('channel not found');
+
+    const fillers = await TranscodedSource.find({
+      _id: { $in: channel.fillerSourceIds },
+      status: TranscodeStatus.Success,
+    });
+    return await setChannelFillerList(channel.id, {
+      fillerControl: channel.fillerControl,
+      fillerSources: fillers.map(data => ({
+        id: data.id || '',
+        manifest: data.manifest,
+      })),
+    });
+  }
+
+  private async createFillerManifest(scheduleId: string, duration: number) {
     const manifestList = new ManifestList();
 
-    if (this.channel.fillerSources.length === 0) {
+    let fillerData = await getChannelFillerList(this.channelId, true);
+    if (!fillerData) {
+      fillerData = await this.updateFillerCache();
+    }
+    if (fillerData.fillerSources.length === 0) {
       return this.createEmptyFiller(duration);
     }
 
     const scheduleCrc = crc32(scheduleId);
-    const availableFillers = this.channel.fillerSources;
+    const availableFillers = fillerData.fillerSources;
 
     const skips =
-      this.channel.fillerControl === FillerControl.Sequential
+      fillerData.fillerControl === FillerControl.Sequential
         ? 0
         : Math.abs(scheduleCrc & 0xffff) % availableFillers.length;
     const step =
-      this.channel.fillerControl === FillerControl.Sequential
+      fillerData.fillerControl === FillerControl.Sequential
         ? 1
         : Math.abs(scheduleCrc >> 16) % availableFillers.length;
 
@@ -251,7 +131,6 @@ export class ScheduleResolver {
       index = (index + step) % availableFillers.length
     ) {
       const filler = availableFillers[index];
-      if (filler.status !== TranscodeStatus.Success) continue;
 
       remain -= manifestList.loadFromSource(
         filler,
@@ -269,7 +148,11 @@ export class ScheduleResolver {
     return manifestList;
   }
 
-  private async resolveRtmpInputs(id: ObjectID, startAt: Date, endAt: Date) {
+  private async resolveRtmpInputs(
+    id: ObjectID,
+    startAt: number,
+    endAt: number,
+  ) {
     const record = await RecordSource.find({
       source: id,
       status: {
@@ -290,9 +173,7 @@ export class ScheduleResolver {
     return record;
   }
 
-  private filterRtmpManifest(startAt: Date, endAt: Date) {
-    const startAtTime = startAt.getTime();
-    const endAtTime = endAt.getTime();
+  private filterRtmpManifest(startAtTime: number, endAtTime: number) {
     const maxDuration = (endAtTime - startAtTime) / 1000;
     return (
       nextDuration: number,
@@ -310,17 +191,15 @@ export class ScheduleResolver {
   }
 
   private async createRtmpInputProgramManifest(
-    schedule: ScheduleDocument,
-    program: Program,
-    programStartAt: Date,
+    schedule: ScheduleData,
+    program: ProgramData,
+    programStartAt: number,
   ) {
     const rtmp = program.sourceId
       ? await RtmpInput.findById(program.sourceId)
       : null;
 
-    const programEndAt = new Date(
-      programStartAt.getTime() + program.duration * 1000,
-    );
+    const programEndAt = programStartAt + program.duration * 1000;
     const sources = rtmp
       ? await this.resolveRtmpInputs(rtmp._id, programStartAt, programEndAt)
       : [];
@@ -329,7 +208,7 @@ export class ScheduleResolver {
 
     if (sources.length === 0) {
       manifestList.loadFromList(
-        this.createFillerManifest(schedule.id, programDuration),
+        await this.createFillerManifest(schedule.id, programDuration),
       );
 
       return manifestList;
@@ -337,9 +216,7 @@ export class ScheduleResolver {
 
     for (let index = 0; index < sources.length; index++) {
       const source = sources[index];
-      const sourceStartAt = new Date(
-        source.createdAt!.getTime() - LIVE_DELAY_SEC * 1000,
-      );
+      const sourceStartAt = source.createdAt!.getTime() - LIVE_DELAY_SEC * 1000;
 
       // (source begin date) - (program start date)
       const durationBetweenStartAndSource = dateDiffSec(
@@ -355,7 +232,7 @@ export class ScheduleResolver {
           );
 
           manifestList.loadFromList(
-            this.createFillerManifest(schedule.id, fillerDuration),
+            await this.createFillerManifest(schedule.id, fillerDuration),
           );
         }
       }
@@ -373,7 +250,7 @@ export class ScheduleResolver {
       );
 
       manifestList.loadFromList(
-        this.createFillerManifest(schedule.id, lastFillerDuration),
+        await this.createFillerManifest(schedule.id, lastFillerDuration),
       );
     }
 
@@ -386,15 +263,13 @@ export class ScheduleResolver {
   }
 
   private async createTranscodedProgramManifest(
-    schedule: ScheduleDocument,
-    program: Program,
-    programStartAt: Date,
+    schedule: ScheduleData,
+    program: ProgramData,
+    programStartAt: number,
   ) {
     // const { startAt, endAt } = schedule;
     const manifestList = new ManifestList();
-    const programEndAt = new Date(
-      programStartAt.getTime() + program.duration * 1000,
-    );
+    const programEndAt = programStartAt + program.duration * 1000;
     const programDuration = dateDiffSec(programEndAt, programStartAt);
     const source = program.sourceId
       ? await TranscodedSource.findById(program.sourceId)
@@ -412,20 +287,22 @@ export class ScheduleResolver {
 
     const remain = programDuration - manifestList.totalDuration;
     if (remain > 0) {
-      manifestList.loadFromList(this.createFillerManifest(schedule.id, remain));
+      manifestList.loadFromList(
+        await this.createFillerManifest(schedule.id, remain),
+      );
     }
 
     return manifestList;
   }
 
   private async createEmptyProgramManifest(
-    schedule: ScheduleDocument,
-    program: Program,
+    schedule: ScheduleData,
+    program: ProgramData,
   ) {
     const manifestList = new ManifestList();
     if (program.duration > 0) {
       manifestList.loadFromList(
-        this.createFillerManifest(schedule.id, program.duration),
+        await this.createFillerManifest(schedule.id, program.duration),
       );
     }
 
@@ -433,9 +310,9 @@ export class ScheduleResolver {
   }
 
   private async createProgramManifest(
-    schedule: ScheduleDocument,
-    program: Program,
-    programEndAt: Date,
+    schedule: ScheduleData,
+    program: ProgramData,
+    programEndAt: number,
   ) {
     if (program.type === ProgramType.Rtmp) {
       return await this.createRtmpInputProgramManifest(
@@ -456,7 +333,7 @@ export class ScheduleResolver {
     }
   }
 
-  private async createManifestForSchedule(schedule: ScheduleDocument) {
+  private async createManifestForSchedule(schedule: ScheduleData) {
     const manifestList = new ManifestList();
     let programStartAt = schedule.startAt;
     for (let index = 0; index < schedule.programs.length; index++) {
@@ -464,15 +341,13 @@ export class ScheduleResolver {
       manifestList.loadFromList(
         await this.createProgramManifest(schedule, program, programStartAt),
       );
-      programStartAt = new Date(
-        programStartAt.getTime() + program.duration * 1000,
-      );
+      programStartAt = programStartAt + program.duration * 1000;
     }
 
-    const scheduleDuration = dateDiffSec(schedule.endAt, schedule.startAt);
+    const scheduleDuration = (schedule.endAt - schedule.startAt) / 1000;
     if (scheduleDuration - manifestList.totalDuration > 2) {
       manifestList.loadFromList(
-        this.createFillerManifest(
+        await this.createFillerManifest(
           schedule.id,
           scheduleDuration - manifestList.totalDuration,
         ),
@@ -483,55 +358,53 @@ export class ScheduleResolver {
   }
 
   private async createFutureManifest(
-    schedule: ScheduleDocument,
+    schedule: ScheduleData,
     maxDuration = MANIFEST_DURATION,
   ) {
     const manifest = await this.createManifestForSchedule(schedule);
-    const elapsed = dateDiffSec(new Date(), schedule.startAt);
+    const elapsed = dateDiffSec(Date.now(), schedule.startAt);
 
     schedulerLogger.debug('manifest duration', manifest.totalDuration);
-    return manifest.select(elapsed, maxDuration);
+    return manifest.select(elapsed, maxDuration, MANIFEST_MIN_SIZE);
   }
 
-  private async resolveSequenceStart(currentSchedule: ScheduleDocument) {
-    if (this.sequenceMap.has(currentSchedule.id)) {
-      return this.sequenceMap.get(currentSchedule.id)!;
-    }
+  private async resolveSequenceStart(schedule: ScheduleData) {
+    const currentSeq = await getSequenceStart(schedule.id, true);
+    if (currentSeq !== null) return currentSeq;
 
     const previousSchedule = await Schedule.findOne({
       endAt: {
-        $gte: new Date(currentSchedule.startAt.getTime() - 1000),
-        $lte: currentSchedule.startAt,
+        $gte: schedule.startAt - 1000,
+        $lte: schedule.startAt,
       },
+      channel: this.channelId,
     }).exec();
 
     if (!previousSchedule) {
-      this.sequenceMap.set(currentSchedule.id, 0);
-      return 0;
+      return await setSequenceStart(schedule.id, 0);
     }
 
-    if (this.sequenceMap.has(previousSchedule.id)) {
-      const previousStart = this.sequenceMap.get(previousSchedule.id)!;
+    const previousSeq = await getSequenceStart(previousSchedule.id);
+    if (previousSeq !== null) {
       const {
         manifest: previousManifest,
-      } = await this.createManifestForSchedule(previousSchedule);
+      } = await this.createManifestForSchedule(
+        convertScheduleDoc(previousSchedule),
+      );
 
       schedulerLogger.debug(
-        'sequence',
-        previousStart,
+        'prev sequence',
+        previousSeq,
         '->',
-        previousStart + previousManifest.length,
+        previousSeq + previousManifest.length,
       );
 
-      this.sequenceMap.set(
-        currentSchedule.id,
-        previousStart + previousManifest.length,
+      return await setSequenceStart(
+        schedule.id,
+        previousSeq + previousManifest.length,
       );
-
-      return previousStart + previousManifest.length;
     } else {
-      this.sequenceMap.set(currentSchedule.id, 0);
-      return 0;
+      return await setSequenceStart(schedule.id, 0);
     }
   }
 
@@ -553,10 +426,12 @@ export class ScheduleResolver {
 
   async createManifest(): Promise<ManifestInput> {
     const now = Date.now();
-    if (now - this.lastScheduleCacheUpdated >= SCHEDULE_CACHE_EXPIRES)
-      await this.updateScheduleCache();
+    if (now - this.lastScheduleCacheUpdated >= SCHEDULE_CACHE_UPDATE_INTERVAL) {
+      await updateScheduleCache(this.channelId);
+      this.lastScheduleCacheUpdated = now;
+    }
 
-    const { next, current } = this.getRecentSchedule();
+    const { next, current } = await this.getRecentSchedule();
     const seqStart = await this.resolveSequenceStart(current);
 
     const { skips, manifest, duration } = await this.createFutureManifest(
@@ -593,10 +468,8 @@ const resolvers: Map<string, ScheduleResolver> = new Map();
 export const createScheduleResolver = async (channel: ChannelDocument) => {
   if (resolvers.has(channel.id)) return resolvers.get(channel.id)!;
 
-  const scheduler = new ScheduleResolver(channel);
+  const scheduler = new ScheduleResolver(channel.id as string);
   resolvers.set(channel.id, scheduler);
-
-  await scheduler.initialize();
 
   return scheduler;
 };
