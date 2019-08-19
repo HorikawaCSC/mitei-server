@@ -18,6 +18,7 @@ export interface FileSourceDocument extends TranscodedSourceDocument {
     width?: number;
     height?: number;
     fileSize: number;
+    duration?: number;
   };
   error?: string;
   transcodable: boolean;
@@ -37,6 +38,7 @@ const sourceSchema = new Schema({
   width: SchemaTypes.Number,
   height: SchemaTypes.Number,
   fileSize: SchemaTypes.Number,
+  duration: SchemaTypes.Number,
 });
 
 const schema = new Schema({

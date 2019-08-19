@@ -25,11 +25,11 @@ export class Transcoder extends EventEmitter {
   transcodedDuration = 0;
 
   get progress() {
-    if (!this.source || !this.source.duration) return 0;
+    if (!this.source || !this.source.source.duration) return 0;
     if (this.source.status === TranscodeStatus.Success) return 100;
 
     return Math.min(
-      Math.ceil((this.transcodedDuration / this.source.duration) * 100),
+      Math.ceil((this.transcodedDuration / this.source.source.duration) * 100),
       100,
     );
   }
@@ -77,7 +77,7 @@ export class Transcoder extends EventEmitter {
 
     this.source.source.width = video.width;
     this.source.source.height = video.height;
-    this.source.duration = Number(video.duration);
+    this.source.source.duration = Number(video.duration);
 
     await this.source.save();
   }
@@ -133,6 +133,7 @@ export class Transcoder extends EventEmitter {
 
     this.source.presetId = this.preset._id;
     this.source.manifest = []; // reset manifest
+    this.source.duration = 0;
     await this.source.save();
 
     await this.setStatus(TranscodeStatus.Running);
@@ -205,6 +206,9 @@ export class Transcoder extends EventEmitter {
               },
               $set: {
                 updatedAt: new Date(),
+              },
+              $inc: {
+                duration,
               },
             });
             this.transcodedDuration += duration;

@@ -279,7 +279,7 @@ export class ScheduleResolver {
       manifestList.loadFromSource(
         source,
         (nextDuration, _loaded, total) => {
-          return total + nextDuration < programDuration;
+          return total + nextDuration <= programDuration;
         },
         true,
       );
