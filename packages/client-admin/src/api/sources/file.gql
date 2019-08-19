@@ -40,6 +40,7 @@ query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
         transcodeProgress
         source {
           status
+          duration
         }
       }
     }
@@ -64,6 +65,7 @@ query getFileSource($id: ID!) {
       height
       status
       fileSize
+      duration
     }
   }
 }

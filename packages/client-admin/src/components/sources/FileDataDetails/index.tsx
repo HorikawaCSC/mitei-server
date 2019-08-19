@@ -2,6 +2,7 @@ import { ExecutionResult } from '@apollo/react-common';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { PageContainer, useErrorDialog } from '@mitei/client-common';
+import { Duration } from 'luxon';
 import * as React from 'react';
 import {
   GetFileSourceQuery,
@@ -47,6 +48,14 @@ export const FileDataDetails = ({
         解像度:{' '}
         {source.source.width
           ? `${source.source.width}x${source.source.height}`
+          : '不明'}
+      </Typography>
+      <Typography>
+        長さ:{' '}
+        {source.source.duration
+          ? Duration.fromMillis(source.source.duration * 1000).toFormat(
+              'hh:mm:ss',
+            )
           : '不明'}
       </Typography>
       <Typography>
