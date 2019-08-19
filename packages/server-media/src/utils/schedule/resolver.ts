@@ -360,12 +360,13 @@ export class ScheduleResolver {
   private async createFutureManifest(
     schedule: ScheduleData,
     maxDuration = MANIFEST_DURATION,
+    minSize = MANIFEST_MIN_SIZE,
   ) {
     const manifest = await this.createManifestForSchedule(schedule);
     const elapsed = dateDiffSec(Date.now(), schedule.startAt);
 
     schedulerLogger.debug('manifest duration', manifest.totalDuration);
-    return manifest.select(elapsed, maxDuration, MANIFEST_MIN_SIZE);
+    return manifest.select(elapsed, maxDuration, minSize);
   }
 
   private async resolveSequenceStart(schedule: ScheduleData) {
@@ -443,6 +444,7 @@ export class ScheduleResolver {
       const { manifest: nextManifest } = await this.createFutureManifest(
         next,
         MANIFEST_DURATION - duration,
+        0,
       );
       manifest.push(...nextManifest);
     } else if (manifest.length === 0) {
