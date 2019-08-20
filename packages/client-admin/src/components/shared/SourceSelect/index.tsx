@@ -28,6 +28,7 @@ type Props = {
     value: GetSourcesSimpleQuery['sourceList']['sources'][0],
   ) => boolean;
   disabled?: boolean;
+  defaultValue?: GetSourcesSimpleQuery['sourceList']['sources'][0] | null;
 };
 export const SourceSelect = (props: Props) => {
   const styles = useStyles();
@@ -65,8 +66,19 @@ export const SourceSelect = (props: Props) => {
     props.handleChange(e.target.value as string);
   };
 
-  const total = data && data.sourceList ? data.sourceList.total : 0;
-  const sources = data && data.sourceList ? data.sourceList.sources : [];
+  const total = React.useMemo(
+    () => (data && data.sourceList ? data.sourceList.total : 0),
+    [data, props.defaultValue],
+  );
+  const sources = React.useMemo(() => {
+    const fetched = data && data.sourceList ? data.sourceList.sources : [];
+    const defaultValue = props.defaultValue;
+    if (defaultValue && !fetched.some(({ id }) => id === defaultValue.id)) {
+      return [...fetched, defaultValue];
+    } else {
+      return fetched;
+    }
+  }, [data, props.defaultValue]);
   const hasMore = total > sources.length;
   return (
     <FormControl className={styles.root} disabled={props.disabled}>

@@ -35,6 +35,7 @@ query getScheduleListSimple($skip: Int!, $take: Int!, $channel: String!, $start:
 fragment programSource on SourceReference {
   ... on TranscodedSource {
     id
+    name
     type
     duration
     thumbnailUrl
@@ -45,6 +46,7 @@ fragment programSource on SourceReference {
   }
   ... on RtmpInput {
     id
+    name
   }
 }
 

@@ -148,6 +148,13 @@ export const ProgramItem = ({
           value={sourceId}
           handleChange={setSourceId}
           disabled={disabled}
+          defaultValue={
+            program.source &&
+            (program.source.__typename === 'FileSource' ||
+              program.source.__typename === 'RecordSource')
+              ? program.source
+              : null
+          }
         />
       ) : programType === ProgramType.Rtmp ? (
         <RtmpInputSelect
