@@ -108,6 +108,10 @@ export const ProgramItem = ({
     setDuration(program.duration);
   }, [program]);
 
+  React.useEffect(() => {
+    if (disabled) handleReset();
+  }, [disabled]);
+
   const handleSave = React.useCallback(async () => {
     const { errors } = (await updateProgram({
       variables: {

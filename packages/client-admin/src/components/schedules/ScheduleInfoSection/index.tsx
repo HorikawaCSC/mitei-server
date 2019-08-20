@@ -51,16 +51,19 @@ export const ScheduleInfoSection = ({ schedule }: Props) => {
   const channelUrl = `/channels/${channel.id}`;
   const [editMode, setEditMode] = React.useState(false);
 
-  const handleChangeEditMode = React.useCallback(
-    (_e: React.ChangeEvent, value: boolean) => setEditMode(value),
-    [editMode],
-  );
-
   const handleReset = React.useCallback(() => {
     setTitle(schedule.title);
     setStartAt(toDate(schedule.startAt));
     setEndAt(toDate(schedule.endAt));
   }, [schedule, title, startAt, endAt]);
+
+  const handleChangeEditMode = React.useCallback(
+    (_e: React.ChangeEvent, value: boolean) => {
+      setEditMode(value);
+      handleReset();
+    },
+    [editMode],
+  );
 
   const handleSave = React.useCallback(async () => {
     const { errors } = (await updateSchedule({
