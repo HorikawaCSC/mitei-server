@@ -59,6 +59,10 @@ query getFileSource($id: ID!) {
     height
     error
     transcodeProgress
+    preset {
+      id
+      name
+    }
     source {
       extension
       width

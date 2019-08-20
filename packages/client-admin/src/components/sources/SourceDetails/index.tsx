@@ -16,6 +16,9 @@ type Props = {
     name: string;
     createdAt: string;
     duration?: number | null;
+    preset?: {
+      name: string;
+    };
   };
 };
 
@@ -34,6 +37,7 @@ export const SourceDetails = (props: Props) => {
           : '不明'}
       </Typography>
       <Typography>作成日時: {toStringDate(source.createdAt)}</Typography>
+      {source.preset && <Typography>変換設定: {source.preset.name}</Typography>}
       <Button color='secondary'>
         <Edit />
         <Typography component='span'>名前の変更</Typography>

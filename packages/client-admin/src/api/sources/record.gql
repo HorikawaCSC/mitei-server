@@ -29,6 +29,10 @@ query getRecordSource($id: ID!) {
       createdAt
       width
       height
+      preset {
+        id
+        name
+      }
       source {
         id
         name
