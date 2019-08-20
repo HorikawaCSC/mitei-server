@@ -12,7 +12,7 @@ export const ChannelDetailView = ({
   const { id } = match.params;
   const { loading, error, data, refetch } = useGetChannelDetailQuery({
     variables: { id },
-    fetchPolicy: 'no-cache',
+    fetchPolicy: 'network-only',
   });
 
   if (loading) return <CircularProgress />;

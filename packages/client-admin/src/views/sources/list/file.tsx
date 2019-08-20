@@ -17,6 +17,7 @@ export const FileSourceList = () => {
   const commonStyles = useCommonStyles();
   const { loading, data, error, fetchMore } = useGetFileSourcesSimpleQuery({
     variables: { skip: 0, take: 10 },
+    fetchPolicy: 'network-only',
   });
   const [scrollRef, inView] = useInView();
 

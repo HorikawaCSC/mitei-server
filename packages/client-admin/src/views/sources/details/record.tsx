@@ -12,6 +12,7 @@ export const RecordSourceDetails = ({
   const sourceId = match.params.id;
   const { data, loading, error } = useGetRecordSourceQuery({
     variables: { id: sourceId },
+    fetchPolicy: 'network-only',
   });
 
   if (loading) {

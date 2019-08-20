@@ -13,6 +13,7 @@ import { recordSourceSimpleDetailString } from '../../../utils/sources';
 export const RecordSourceList = () => {
   const { loading, data, error, fetchMore } = useGetRecordSourcesSimpleQuery({
     variables: { skip: 0, take: 10 },
+    fetchPolicy: 'network-only',
   });
   const [scrollRef, inView] = useInView();
 

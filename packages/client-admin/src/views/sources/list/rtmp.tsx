@@ -36,6 +36,7 @@ export const RtmpInputList = () => {
     fetchMore,
   } = useGetRtmpInputListSimpleQuery({
     variables: { skip: 0, take: 10 },
+    fetchPolicy: 'network-only',
   });
   const [removeRtmpInput] = useRemoveRtmpInputMutation();
   const [scrollRef, inView] = useInView();

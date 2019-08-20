@@ -14,6 +14,7 @@ export const FileSourceDetails = ({
   const fileId = match.params.id;
   const { data, loading, error } = useGetFileSourceQuery({
     variables: { id: fileId },
+    fetchPolicy: 'network-only',
   });
 
   if (loading) {

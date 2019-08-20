@@ -22,6 +22,7 @@ export const ChannelsListView = () => {
     fetchMore,
   } = useGetChannelsSimpleQuery({
     variables: { skip: 0, take: 10 },
+    fetchPolicy: 'network-only',
   });
   const commonStyles = useCommonStyles();
   const [addDialogOpen, setAddDialogOpen] = React.useState(false);

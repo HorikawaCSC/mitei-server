@@ -44,6 +44,7 @@ export const ScheduleList = ({ channelId, day }: Props) => {
       skip: 0,
       take: 10,
     },
+    fetchPolicy: 'network-only',
   });
   const { history } = useRouter();
 
