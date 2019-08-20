@@ -16,6 +16,7 @@ query getRtmpInputListSimple($skip: Int!, $take: Int!) {
       name
       publishUrl
       preset {
+        id
         name
       }
     }

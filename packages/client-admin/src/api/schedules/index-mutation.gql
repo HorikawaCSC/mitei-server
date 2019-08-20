@@ -1,5 +1,7 @@
 fragment scheduleUpdate on Schedule {
   id
+  startAt
+  endAt
   isValid
   programs {
     id
