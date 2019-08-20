@@ -47,6 +47,10 @@ fragment programSource on SourceReference {
   ... on RtmpInput {
     id
     name
+    preset {
+      id
+      name
+    }
   }
 }
 

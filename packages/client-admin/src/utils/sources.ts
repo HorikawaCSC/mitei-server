@@ -92,8 +92,10 @@ export const rtmpInputSimpleWithUrlString = (input: RtmpInputSimpleData) => {
   } / エンコ設定: ${input.preset.name}`;
 };
 
-export const rtmpInputSimpleString = (input: RtmpInputSimpleData) => {
-  return `${rtmpStatusText[input.status]} / エンコ設定: ${input.preset.name}`;
+export const rtmpInputSimpleString = (
+  input: Pick<RtmpInputSimpleData, 'preset'>,
+) => {
+  return `エンコ設定: ${input.preset.name}`;
 };
 
 export const fileStatusText = {

@@ -6,7 +6,10 @@ import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useGetRtmpInputListSimpleQuery } from '../../../api/generated/graphql';
+import {
+  GetRtmpInputListSimpleQuery,
+  useGetRtmpInputListSimpleQuery,
+} from '../../../api/generated/graphql';
 import { rtmpInputSimpleString } from '../../../utils/sources';
 
 const useStyles = makeStyles({
@@ -22,7 +25,12 @@ type Props = {
   value: string;
   handleChange: (value: string) => void;
   disabled?: boolean;
+  defaultValue?: Omit<
+    GetRtmpInputListSimpleQuery['rtmpInputList']['inputs'][0],
+    'status' | 'publishUrl'
+  > | null;
 };
+
 export const RtmpInputSelect = (props: Props) => {
   const styles = useStyles();
   const { data, loading, fetchMore } = useGetRtmpInputListSimpleQuery({
@@ -59,8 +67,19 @@ export const RtmpInputSelect = (props: Props) => {
     props.handleChange(e.target.value as string);
   };
 
-  const total = data && data.rtmpInputList ? data.rtmpInputList.total : 0;
-  const inputs = data && data.rtmpInputList ? data.rtmpInputList.inputs : [];
+  const total = React.useMemo(
+    () => (data && data.rtmpInputList ? data.rtmpInputList.total : 0),
+    [data, props.defaultValue],
+  );
+  const inputs = React.useMemo(() => {
+    const fetched = data && data.rtmpInputList ? data.rtmpInputList.inputs : [];
+    const defaultValue = props.defaultValue;
+    if (defaultValue && !fetched.some(({ id }) => id === defaultValue.id)) {
+      return [...fetched, defaultValue];
+    } else {
+      return fetched;
+    }
+  }, [data, props.defaultValue]);
   const hasMore = total > inputs.length;
   return (
     <FormControl className={styles.root} disabled={props.disabled}>

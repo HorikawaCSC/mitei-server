@@ -161,6 +161,11 @@ export const ProgramItem = ({
           value={sourceId}
           handleChange={setSourceId}
           disabled={disabled}
+          defaultValue={
+            program.source && program.source.__typename === 'RtmpInput'
+              ? program.source
+              : null
+          }
         />
       ) : null,
     [programType, sourceId, disabled],
