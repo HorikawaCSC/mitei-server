@@ -74,7 +74,7 @@ export const HeaderMenu = () => {
               </ListItemIcon>
               <ListItemText>ソース一覧</ListItemText>
             </ListItem>
-            <ListItem button component={Link} to='/encode-presets'>
+            <ListItem button component={Link} to='/presets'>
               <ListItemIcon>
                 <MovieCreation />
               </ListItemIcon>

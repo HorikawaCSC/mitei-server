@@ -3,7 +3,15 @@ query getTranscodePresetList($skip: Int!, $take: Int!) {
     presets {
       id
       name
+      parameter
     }
     total
+  }
+}
+
+mutation addTranscodePreset($name: String!, $parameter: [String!]!) {
+  createTranscodePreset(name: $name, parameter: $parameter) {
+    id
+    name
   }
 }

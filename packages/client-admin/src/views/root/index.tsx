@@ -7,6 +7,7 @@ import { useGetMyselfSimpleQuery } from '../../api/generated/graphql';
 import { HeaderMenu } from '../../components/shared/HeaderMenu';
 import { ChannelsRoot } from '../channels';
 import { LoginView } from '../login';
+import { PresetsList } from '../presets';
 import { ScheduleRoot } from '../schedules';
 import { SourcesRoot } from '../sources';
 
@@ -46,6 +47,7 @@ export const Root = () => {
           <Route path='/sources' component={SourcesRoot} />
           <Route path='/channels' component={ChannelsRoot} />
           <Route path='/schedules' component={ScheduleRoot} />
+          <Route path='/presets' component={PresetsList} />
         </Switch>
       </Container>
       <MessageView />
