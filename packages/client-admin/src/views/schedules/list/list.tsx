@@ -14,6 +14,7 @@ import { NotFoundView, PageContainer } from '@mitei/client-common';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import * as React from 'react';
+import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import useRouter from 'use-react-router';
 import { useGetScheduleListSimpleQuery } from '../../../api/generated/graphql';
@@ -32,13 +33,16 @@ export const ScheduleList = ({ channelId, day }: Props) => {
   const reqStartAt = dayDate.startOf('day');
   const reqEndAt = dayDate.endOf('day');
   const styles = useStyles();
-  const param = {
-    channel: channelId,
-    start: reqStartAt.toISO(),
-    end: reqEndAt.toISO(),
-  };
+  const param = React.useMemo(
+    () => ({
+      channel: channelId,
+      start: reqStartAt.toISO(),
+      end: reqEndAt.toISO(),
+    }),
+    [channelId, reqStartAt, reqEndAt],
+  );
 
-  const { loading, data, error } = useGetScheduleListSimpleQuery({
+  const { loading, data, error, fetchMore } = useGetScheduleListSimpleQuery({
     variables: {
       ...param,
       skip: 0,
@@ -47,6 +51,40 @@ export const ScheduleList = ({ channelId, day }: Props) => {
     fetchPolicy: 'network-only',
   });
   const { history } = useRouter();
+  const handleDateChange = React.useCallback(
+    (value: unknown) => {
+      const date = value as DateTime;
+      history.push(`/schedules/${channelId}?day=${date.toFormat('yyyyMMdd')}`);
+    },
+    [channelId],
+  );
+
+  const [scrollRef, inView] = useInView();
+
+  React.useEffect(() => {
+    if (inView && !loading && data) {
+      const { schedules } = data.scheduleList;
+      fetchMore({
+        variables: {
+          skip: schedules.length,
+          take: 10,
+        },
+        updateQuery(prev, { fetchMoreResult }) {
+          if (!fetchMoreResult) return prev;
+          return {
+            scheduleList: {
+              total: fetchMoreResult.scheduleList.total,
+              schedules: [
+                ...prev.scheduleList.schedules,
+                ...fetchMoreResult.scheduleList.schedules,
+              ],
+              __typename: prev.scheduleList.__typename,
+            },
+          };
+        },
+      });
+    }
+  }, [inView]);
 
   if (loading) {
     return <CircularProgress />;
@@ -55,12 +93,8 @@ export const ScheduleList = ({ channelId, day }: Props) => {
     return <NotFoundView error={error ? error.message : ''} />;
   }
 
-  const handleDateChange = (value: unknown) => {
-    const date = value as DateTime;
-    history.push(`/schedules/${channelId}?day=${date.toFormat('yyyyMMdd')}`);
-  };
   const { schedules, total } = data.scheduleList;
-
+  const hasMore = total > schedules.length;
   return (
     <PageContainer title={`スケジュール一覧`} mini>
       <DatePicker
@@ -107,6 +141,11 @@ export const ScheduleList = ({ channelId, day }: Props) => {
               </TableCell>
             </TableRow>
           ))}
+          {hasMore && (
+            <TableRow ref={scrollRef}>
+              <TableCell>Loading</TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
       <Button
