@@ -1,0 +1,22 @@
+enum UserKind {
+  normal
+  admin
+}
+
+enum IdPType {
+  twitter
+}
+
+type User {
+  id: ID!
+  userId: ID!
+  screenName: String!
+  iconUrl: String
+  kind: UserKind!
+  type: IdPType!
+}
+
+type Users {
+  users: [User!]!
+  total: Int!
+}

@@ -18,12 +18,16 @@ const createContext: ContextFunction<{ req: Request }, GqlContext> = ({
 };
 
 const resolvers = combineResolvers([apiResolvers]);
-export const gqlServer = new ApolloServer({
-  typeDefs: gql(
-    readFileSync(require.resolve('@mitei/schema/app.gql'), {
+const typeDefs = ['app', 'channel', 'schedule', 'source', 'user'].map(name =>
+  gql(
+    readFileSync(require.resolve(`@mitei/schema/${name}.gql`), {
       encoding: 'utf8',
     }),
   ),
+);
+
+export const gqlServer = new ApolloServer({
+  typeDefs,
   resolvers,
   context: createContext,
   subscriptions: {
