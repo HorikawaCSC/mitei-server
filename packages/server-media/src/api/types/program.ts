@@ -1,7 +1,5 @@
+import { ProgramType, RtmpInput, TranscodedSource } from '@mitei/server-models';
 import { ProgramResolvers } from '../../generated/graphql';
-import { RtmpInput } from '../../models/RtmpInput';
-import { ProgramType } from '../../models/streaming/Schedule';
-import { TranscodedSource } from '../../models/TranscodedSource';
 
 export const programResolvers: ProgramResolvers = {
   // @ts-ignore

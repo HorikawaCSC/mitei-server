@@ -1,5 +1,5 @@
+import { SourceType } from '@mitei/server-models';
 import { TranscodedSourceResolvers } from '../../generated/graphql';
-import { SourceType } from '../../models/TranscodedSource';
 import { ensureLoggedInAsAdmin } from '../../utils/gql/ensureUser';
 
 export const transcodedSourceResolvers: TranscodedSourceResolvers = {

@@ -1,11 +1,11 @@
-import { Router } from 'express';
-import { config } from '../../../../config';
 import {
   Manifest,
   SourceType,
   TranscodedSource,
   TranscodeStatus,
-} from '../../../../models/TranscodedSource';
+} from '@mitei/server-models';
+import { Router } from 'express';
+import { config } from '../../../../config';
 import {
   generateManifest,
   ManifestInput,

@@ -1,18 +1,17 @@
+import {
+  FileSource,
+  FileSourceDocument,
+  Manifest,
+  SourceStatus,
+  TranscodePreset,
+  TranscodePresetDocument,
+  TranscodeStatus,
+} from '@mitei/server-models';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import { createInterface } from 'readline';
 import { TranscodeWorkerParam } from '.';
 import { config } from '../../config';
-import {
-  FileSource,
-  FileSourceDocument,
-  SourceStatus,
-} from '../../models/FileSource';
-import { Manifest, TranscodeStatus } from '../../models/TranscodedSource';
-import {
-  TranscodePreset,
-  TranscodePresetDocument,
-} from '../../models/TranscodePreset';
 import { AudioStream, VideoStream } from '../../types/ffprobe';
 import { transcodeLogger } from '../../utils/logging';
 import { ffprobe } from '../../utils/transcode/ffprobe';

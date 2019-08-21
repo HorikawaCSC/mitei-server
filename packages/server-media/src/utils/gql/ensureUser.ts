@@ -1,7 +1,7 @@
+import { UserDocument } from '@mitei/server-models';
 import { AuthenticationError } from 'apollo-server-core';
 import { GqlContext } from '../../api/context';
 import { ResolverFn } from '../../generated/graphql';
-import { UserDocument } from '../../models/User';
 
 type LoggedInContext = Omit<GqlContext, 'userInfo'> & {
   userInfo: UserDocument;

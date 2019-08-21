@@ -12,14 +12,14 @@ generates:
 config:
   contextType: ../api/context#GqlContext
   mappers:
-    FileSource: ../models/FileSource#FileSourceDocument
-    TranscodedSource: ../models/TranscodedSource#TranscodedSourceDocument
-    User: ../models/User#UserDocument
-    RtmpInput: ../models/RtmpInput#RtmpInputDocument
-    RecordSource: ../models/RecordSource#RecordSourceDocument
-    TranscodePreset: ../models/TranscodePreset#TranscodePresetDocument
-    Channel: ../models/streaming/Channel#ChannelDocument
-    Schedule: ../models/streaming/Schedule#ScheduleDocument
-    Program: ../models/streaming/Schedule#Program
+    FileSource: '@mitei/server-models#FileSourceDocument'
+    TranscodedSource: '@mitei/server-models#TranscodedSourceDocument'
+    User: '@mitei/server-models#UserDocument'
+    RtmpInput: '@mitei/server-models#RtmpInputDocument'
+    RecordSource: '@mitei/server-models#RecordSourceDocument'
+    TranscodePreset: '@mitei/server-models#TranscodePresetDocument'
+    Channel: '@mitei/server-models#ChannelDocument'
+    Schedule: '@mitei/server-models#ScheduleDocument'
+    Program: '@mitei/server-models#Program'
   scalars:
     Date: Date

@@ -1,6 +1,6 @@
+import { RtmpInput, RtmpStatus } from '@mitei/server-models';
 import { urlencoded } from 'body-parser';
 import { Router } from 'express';
-import { RtmpInput, RtmpStatus } from '../../models/RtmpInput';
 import { RtmpEvent } from '../../types/RtmpEvent';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';

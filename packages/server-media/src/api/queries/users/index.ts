@@ -1,5 +1,5 @@
+import { User } from '@mitei/server-models';
 import { QueryResolvers } from '../../../generated/graphql';
-import { User } from '../../../models/User';
 import { omitUndefined } from '../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 

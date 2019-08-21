@@ -1,6 +1,5 @@
+import { FileSource, TranscodePreset } from '@mitei/server-models';
 import { MutationResolvers } from '../../../../generated/graphql';
-import { FileSource } from '../../../../models/FileSource';
-import { TranscodePreset } from '../../../../models/TranscodePreset';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 import { transcodeWorker } from '../../../../workers/transcode';
 

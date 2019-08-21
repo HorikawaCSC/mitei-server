@@ -1,11 +1,11 @@
-import { ObjectID } from 'bson';
-import { MutationResolvers } from '../../../../generated/graphql';
 import {
   Channel,
   ChannelPermission,
   FillerControl,
-} from '../../../../models/streaming/Channel';
-import { TranscodedSource } from '../../../../models/TranscodedSource';
+  TranscodedSource,
+} from '@mitei/server-models';
+import { ObjectID } from 'bson';
+import { MutationResolvers } from '../../../../generated/graphql';
 import { findIdCondition } from '../../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 

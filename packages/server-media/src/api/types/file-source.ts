@@ -1,5 +1,5 @@
+import { TranscodeStatus } from '@mitei/server-models';
 import { FileSourceResolvers } from '../../generated/graphql';
-import { TranscodeStatus } from '../../models/TranscodedSource';
 import { ensureLoggedInAsAdmin } from '../../utils/gql/ensureUser';
 import { transcodeWorker } from '../../workers/transcode';
 import { transcodedSourceResolvers } from './transcoded-source';

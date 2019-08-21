@@ -1,5 +1,5 @@
+import { Channel } from '@mitei/server-models';
 import { Router } from 'express';
-import { Channel } from '../../../../models/streaming/Channel';
 import { generateManifest } from '../../../../utils/hls/manifest';
 import { createScheduleResolver } from '../../../../utils/schedule/resolver';
 

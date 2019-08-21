@@ -1,8 +1,11 @@
+import {
+  ProgramType,
+  RtmpInput,
+  Schedule,
+  TranscodedSource,
+} from '@mitei/server-models';
 import { ObjectId } from 'mongodb';
 import { TranscodeStatus } from '../../generated/graphql';
-import { RtmpInput } from '../../models/RtmpInput';
-import { ProgramType, Schedule } from '../../models/streaming/Schedule';
-import { TranscodedSource } from '../../models/TranscodedSource';
 
 export const checkOverlappedSchedule = async (
   startAt: Date,

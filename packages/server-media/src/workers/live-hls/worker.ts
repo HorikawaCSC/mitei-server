@@ -1,12 +1,17 @@
+import {
+  Manifest,
+  RecordSource,
+  RecordSourceDocument,
+  RtmpInputDocument,
+  RtmpStatus,
+  TranscodeStatus,
+} from '@mitei/server-models';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import { existsSync, promises as fs } from 'fs';
 import { DateTime } from 'luxon';
 import { createInterface } from 'readline';
 import { config } from '../../config';
-import { RecordSource, RecordSourceDocument } from '../../models/RecordSource';
-import { RtmpInputDocument, RtmpStatus } from '../../models/RtmpInput';
-import { Manifest, TranscodeStatus } from '../../models/TranscodedSource';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
 

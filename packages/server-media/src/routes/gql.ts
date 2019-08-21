@@ -1,3 +1,4 @@
+import { UserDocument } from '@mitei/server-models';
 import { combineResolvers } from 'apollo-resolvers';
 import { ContextFunction } from 'apollo-server-core';
 import { ApolloServer, gql } from 'apollo-server-express';
@@ -5,7 +6,6 @@ import { Request } from 'express';
 import { readFileSync } from 'fs';
 import { resolvers as apiResolvers } from '../api';
 import { GqlContext } from '../api/context';
-import { UserDocument } from '../models/User';
 
 const createContext: ContextFunction<{ req: Request }, GqlContext> = ({
   req,

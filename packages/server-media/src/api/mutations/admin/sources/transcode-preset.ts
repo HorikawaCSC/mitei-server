@@ -1,5 +1,5 @@
+import { TranscodePreset } from '@mitei/server-models';
 import { MutationResolvers } from '../../../../generated/graphql';
-import { TranscodePreset } from '../../../../models/TranscodePreset';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 
 export const transcodePresetMutationResolvers: MutationResolvers = {

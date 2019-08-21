@@ -1,4 +1,4 @@
-import { UserDocument } from '../models/User';
+import { UserDocument } from '@mitei/server-models';
 
 export interface GqlContext {
   userInfo?: UserDocument;

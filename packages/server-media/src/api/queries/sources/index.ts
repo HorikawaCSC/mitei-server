@@ -1,8 +1,10 @@
+import {
+  FileSource,
+  RecordSource,
+  RtmpInput,
+  TranscodedSource,
+} from '@mitei/server-models';
 import { QueryResolvers } from '../../../generated/graphql';
-import { FileSource } from '../../../models/FileSource';
-import { RecordSource } from '../../../models/RecordSource';
-import { RtmpInput } from '../../../models/RtmpInput';
-import { TranscodedSource } from '../../../models/TranscodedSource';
 import { omitUndefined } from '../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 

@@ -1,11 +1,11 @@
-import { config } from '../../config';
-import { RecordSource } from '../../models/RecordSource';
 import {
+  RecordSource,
   RtmpInput,
   RtmpInputDocument,
   RtmpStatus,
-} from '../../models/RtmpInput';
-import { TranscodeStatus } from '../../models/TranscodedSource';
+  TranscodeStatus,
+} from '@mitei/server-models';
+import { config } from '../../config';
 import { liveHlsLogger } from '../../utils/logging';
 import { LiveHLSWorker } from './worker';
 

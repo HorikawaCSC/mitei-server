@@ -1,5 +1,4 @@
-import { FillerControl } from '../../models/streaming/Channel';
-import { Manifest } from '../../models/TranscodedSource';
+import { FillerControl, Manifest } from '@mitei/server-models';
 import { schedulerLogger } from '../logging';
 import { redis } from '../redis';
 

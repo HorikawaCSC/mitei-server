@@ -1,7 +1,7 @@
+import { FileSource, SourceStatus } from '@mitei/server-models';
 import { createWriteStream, existsSync, promises as fs } from 'fs';
 import { config } from '../../../../config';
 import { MutationResolvers } from '../../../../generated/graphql';
-import { FileSource, SourceStatus } from '../../../../models/FileSource';
 import { GqlUpload } from '../../../../types/gql-upload';
 import { extractExtension } from '../../../../utils/filename';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';

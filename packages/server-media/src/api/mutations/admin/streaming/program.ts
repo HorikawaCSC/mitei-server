@@ -1,6 +1,6 @@
+import { Program, Schedule } from '@mitei/server-models';
 import { ObjectId } from 'mongodb';
 import { MutationResolvers } from '../../../../generated/graphql';
-import { Program, Schedule } from '../../../../models/streaming/Schedule';
 import { findIdCondition } from '../../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 import { checkTypeAndSource } from '../../../../utils/schedule/validate';

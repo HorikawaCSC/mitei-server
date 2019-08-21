@@ -1,10 +1,6 @@
+import { Channel, Schedule, ScheduleDocument } from '@mitei/server-models';
 import { Document } from 'mongoose';
 import { MutationResolvers } from '../../../../generated/graphql';
-import { Channel } from '../../../../models/streaming/Channel';
-import {
-  Schedule,
-  ScheduleDocument,
-} from '../../../../models/streaming/Schedule';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 import { checkOverlappedSchedule } from '../../../../utils/schedule/validate';
 

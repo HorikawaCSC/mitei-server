@@ -1,9 +1,9 @@
-import { SourceReferenceResolvers } from '../../generated/graphql';
-import { RtmpInput } from '../../models/RtmpInput';
 import {
+  RtmpInput,
   TranscodedSource,
   TranscodedSourceDocument,
-} from '../../models/TranscodedSource';
+} from '@mitei/server-models';
+import { SourceReferenceResolvers } from '../../generated/graphql';
 
 export const sourceReferenceResolvers: SourceReferenceResolvers = {
   __resolveType: sourceRef => {

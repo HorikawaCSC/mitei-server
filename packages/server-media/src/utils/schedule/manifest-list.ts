@@ -1,4 +1,4 @@
-import { Manifest } from '../../models/TranscodedSource';
+import { Manifest } from '@mitei/server-models';
 import {
   EMPTY_FILLER_MAX_DURATION,
   EMPTY_FILLER_OFFSET,

@@ -1,12 +1,12 @@
-import * as Queue from 'bull';
-import { config } from '../../config';
 import {
   FileSource,
   FileSourceDocument,
   SourceStatus,
-} from '../../models/FileSource';
-import { TranscodeStatus } from '../../models/TranscodedSource';
-import { TranscodePresetDocument } from '../../models/TranscodePreset';
+  TranscodePresetDocument,
+  TranscodeStatus,
+} from '@mitei/server-models';
+import * as Queue from 'bull';
+import { config } from '../../config';
 import { transcodeLogger } from '../../utils/logging';
 import { Transcoder } from './transcoder';
 

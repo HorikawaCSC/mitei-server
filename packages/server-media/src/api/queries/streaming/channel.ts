@@ -1,5 +1,5 @@
+import { Channel } from '@mitei/server-models';
 import { QueryResolvers } from '../../../generated/graphql';
-import { Channel } from '../../../models/streaming/Channel';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 
 export const channelQueryResolvers: QueryResolvers = {

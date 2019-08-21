@@ -1,18 +1,17 @@
-import { ObjectID } from 'bson';
-import { crc32 } from 'crc';
-import { config } from '../../config';
-import { RecordSource } from '../../models/RecordSource';
-import { RtmpInput } from '../../models/RtmpInput';
 import {
   Channel,
   ChannelDocument,
   FillerControl,
-} from '../../models/streaming/Channel';
-import { ProgramType, Schedule } from '../../models/streaming/Schedule';
-import {
+  ProgramType,
+  RecordSource,
+  RtmpInput,
+  Schedule,
   TranscodedSource,
   TranscodeStatus,
-} from '../../models/TranscodedSource';
+} from '@mitei/server-models';
+import { ObjectID } from 'bson';
+import { crc32 } from 'crc';
+import { config } from '../../config';
 import { ManifestInput } from '../hls/manifest';
 import { encodeSegmentRef } from '../hls/segment-ref';
 import { schedulerLogger } from '../logging';

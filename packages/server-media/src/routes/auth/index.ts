@@ -1,8 +1,8 @@
+import { AuthType, User, UserDocument, UserKind } from '@mitei/server-models';
 import { Router } from 'express';
 import * as passport from 'passport';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
 import { config } from '../../config';
-import { AuthType, User, UserDocument, UserKind } from '../../models/User';
 import { authLogger } from '../../utils/logging';
 
 passport.use(

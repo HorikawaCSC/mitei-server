@@ -1,5 +1,5 @@
+import { TranscodePreset } from '@mitei/server-models';
 import { QueryResolvers } from '../../../generated/graphql';
-import { TranscodePreset } from '../../../models/TranscodePreset';
 import { omitUndefined } from '../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 

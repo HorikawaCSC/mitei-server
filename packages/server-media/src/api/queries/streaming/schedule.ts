@@ -1,5 +1,5 @@
+import { Schedule } from '@mitei/server-models';
 import { QueryResolvers } from '../../../generated/graphql';
-import { Schedule } from '../../../models/streaming/Schedule';
 import { omitUndefined } from '../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 

@@ -1,9 +1,5 @@
+import { ProgramType, Schedule, ScheduleDocument } from '@mitei/server-models';
 import { ObjectId } from 'mongodb';
-import {
-  ProgramType,
-  Schedule,
-  ScheduleDocument,
-} from '../../models/streaming/Schedule';
 import { schedulerLogger } from '../logging';
 import { redis } from '../redis';
 
