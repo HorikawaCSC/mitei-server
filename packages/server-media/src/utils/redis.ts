@@ -5,3 +5,7 @@ export const redis = new Redis({
   ...config.redis,
   lazyConnect: true,
 });
+
+export const redisKeys = {
+  deviceChallenge: (deviceId: string) => `mitei:devc:${deviceId}`,
+};

@@ -1,0 +1,24 @@
+union Playbackable = FileSource | RecordSource | Channel
+
+enum DeviceType {
+  browser
+  chromecast
+}
+
+type ViewerChallenge {
+  token: String!
+  code: String!
+}
+
+type ViewerChallengeRequest {
+  id: String!
+  requestFrom: String!
+  code: String!
+  type: DeviceType!
+  createdAt: Date!
+}
+
+type ViewerChallengeResult {
+  success: Boolean!
+  token: String!
+}

@@ -36,8 +36,11 @@ type Query {
   transcodePreset(id: ID!): TranscodePreset
   transcodePresetList(skip: Int!, take: Int!): TranscodePresetList!
 
+  viewerRequests: [ViewerChallengeRequest!]!
+
   # normal func
   me: User
+  viewerChallengeResult(token: String!): ViewerChallengeResult!
 }
 
 type Mutation {
@@ -110,6 +113,9 @@ type Mutation {
     scheduleId: ID!,
     order: [ID!]!
   ): Schedule!
+
+  createViewerChallenge(device: DeviceType!): ViewerChallenge!
+  acceptViewerChallenge(deviceId: String!): Boolean!
 }
 
 schema {

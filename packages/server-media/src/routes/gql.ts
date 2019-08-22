@@ -10,20 +10,24 @@ import { GqlContext } from '../api/context';
 const createContext: ContextFunction<{ req: Request }, GqlContext> = ({
   req,
 }) => {
+  const requestAddr = req.ip;
   if (req.user) {
-    return { userInfo: req.user as UserDocument };
+    return { userInfo: req.user as UserDocument, requestAddr };
   } else {
-    return {};
+    return {
+      requestAddr,
+    };
   }
 };
 
 const resolvers = combineResolvers([apiResolvers]);
-const typeDefs = ['app', 'channel', 'schedule', 'source', 'user'].map(name =>
-  gql(
-    readFileSync(require.resolve(`@mitei/schema/${name}.gql`), {
-      encoding: 'utf8',
-    }),
-  ),
+const typeDefs = ['app', 'channel', 'schedule', 'source', 'user', 'viewer'].map(
+  name =>
+    gql(
+      readFileSync(require.resolve(`@mitei/schema/${name}.gql`), {
+        encoding: 'utf8',
+      }),
+    ),
 );
 
 export const gqlServer = new ApolloServer({
