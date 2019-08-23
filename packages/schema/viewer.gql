@@ -22,3 +22,14 @@ type ViewerChallengeResult {
   success: Boolean!
   token: String!
 }
+type ViewerDevice {
+  id: String!
+  type: DeviceType!
+  displayName: String!
+  playingContent: Playbackable
+}
+
+type ViewerDeviceList {
+  total: Int!
+  devices: [ViewerDevice!]!
+}

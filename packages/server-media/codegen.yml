@@ -21,5 +21,6 @@ config:
     Channel: '@mitei/server-models#ChannelDocument'
     Schedule: '@mitei/server-models#ScheduleDocument'
     Program: '@mitei/server-models#Program'
+    ViewerDevice: '@mitei/server-models#ViewerDeviceDocument'
   scalars:
     Date: Date

@@ -6,6 +6,8 @@ import { Request } from 'express';
 import { readFileSync } from 'fs';
 import { resolvers as apiResolvers } from '../api';
 import { GqlContext } from '../api/context';
+import { AuthDirective } from '../api/directives/auth';
+import { DeviceDirective } from '../api/directives/device';
 import { parseToken, TokenType } from '../utils/viewer/token';
 
 const createContext: ContextFunction<{ req: Request }, GqlContext> = async ({
@@ -47,6 +49,10 @@ export const gqlServer = new ApolloServer({
   context: createContext,
   subscriptions: {
     path: '/gql/ws',
+  },
+  schemaDirectives: {
+    auth: AuthDirective,
+    deviceOnly: DeviceDirective,
   },
   playground: {
     tabs: [

@@ -37,6 +37,7 @@ type Query {
   transcodePresetList(skip: Int!, take: Int!): TranscodePresetList!
 
   viewerRequests: [ViewerChallengeRequest!]!
+  viewerDevices(skip: Int!, take: Int!): ViewerDeviceList!
 
   # normal func
   me: User
