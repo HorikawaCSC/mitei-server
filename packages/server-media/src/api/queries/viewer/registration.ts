@@ -1,11 +1,10 @@
 import { QueryResolvers } from '../../../generated/graphql';
 import { ViewerChallengeData } from '../../../types/viewer';
-import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 import { redis, redisKeys } from '../../../utils/redis';
 import { parseToken, TokenType } from '../../../utils/viewer/token';
 
 export const viewerRegistrationQueryResolvers: QueryResolvers = {
-  viewerRequests: ensureLoggedInAsAdmin(async () => {
+  viewerRequests: async () => {
     const requestIds = (await redis.keys(redisKeys.deviceChallenge('*'))).map(
       key => key.replace(redisKeys.deviceChallenge(''), ''),
     );
@@ -24,7 +23,7 @@ export const viewerRegistrationQueryResolvers: QueryResolvers = {
       type: requests[i].type,
       createdAt: new Date(requests[i].date),
     }));
-  }),
+  },
   viewerChallengeResult: async (_parent, { token }) => {
     const { type, deviceId } = parseToken(token);
     if (type !== TokenType.Registration) {

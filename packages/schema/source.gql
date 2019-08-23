@@ -24,16 +24,16 @@ enum SourceType {
 
 interface TranscodedSource {
   id: ID!
-  status: TranscodeStatus!
+  status: TranscodeStatus! @auth(requires: [admin])
   duration: Float
-  thumbnailUrl: String
-  width: Int
-  height: Int
-  name: String!
-  createdAt: Date!
-  updatedAt: Date!
-  createdBy: User!
-  preset: TranscodePreset
+  thumbnailUrl: String @auth(requires: [admin])
+  width: Int @auth(requires: [admin])
+  height: Int @auth(requires: [admin])
+  name: String! @auth(requires: [admin])
+  createdAt: Date! @auth(requires: [admin])
+  updatedAt: Date! @auth(requires: [admin])
+  createdBy: User! @auth(requires: [admin])
+  preset: TranscodePreset @auth(requires: [admin])
   type: SourceType!
 }
 
@@ -48,7 +48,7 @@ enum SourceStatus {
   deleted
 }
 
-type FileSourceOrignalInfo {
+type FileSourceOrignalInfo @auth(requires: [admin]) {
   status: SourceStatus!
   extension: String!
   width: Int
@@ -59,22 +59,22 @@ type FileSourceOrignalInfo {
 
 type FileSource implements TranscodedSource {
   id: ID!
-  status: TranscodeStatus!
+  status: TranscodeStatus! @auth(requires: [admin])
   duration: Float
-  thumbnailUrl: String
-  width: Int
-  height: Int
-  name: String!
-  createdAt: Date!
-  updatedAt: Date!
-  createdBy: User!
-  preset: TranscodePreset
-  type: SourceType!
+  thumbnailUrl: String @auth(requires: [admin])
+  width: Int @auth(requires: [admin])
+  height: Int @auth(requires: [admin])
+  name: String! @auth(requires: [admin])
+  createdAt: Date! @auth(requires: [admin])
+  updatedAt: Date! @auth(requires: [admin])
+  createdBy: User! @auth(requires: [admin])
+  preset: TranscodePreset @auth(requires: [admin])
+  type: SourceType! @auth(requires: [admin])
 
   # additional props
   source: FileSourceOrignalInfo!
-  error: String
-  transcodeProgress: Float
+  error: String @auth(requires: [admin])
+  transcodeProgress: Float @auth(requires: [admin])
 }
 
 type FileSourceList {
@@ -87,7 +87,7 @@ enum RtmpStatus {
   unused
 }
 
-type RtmpInput {
+type RtmpInput @auth(requires: [admin]) {
   id: ID!
   name: String!
   status: RtmpStatus!
@@ -103,21 +103,21 @@ type RtmpInputList {
 
 type RecordSource implements TranscodedSource {
   id: ID!
-  status: TranscodeStatus!
+  status: TranscodeStatus! @auth(requires: [admin])
   duration: Float
-  thumbnailUrl: String
-  width: Int
-  height: Int
-  name: String!
-  createdAt: Date!
-  updatedAt: Date!
-  createdBy: User!
-  preset: TranscodePreset!
-  type: SourceType!
+  thumbnailUrl: String @auth(requires: [admin])
+  width: Int @auth(requires: [admin])
+  height: Int @auth(requires: [admin])
+  name: String! @auth(requires: [admin])
+  createdAt: Date! @auth(requires: [admin])
+  updatedAt: Date! @auth(requires: [admin])
+  createdBy: User! @auth(requires: [admin])
+  preset: TranscodePreset! @auth(requires: [admin])
+  type: SourceType! @auth(requires: [admin])
 
   # additional props
   source: RtmpInput!
-  error: String
+  error: String @auth(requires: [admin])
 }
 
 type RecordSourceList {
@@ -125,13 +125,13 @@ type RecordSourceList {
   total: Int!
 }
 
-type TranscodePreset {
+type TranscodePreset @auth(requires: [admin]) {
   id: ID!
   name: String!
   parameter: [String!]!
 }
 
-type TranscodePresetList {
+type TranscodePresetList @auth(requires: [admin]) {
   presets: [TranscodePreset!]!
   total: Int!
 }

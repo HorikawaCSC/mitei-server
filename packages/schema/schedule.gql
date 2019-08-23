@@ -17,8 +17,8 @@ type Schedule {
   startAt: Date!
   endAt: Date!
   channel: Channel!
-  programs: [Program!]!
-  isValid: Boolean!
+  programs: [Program!]! @auth(requires: [admin])
+  isValid: Boolean! @auth(requires: [admin])
 }
 
 type ScheduleList {

@@ -1,13 +1,12 @@
 import { User } from '@mitei/server-models';
 import { QueryResolvers } from '../../../generated/graphql';
 import { omitUndefined } from '../../../utils/db';
-import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 
 export const usersQueryResolver: QueryResolvers = {
   me: (_parent, _args, { userInfo }) => {
     return userInfo || null;
   },
-  users: ensureLoggedInAsAdmin(async (_parent, { kind, type, skip, take }) => {
+  users: async (_parent, { kind, type, skip, take }) => {
     const conditions = omitUndefined({
       kind,
       type,
@@ -22,5 +21,5 @@ export const usersQueryResolver: QueryResolvers = {
       users: result,
       total: count,
     };
-  }),
+  },
 };

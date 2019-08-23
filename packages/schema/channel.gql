@@ -11,10 +11,10 @@ enum ChannelPermission {
 type Channel {
   id: String!
   displayName: String!
-  createdBy: User!
-  fillerSources: [TranscodedSource!]!
-  fillerControl: FillerControl!
-  permission: ChannelPermission!
+  createdBy: User! @auth(requires: [admin])
+  fillerSources: [TranscodedSource!]! @auth(requires: [admin])
+  fillerControl: FillerControl! @auth(requires: [admin])
+  permission: ChannelPermission! @auth(requires: [admin])
 }
 
 type ChannelList {

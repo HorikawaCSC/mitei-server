@@ -9,11 +9,11 @@ enum IdPType {
 
 type User {
   id: ID!
-  userId: ID!
+  userId: ID! @auth(requires: [admin])
   screenName: String!
   iconUrl: String
-  kind: UserKind!
-  type: IdPType!
+  kind: UserKind! @auth(requires: [admin])
+  type: IdPType! @auth(requires: [admin])
 }
 
 type Users {
