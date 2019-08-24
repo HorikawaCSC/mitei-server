@@ -43,11 +43,13 @@ const createContext: ContextFunction<
 };
 
 const subscriptionOnConnect = async (
-  _params_: unknown,
+  connectionParams: unknown,
   _websocket: WebSocket,
   { request }: ConnectionContext,
 ): Promise<WSContext> => {
   await authenticateWebSocket(request);
+  const params = connectionParams as Record<string, string>;
+  Object.keys(params).forEach(key => (request.headers[key] = params[key]));
   return { request: request as Request };
 };
 

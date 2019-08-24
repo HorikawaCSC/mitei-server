@@ -22,5 +22,6 @@ config:
     Schedule: '@mitei/server-models#ScheduleDocument'
     Program: '@mitei/server-models#Program'
     ViewerDevice: '@mitei/server-models#ViewerDeviceDocument'
+    ViewerRequest: ViewerRequestParam
   scalars:
     Date: Date

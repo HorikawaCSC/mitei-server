@@ -121,9 +121,15 @@ type Mutation {
 
   createViewerChallenge(device: DeviceType!): ViewerChallenge!
   acceptViewerChallenge(deviceId: String!): Boolean! @auth(requires: [admin])
+  dispatchViewerRequest(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
+}
+
+type Subscription {
+  viewerRequest: ViewerRequest! @deviceOnly
 }
 
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }
