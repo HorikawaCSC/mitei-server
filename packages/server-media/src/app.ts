@@ -1,9 +1,6 @@
 import { json } from 'body-parser';
-import * as createMongoSessionStore from 'connect-mongo';
 import * as express from 'express';
-import * as session from 'express-session';
-import { connect } from 'mongoose';
-import * as passport from 'passport';
+import { connect as connectMongo } from 'mongoose';
 import { resolve } from 'path';
 import { config } from './config';
 import { router as apiRouter } from './routes/api';
@@ -11,15 +8,13 @@ import { arenaApp } from './routes/arena';
 import { router as authRouter } from './routes/auth';
 import { router as callbackRouter } from './routes/callback';
 import { gqlServer } from './routes/gql';
-import { redis } from './utils/redis';
+import { applyAuthenticateMiddleware } from './utils/auth';
+import { connectRedis } from './utils/redis';
 import { liveHlsManager } from './workers/live-hls';
 
 (async () => {
-  const { connection } = await connect(
-    config.mongo,
-    { useNewUrlParser: true },
-  );
-  await redis.connect();
+  await connectMongo(config.mongo, { useNewUrlParser: true });
+  await connectRedis();
 
   await liveHlsManager.cleanUpUnused();
 
@@ -29,19 +24,8 @@ import { liveHlsManager } from './workers/live-hls';
 
   const app = express();
 
-  const MongoStore = createMongoSessionStore(session);
-
   app.use(json());
-  app.use(
-    session({
-      secret: config.secrets.session,
-      resave: false,
-      saveUninitialized: false,
-      store: new MongoStore({ mongooseConnection: connection }),
-    }),
-  );
-  app.use(passport.initialize());
-  app.use(passport.session());
+  applyAuthenticateMiddleware(app);
 
   app.use('/auth', authRouter);
   app.use('/api', apiRouter);

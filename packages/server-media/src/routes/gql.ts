@@ -4,20 +4,29 @@ import { ContextFunction } from 'apollo-server-core';
 import { ApolloServer, gql } from 'apollo-server-express';
 import { Request } from 'express';
 import { readFileSync } from 'fs';
+import { ConnectionContext } from 'subscriptions-transport-ws';
+import * as WebSocket from 'ws';
 import { resolvers as apiResolvers } from '../api';
 import { GqlContext } from '../api/context';
 import { AuthDirective } from '../api/directives/auth';
 import { DeviceDirective } from '../api/directives/device';
+import { authenticateWebSocket } from '../utils/auth';
 import { parseToken, TokenType } from '../utils/viewer/token';
 
-const createContext: ContextFunction<{ req: Request }, GqlContext> = async ({
-  req,
-}) => {
-  const requestAddr = req.ip;
-  if (req.user) {
-    return { userInfo: req.user as UserDocument, requestAddr };
-  } else if (typeof req.headers['x-device-token'] === 'string') {
-    const { type, deviceId } = parseToken(req.headers[
+type WSContext = { request: Request };
+const createContext: ContextFunction<
+  { req?: Request; connection: { context?: WSContext } },
+  GqlContext
+> = async ({ req, connection }) => {
+  const request =
+    req || (connection.context ? connection.context.request : null);
+  if (!request) return { requestAddr: '' }; // on subscription
+
+  const requestAddr = request.ip;
+  if (request.user) {
+    return { userInfo: request.user as UserDocument, requestAddr };
+  } else if (typeof request.headers['x-device-token'] === 'string') {
+    const { type, deviceId } = parseToken(request.headers[
       'x-device-token'
     ] as string);
     if (type === TokenType.AuthorizedClient) {
@@ -31,6 +40,15 @@ const createContext: ContextFunction<{ req: Request }, GqlContext> = async ({
   return {
     requestAddr,
   };
+};
+
+const subscriptionOnConnect = async (
+  _params_: unknown,
+  _websocket: WebSocket,
+  { request }: ConnectionContext,
+): Promise<WSContext> => {
+  await authenticateWebSocket(request);
+  return { request: request as Request };
 };
 
 const resolvers = combineResolvers([apiResolvers]);
@@ -49,6 +67,7 @@ export const gqlServer = new ApolloServer({
   context: createContext,
   subscriptions: {
     path: '/gql/ws',
+    onConnect: subscriptionOnConnect,
   },
   schemaDirectives: {
     auth: AuthDirective,
