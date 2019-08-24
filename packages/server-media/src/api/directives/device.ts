@@ -45,7 +45,7 @@ export class DeviceDirective extends SchemaDirectiveVisitor {
 
     Object.keys(fields).forEach(fieldName => {
       const field = fields[fieldName] as DeviceField;
-      const { resolve = defaultFieldResolver } = field;
+      const { resolve = defaultFieldResolver, subscribe } = field;
 
       field.resolve = async function(...args) {
         const context = args[2] as GqlContext;
@@ -56,6 +56,17 @@ export class DeviceDirective extends SchemaDirectiveVisitor {
 
         return resolve.apply(this, args);
       };
+      if (subscribe) {
+        field.subscribe = async function(...args) {
+          const context = args[2] as GqlContext;
+          const device = context.deviceInfo;
+          if (!device) {
+            throw new Error('not authorized');
+          }
+
+          return subscribe.apply(this, args);
+        };
+      }
     });
   }
 }
