@@ -1,3 +1,4 @@
+import { AuthenticationError } from 'apollo-server-core';
 import {
   defaultFieldResolver,
   GraphQLField,
@@ -59,7 +60,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
         const context = args[2] as GqlContext;
         const user = context.userInfo;
         if (!user || !requiredRole.includes(user.kind)) {
-          throw new Error('not authorized');
+          throw new AuthenticationError('not authorized');
         }
 
         return resolve.apply(this, args);
@@ -76,7 +77,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
           const context = args[2] as GqlContext;
           const user = context.userInfo;
           if (!user || !requiredRole.includes(user.kind)) {
-            throw new Error('not authorized');
+            throw new AuthenticationError('not authorized');
           }
 
           return subscribe.apply(this, args);

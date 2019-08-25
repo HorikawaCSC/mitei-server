@@ -1,3 +1,4 @@
+import { AuthenticationError } from 'apollo-server-core';
 import {
   defaultFieldResolver,
   GraphQLField,
@@ -51,7 +52,7 @@ export class DeviceDirective extends SchemaDirectiveVisitor {
         const context = args[2] as GqlContext;
         const device = context.deviceInfo;
         if (!device) {
-          throw new Error('not authorized');
+          throw new AuthenticationError('not authorized device');
         }
 
         return resolve.apply(this, args);
@@ -61,7 +62,7 @@ export class DeviceDirective extends SchemaDirectiveVisitor {
           const context = args[2] as GqlContext;
           const device = context.deviceInfo;
           if (!device) {
-            throw new Error('not authorized');
+            throw new AuthenticationError('not authorized device');
           }
 
           return subscribe.apply(this, args);
