@@ -1,0 +1,20 @@
+mutation createChallenge($type: DeviceType!) {
+  createViewerChallenge(device: $type) {
+    token
+    code
+  }
+}
+
+query getViewerInfo {
+  viewerInfo {
+    id
+    displayName
+  }
+}
+
+query getChallengeResult($token: String!) {
+  viewerChallengeResult(token: $token) {
+    success
+    token
+  }
+}
