@@ -27,6 +27,7 @@ const schema = new Schema(
       enum: Object.values(DeviceType),
       required: true,
       default: DeviceType.Browser,
+      alias: 'type',
     },
   },
   {

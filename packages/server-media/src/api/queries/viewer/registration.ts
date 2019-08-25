@@ -42,4 +42,10 @@ export const viewerRegistrationQueryResolvers: QueryResolvers = {
       success: challengeData.accept,
     };
   },
+  viewerInfo: async (_parent, _args, { deviceInfo }) => {
+    if (deviceInfo) {
+      return deviceInfo;
+    }
+    return null;
+  },
 };

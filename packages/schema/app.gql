@@ -44,8 +44,9 @@ type Query {
   viewerDevices(skip: Int!, take: Int!): ViewerDeviceList! @auth(requires: [admin])
 
   # normal func
-  me: User @auth(requires: [admin, normal])
+  me: User
   viewerChallengeResult(token: String!): ViewerChallengeResult!
+  viewerInfo: ViewerDevice
 }
 
 type Mutation {
