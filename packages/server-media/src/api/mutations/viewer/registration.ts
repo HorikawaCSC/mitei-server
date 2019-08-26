@@ -64,6 +64,8 @@ export const viewerRegistrationMutationResolvers: MutationResolvers = {
           accept: true,
           token,
         }),
+        'EX',
+        60,
       );
 
       return true;
