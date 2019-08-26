@@ -15,9 +15,14 @@ router.get('/:channelId/manifest.m3u8', async (req, res) => {
     }
 
     const scheduler = await createScheduleResolver(channel);
+    const manifest = await scheduler.createManifest();
+    if (!manifest) {
+      return res.status(404).end('channel not found');
+    }
+
     res
       .contentType('application/vnd.apple.mpegurl')
-      .end(generateManifest(await scheduler.createManifest()));
+      .end(generateManifest(manifest));
   } catch (err) {
     res.status(500).end(err.message || 'internal error');
   }

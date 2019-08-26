@@ -424,7 +424,7 @@ export class ScheduleResolver {
     }
   }
 
-  async createManifest(): Promise<ManifestInput> {
+  async createManifest(): Promise<ManifestInput | null> {
     const now = Date.now();
     if (now - this.lastScheduleCacheUpdated >= SCHEDULE_CACHE_UPDATE_INTERVAL) {
       await updateScheduleCache(this.channelId);
@@ -447,7 +447,7 @@ export class ScheduleResolver {
       );
       manifest.push(...nextManifest);
     } else if (manifest.length === 0) {
-      throw new Error('channel not running');
+      return null;
     }
 
     return {
