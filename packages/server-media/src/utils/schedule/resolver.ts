@@ -11,6 +11,7 @@ import {
 } from '@mitei/server-models';
 import { ObjectID } from 'bson';
 import { crc32 } from 'crc';
+import { NotFound } from 'http-errors';
 import { config } from '../../config';
 import { ManifestInput } from '../hls/manifest';
 import { encodeSegmentRef } from '../hls/segment-ref';
@@ -56,14 +57,14 @@ export class ScheduleResolver {
       schedule = await updateScheduleCache(this.channelId);
 
       if (!schedule) {
-        throw new Error('no current schedule');
+        throw new NotFound('no current schedule');
       }
     }
 
     const current = schedule.find(
       value => value.startAt <= now && value.endAt >= now,
     );
-    if (!current) throw new Error('no current schedule');
+    if (!current) throw new NotFound('no current schedule');
 
     const next = schedule.find(value => value.startAt >= now);
 
@@ -84,7 +85,7 @@ export class ScheduleResolver {
 
   private async updateFillerCache() {
     const channel = await Channel.findById(this.channelId);
-    if (!channel) throw new Error('channel not found');
+    if (!channel) throw new NotFound('channel not found');
 
     const fillers = await TranscodedSource.find({
       _id: { $in: channel.fillerSourceIds },
@@ -447,7 +448,7 @@ export class ScheduleResolver {
       );
       manifest.push(...nextManifest);
     } else if (manifest.length === 0) {
-      return null;
+      throw new NotFound('no schedule');
     }
 
     return {

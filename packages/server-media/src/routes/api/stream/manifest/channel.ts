@@ -24,6 +24,6 @@ router.get('/:channelId/manifest.m3u8', async (req, res) => {
       .contentType('application/vnd.apple.mpegurl')
       .end(generateManifest(manifest));
   } catch (err) {
-    res.status(500).end(err.message || 'internal error');
+    res.status(err.status || 500).end(err.message || 'internal error');
   }
 });
