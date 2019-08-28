@@ -1,4 +1,4 @@
-query getScheduleListSimple($skip: Int!, $take: Int!, $channel: String!, $start: Date, $end: Date) {
+query getScheduleListSimple($skip: Int!, $take: Int!, $channel: String!, $start: DateTime, $end: DateTime) {
   scheduleList(
     skip: $skip,
     take: $take,

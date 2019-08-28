@@ -1,4 +1,4 @@
-scalar Date
+scalar DateTime
 
 directive @auth(
   requires: [UserKind!]! = [normal],
@@ -32,8 +32,8 @@ type Query {
   scheduleList(
     skip: Int!,
     take: Int!,
-    startAt: Date,
-    endAt: Date,
+    startAt: DateTime,
+    endAt: DateTime,
     channel: [String!],
   ): ScheduleList!
 
@@ -86,15 +86,15 @@ type Mutation {
 
   createSchedule(
     channelId: String!,
-    startAt: Date!,
-    endAt: Date!,
+    startAt: DateTime!,
+    endAt: DateTime!,
     title: String!,
   ): Schedule! @auth(requires: [admin])
   updateSchedule(
     scheduleId: ID!,
     title: String,
-    startAt: Date,
-    endAt: Date,
+    startAt: DateTime,
+    endAt: DateTime,
   ): Schedule! @auth(requires: [admin])
 
   addProgramToSchedule(

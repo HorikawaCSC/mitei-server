@@ -15,7 +15,7 @@ import { transcodedSourceResolvers } from './types/transcoded-source';
 import { viewerRequestResolvers } from './types/viewer-request';
 
 export const resolvers: Resolvers = {
-  Date: GraphQLDateTime,
+  DateTime: GraphQLDateTime,
   Mutation: mutationResolvers,
   Query: queryResolvers,
   TranscodedSource: transcodedSourceResolvers,

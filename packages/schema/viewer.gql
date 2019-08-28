@@ -15,7 +15,7 @@ type ViewerChallengeRequest {
   requestFrom: String!
   code: String!
   type: DeviceType!
-  createdAt: Date!
+  createdAt: DateTime!
 }
 
 type ViewerChallengeResult {
@@ -27,7 +27,7 @@ type ViewerDevice {
   id: String!
   type: DeviceType!
   displayName: String!
-  playingContent: Playbackable
+  playingContent: Playbackable @auth(requires: [admin])
 }
 
 type ViewerDeviceList {
@@ -59,4 +59,15 @@ input ViewerRequestParam {
   sourceType: ViewerSourceType
   sourceId: ID
   volume: Float
+}
+
+enum ViewerMetricsType {
+  elapsed
+  error
+}
+
+input ViewerMetricsParam {
+  type: ViewerMetricsType!
+  elapsed: Float
+  message: String
 }

@@ -15,8 +15,8 @@ fragment scheduleUpdate on Schedule {
 
 mutation addSchedule(
   $channelId: String!,
-  $startAt: Date!,
-  $endAt: Date!,
+  $startAt: DateTime!,
+  $endAt: DateTime!,
   $title: String!
 ) {
   createSchedule(
@@ -31,8 +31,8 @@ mutation addSchedule(
 
 mutation updateSchedule(
   $scheduleId: ID!,
-  $startAt: Date,
-  $endAt: Date,
+  $startAt: DateTime,
+  $endAt: DateTime,
   $title: String
 ) {
   updateSchedule(
