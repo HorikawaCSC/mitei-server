@@ -2,23 +2,38 @@ import * as Hls from 'hls.js';
 import * as React from 'react';
 
 type Props = {
+  className?: string;
   source: string;
   autoFix?: boolean;
   controls?: boolean;
   autoplay?: boolean;
-  className?: string;
+  onNotFound?: () => void;
+  onPlay?: () => void;
+  onEnded?: () => void;
+  onTimeUpdate?: () => void;
+  onHlsError?: (err: Hls.errorData) => void;
+  onStallBuffer?: () => void;
 };
 
+const createHls = () =>
+  new Hls({
+    debug: process.env.NODE_ENV !== 'production',
+    levelLoadingMaxRetry: 1,
+    fragLoadingMaxRetry: 3,
+    manifestLoadingMaxRetry: 1,
+  });
+
 export const HLSPlayer = (props: Props) => {
-  const hls = React.useMemo(
-    () =>
-      new Hls({
-        debug: process.env.NODE_ENV !== 'production',
-      }),
-    [],
-  );
-  const supported = React.useMemo(() => Hls.isSupported(), []);
+  const [hls, setHls] = React.useState(() => createHls());
   const videoRef = React.createRef<HTMLVideoElement>();
+  const hlsJsSupported = React.useMemo(() => Hls.isSupported(), []);
+  const nativeSupported = React.useMemo(
+    () =>
+      videoRef.current
+        ? videoRef.current.canPlayType('application/vnd.apple.mpegurl')
+        : true,
+    [videoRef.current],
+  );
 
   const tryPlay = React.useCallback(async () => {
     try {
@@ -28,36 +43,47 @@ export const HLSPlayer = (props: Props) => {
     }
   }, [videoRef.current]);
 
-  const restartHls = React.useCallback(() => {
+  const restartHls = () => {
     hls.detachMedia();
     hls.destroy();
-  }, [hls]);
 
-  const setupErrorHandle = React.useCallback(() => {
+    console.error('hls.js restarting');
+    setHls(createHls());
+  };
+
+  // error handler
+  const setupErrorHandle = () => {
     hls.on(Hls.Events.ERROR, (_e, data) => {
-      if (data.fatal) {
-        switch (data.type) {
-          case Hls.ErrorTypes.NETWORK_ERROR:
-            // try to recover network error
-            console.log('fatal network error encountered, try to recover');
-            hls.startLoad();
-            break;
-          case Hls.ErrorTypes.MEDIA_ERROR:
-            console.log('fatal media error encountered, try to recover');
-            hls.recoverMediaError();
-            break;
-          default:
-            // cannot recover
-            restartHls();
-            break;
-        }
+      console.log(data);
+      if (props.onHlsError) props.onHlsError(data);
+      switch (data.type) {
+        case Hls.ErrorTypes.NETWORK_ERROR:
+          // try to recover network error
+          console.log(data);
+          if (data.response && data.response.code === 404) {
+            if (props.onNotFound) props.onNotFound();
+          }
+
+          hls.startLoad();
+          break;
+        case Hls.ErrorTypes.MEDIA_ERROR:
+          if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+            if (props.onStallBuffer) props.onStallBuffer();
+          }
+          console.log('fatal media error encountered, try to recover');
+          if (data.fatal) hls.recoverMediaError();
+          break;
+        default:
+          // cannot recover
+          if (data.fatal) restartHls();
+          break;
       }
     });
-  }, [hls]);
+  };
 
   React.useEffect(() => {
     if (!videoRef.current) return;
-    if (supported && !hls.media) {
+    if (hlsJsSupported && !hls.media) {
       console.log('hls attached and will be initialized');
       hls.attachMedia(videoRef.current);
       hls.loadSource(props.source);
@@ -66,24 +92,25 @@ export const HLSPlayer = (props: Props) => {
         hls.once(Hls.Events.MANIFEST_PARSED, () => tryPlay());
       }
       setupErrorHandle();
-    } else if (
-      !supported &&
-      videoRef.current.canPlayType('application/vnd.apple.mpegurl')
-    ) {
+    } else if (!hlsJsSupported && nativeSupported) {
       console.log('use native hls playback mode');
       videoRef.current.src = props.source;
       tryPlay();
+      return;
     }
 
     return () => hls.destroy();
-  }, [videoRef.current]);
+  }, [videoRef.current, hls]);
 
-  return supported ? (
+  return hlsJsSupported || nativeSupported ? (
     <video
+      className={props.className}
       ref={videoRef}
       controls={props.controls}
       autoPlay={props.autoplay}
-      className={props.className}
+      onPlay={props.onPlay}
+      onEnded={props.onEnded}
+      onTimeUpdate={props.onTimeUpdate}
     />
   ) : (
     <p>playback not supported</p>

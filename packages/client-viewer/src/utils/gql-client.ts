@@ -20,6 +20,9 @@ const getHeaders = (): Record<string, string> => {
   return {};
 };
 
+const authenticated = () => {
+  return !!storage.get('devToken');
+};
 const httpEndpoint = `${location.origin}/gql`;
 const httpLink = new HttpLink({
   uri: httpEndpoint,
@@ -59,10 +62,7 @@ const link = from([
   split(
     ({ query }) => {
       const definition = getMainDefinition(query);
-      return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      );
+      return definition.kind === 'OperationDefinition' && authenticated();
     },
     wsLink,
     httpLink,
