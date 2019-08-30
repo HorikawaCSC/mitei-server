@@ -1,0 +1,45 @@
+mutation createChannelSimple($id: String!, $displayName: String!) {
+  createChannel(id: $id, displayName: $displayName) {
+    id
+  }
+}
+
+mutation updateChannelFillerControl($id: String!, $mode: FillerControl) {
+  updateChannel(id: $id, fillerControl: $mode) {
+    id
+    fillerControl
+  }
+}
+
+mutation removeFiller($id: String!, $source: ID!) {
+  removeFillerFromChannel(id: $id, sources: [$source])
+}
+
+mutation addFiller($id: String!, $source: ID!) {
+  addFillerToChannel(id: $id, sources: [$source])
+}
+
+query getChannelsSimple($skip: Int!, $take: Int!) {
+  channelList(skip: $skip, take: $take) {
+    total
+    channels {
+      id
+      displayName
+    }
+  }
+}
+
+query getChannelDetail($id: String!) {
+  channel(id: $id) {
+    id
+    displayName
+    fillerControl
+    fillerSources {
+      id
+      duration
+      status
+      name
+      type
+    }
+  }
+}

@@ -1,0 +1,73 @@
+union Playbackable = FileSource | RecordSource | Channel
+
+enum DeviceType {
+  browser
+  chromecast
+}
+
+type ViewerChallenge {
+  token: String!
+  code: String!
+}
+
+type ViewerChallengeRequest {
+  id: String!
+  requestFrom: String!
+  code: String!
+  type: DeviceType!
+  createdAt: DateTime!
+}
+
+type ViewerChallengeResult {
+  success: Boolean!
+  token: String!
+}
+
+type ViewerDevice {
+  id: String!
+  type: DeviceType!
+  displayName: String!
+  playingContent: Playbackable @auth(requires: [admin])
+}
+
+type ViewerDeviceList {
+  total: Int!
+  devices: [ViewerDevice!]!
+}
+
+enum ViewerRequestType {
+  play
+  togglePause
+  stop
+  volume
+}
+
+enum ViewerSourceType {
+  channel
+  source
+}
+
+type ViewerRequest {
+  type: ViewerRequestType!
+  source: Playbackable
+  volume: Float
+}
+
+input ViewerRequestParam {
+  device: ID!
+  type: ViewerRequestType!
+  sourceType: ViewerSourceType
+  sourceId: ID
+  volume: Float
+}
+
+enum ViewerMetricsType {
+  elapsed
+  error
+}
+
+input ViewerMetricsParam {
+  type: ViewerMetricsType!
+  elapsed: Float
+  message: String
+}

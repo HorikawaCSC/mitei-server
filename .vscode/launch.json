@@ -1,20 +1,27 @@
 {
-  // Use IntelliSense to find out which attributes exist for node debugging
-  // Use hover for the description of the existing attributes
-  // For further information visit https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Program",
+      "name": "Run server-media",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceRoot}/src/server/app.ts",
-      "cwd": "${workspaceRoot}",
+      "address": "localhost",
+      "protocol": "inspector",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/lerna",
+      "runtimeArgs": [
+        "exec",
+        "--scope",
+        "@mitei/server-media",
+        "--",
+        "node"
+      ],
+      "program": "${workspaceRoot}/packages/server-media/src/app.ts",
+      "cwd": "${workspaceRoot}/packages/server-media/",
       "outFiles": [
-        "${workspaceRoot}/dist/**/*.js"
+        "${workspaceRoot}/packages/server-media/dist/**/*.js"
       ],
       "sourceMaps": true,
-      "preLaunchTask": "build"
+      "preLaunchTask": "build-server-media"
     }
   ]
 }

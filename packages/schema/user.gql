@@ -1,0 +1,22 @@
+enum UserKind {
+  normal
+  admin
+}
+
+enum IdPType {
+  twitter
+}
+
+type User {
+  id: ID!
+  userId: ID! @auth(requires: [admin])
+  screenName: String!
+  iconUrl: String
+  kind: UserKind! @auth(requires: [admin])
+  type: IdPType! @auth(requires: [admin])
+}
+
+type Users {
+  users: [User!]!
+  total: Int!
+}

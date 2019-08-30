@@ -1,0 +1,16 @@
+subscription viewerRequest {
+  viewerRequest {
+    type
+    source {
+      ... on TranscodedSource {
+        id
+        name
+      }
+      ... on Channel {
+        channelId: id
+        displayName
+      }
+    }
+    volume
+  }
+}

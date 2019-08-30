@@ -1,0 +1,139 @@
+input UploadFileInfo {
+  filename: String!
+  size: Int!
+}
+
+input UploadFileChunk {
+  chunk: Upload!
+  begin: Int!
+  size: Int!
+}
+
+enum TranscodeStatus {
+  pending
+  waiting
+  running
+  success
+  failed
+}
+
+enum SourceType {
+  file
+  record
+}
+
+interface TranscodedSource {
+  id: ID!
+  status: TranscodeStatus! @auth(requires: [admin])
+  duration: Float
+  thumbnailUrl: String @auth(requires: [admin])
+  width: Int @auth(requires: [admin])
+  height: Int @auth(requires: [admin])
+  name: String! @auth(requires: [admin])
+  createdAt: DateTime! @auth(requires: [admin])
+  updatedAt: DateTime! @auth(requires: [admin])
+  createdBy: User! @auth(requires: [admin])
+  preset: TranscodePreset @auth(requires: [admin])
+  type: SourceType!
+}
+
+type SourceList {
+  sources: [TranscodedSource!]!
+  total: Int!
+}
+
+enum SourceStatus {
+  uploading
+  available
+  deleted
+}
+
+type FileSourceOrignalInfo @auth(requires: [admin]) {
+  status: SourceStatus!
+  extension: String!
+  width: Int
+  height: Int
+  fileSize: Int!
+  duration: Float
+}
+
+type FileSource implements TranscodedSource {
+  id: ID!
+  status: TranscodeStatus! @auth(requires: [admin])
+  duration: Float
+  thumbnailUrl: String @auth(requires: [admin])
+  width: Int @auth(requires: [admin])
+  height: Int @auth(requires: [admin])
+  name: String! @auth(requires: [admin])
+  createdAt: DateTime! @auth(requires: [admin])
+  updatedAt: DateTime! @auth(requires: [admin])
+  createdBy: User! @auth(requires: [admin])
+  preset: TranscodePreset @auth(requires: [admin])
+  type: SourceType! @auth(requires: [admin])
+
+  # additional props
+  source: FileSourceOrignalInfo!
+  error: String @auth(requires: [admin])
+  transcodeProgress: Float @auth(requires: [admin])
+}
+
+type FileSourceList {
+  sources: [FileSource!]!
+  total: Int!
+}
+
+enum RtmpStatus {
+  live
+  unused
+}
+
+type RtmpInput @auth(requires: [admin]) {
+  id: ID!
+  name: String!
+  status: RtmpStatus!
+  publishUrl: String!
+  preset: TranscodePreset!
+  createdBy: User!
+}
+
+type RtmpInputList {
+  inputs: [RtmpInput!]!
+  total: Int!
+}
+
+type RecordSource implements TranscodedSource {
+  id: ID!
+  status: TranscodeStatus! @auth(requires: [admin])
+  duration: Float
+  thumbnailUrl: String @auth(requires: [admin])
+  width: Int @auth(requires: [admin])
+  height: Int @auth(requires: [admin])
+  name: String! @auth(requires: [admin])
+  createdAt: DateTime! @auth(requires: [admin])
+  updatedAt: DateTime! @auth(requires: [admin])
+  createdBy: User! @auth(requires: [admin])
+  preset: TranscodePreset! @auth(requires: [admin])
+  type: SourceType! @auth(requires: [admin])
+
+  # additional props
+  source: RtmpInput!
+  error: String @auth(requires: [admin])
+}
+
+type RecordSourceList {
+  sources: [RecordSource!]!
+  total: Int!
+}
+
+type TranscodePreset @auth(requires: [admin]) {
+  id: ID!
+  name: String!
+  parameter: [String!]!
+}
+
+type TranscodePresetList @auth(requires: [admin]) {
+  presets: [TranscodePreset!]!
+  total: Int!
+}
+
+union SourceReference = FileSource | RecordSource | RtmpInput

@@ -1,0 +1,86 @@
+query getScheduleListSimple($skip: Int!, $take: Int!, $channel: String!, $start: DateTime, $end: DateTime) {
+  scheduleList(
+    skip: $skip,
+    take: $take,
+    startAt: $start,
+    endAt: $end,
+    channel: [$channel],
+  ) {
+    total
+    schedules {
+      id
+      title
+      startAt
+      endAt
+      isValid
+      programs {
+        id
+        type
+        duration
+        source {
+          ... on TranscodedSource {
+            id
+            name
+          }
+          ... on RtmpInput {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment programSource on SourceReference {
+  ... on TranscodedSource {
+    id
+    name
+    type
+    duration
+    thumbnailUrl
+    status
+    createdAt
+    width
+    height
+  }
+  ... on RtmpInput {
+    id
+    name
+    preset {
+      id
+      name
+    }
+  }
+}
+
+query getSchedule($id: ID!) {
+  schedule(id: $id) {
+    id
+    title
+    startAt
+    endAt
+    isValid
+    channel {
+      id
+      displayName
+    }
+    programs {
+      id
+      type
+      duration
+      source {
+        ...programSource
+      }
+    }
+  }
+}
+
+query getSourceDuration($id: ID!) {
+  source(sourceId: $id) {
+    ... on TranscodedSource {
+      id
+      duration
+    }
+  }
+}

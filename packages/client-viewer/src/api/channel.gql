@@ -1,0 +1,9 @@
+query getNearSchedules($channelId: String!, $now: DateTime!) {
+  scheduleList(skip: 0, take: 5, startAt: $now, channel: [$channelId]) {
+    schedules {
+      id
+      startAt
+      endAt
+    }
+  }
+}

@@ -1,0 +1,75 @@
+mutation createFileSourceUpload($fileInfo: UploadFileInfo!) {
+  createFileSourceUpload(fileInfo: $fileInfo) {
+    id
+  }
+}
+
+mutation uploadFileSourceChunk($sourceId: String!, $file: UploadFileChunk!) {
+  uploadFileSourceChunk(sourceId: $sourceId, file: $file)
+}
+
+mutation probeFileSource($sourceId: String!) {
+  probeFileSource(sourceId: $sourceId)
+}
+
+mutation enqueueTranscode($sourceId: ID!, $presetId: ID!) {
+  enqueueFileSourceTranscode(sourceId: $sourceId, presetId: $presetId)
+}
+
+query getFileTranscodeStatus($id: ID!) {
+  source(sourceId: $id) {
+    ... on FileSource {
+      id
+      status
+      transcodeProgress
+    }
+  }
+}
+
+query getFileSourcesSimple($skip: Int!, $take: Int!, $status: TranscodeStatus) {
+  sourceList(skip: $skip, take: $take, status: $status, type: file) {
+    total
+    sources {
+      id
+      duration
+      name
+      thumbnailUrl
+      status
+      createdAt
+      ... on FileSource {
+        transcodeProgress
+        source {
+          status
+          duration
+        }
+      }
+    }
+  }
+}
+
+query getFileSource($id: ID!) {
+  fileSource(sourceId: $id) {
+    id
+    duration
+    name
+    thumbnailUrl
+    status
+    createdAt
+    width
+    height
+    error
+    transcodeProgress
+    preset {
+      id
+      name
+    }
+    source {
+      extension
+      width
+      height
+      status
+      fileSize
+      duration
+    }
+  }
+}

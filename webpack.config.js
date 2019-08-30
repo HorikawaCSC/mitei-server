@@ -12,7 +12,8 @@ const config = (isProd, isWatch) => ({
   context: path.resolve(__dirname, './src/client'),
 
   entry: {
-    main: './index.tsx',
+    main: './normal/index.tsx',
+    admin: './admin/index.tsx',
   },
 
   output: {
@@ -20,17 +21,6 @@ const config = (isProd, isWatch) => ({
     chunkFilename: isProd ? '[name]-[hash].js' : '[name].js',
     path: path.resolve(__dirname, 'packs'),
     publicPath: '/packs/',
-  },
-  optimization: {
-    splitChunks: {
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/](@fortawesome[\\/]fontawesome-svg-core)[\\/]/,
-          name: 'fontawesome',
-          chunks: 'all',
-        },
-      },
-    },
   },
 
   module: {
@@ -42,13 +32,15 @@ const config = (isProd, isWatch) => ({
       },
       {
         test: /\.(jpe?g|png|gif|ttf|otf|eot|svg|woff2?)$/,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            name: isProd ? '[name]-[hash].[ext]' : '[name].[ext]',
-            publicPath: '/packs/',
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: isProd ? '[name]-[hash].[ext]' : '[name].[ext]',
+              publicPath: '/packs/',
+            },
           },
-        }],
+        ],
       },
       {
         test: /\.css$/,
@@ -68,7 +60,7 @@ const config = (isProd, isWatch) => ({
   plugins: [
     isProd ? null : new webpack.HotModuleReplacementPlugin(),
 
-    isProd ? new CleanWebpackPlugin() : null,
+    new CleanWebpackPlugin(),
 
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
@@ -76,9 +68,18 @@ const config = (isProd, isWatch) => ({
 
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: './index.html',
+      template: './normal/index.html',
       minify: isProd,
       alwaysWriteToDisk: true,
+      chunks: ['main'],
+    }),
+
+    new HtmlWebpackPlugin({
+      filename: 'admin.html',
+      template: './admin/index.html',
+      minify: isProd,
+      alwaysWriteToDisk: true,
+      chunks: ['admin'],
     }),
 
     new HtmlWebpackHarddiskPlugin(),
@@ -96,12 +97,22 @@ const config = (isProd, isWatch) => ({
     historyApiFallback: true,
     hot: true,
     port: 8080,
-    index: 'index.html',
+    index: '',
     watchOptions: {
       ignored: /node_modules/,
     },
+    proxy: {
+      '/gql/ws': {
+        target: 'ws://localhost:3000/',
+        ws: true,
+      },
+      '*': {
+        target: 'http://localhost:3000',
+      },
+    },
     host: '0.0.0.0',
-  }
+  },
 });
 
-module.exports = (command, { mode }) => config(mode === 'production', command === 'webpack-dev-server');
+module.exports = (command, { mode }) =>
+  config(mode === 'production', command === 'webpack-dev-server');

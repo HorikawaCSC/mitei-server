@@ -1,0 +1,25 @@
+mutation addRtmpInput($name: String!, $presetId: ID!) {
+  createRtmpInput(name: $name, presetId: $presetId) {
+    id
+  }
+}
+
+mutation removeRtmpInput($id: ID!) {
+  removeRtmpInput(id: $id)
+}
+
+query getRtmpInputListSimple($skip: Int!, $take: Int!) {
+  rtmpInputList(skip: $skip, take: $take) {
+    inputs {
+      id
+      status
+      name
+      publishUrl
+      preset {
+        id
+        name
+      }
+    }
+    total
+  }
+}

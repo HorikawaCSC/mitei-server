@@ -1,0 +1,27 @@
+enum ProgramType {
+  rtmp,
+  transcoded,
+  empty,
+}
+
+type Program {
+  id: ID!
+  type: ProgramType!
+  duration: Float!
+  source: SourceReference
+}
+
+type Schedule {
+  id: ID!
+  title: String!
+  startAt: DateTime!
+  endAt: DateTime!
+  channel: Channel!
+  programs: [Program!]! @auth(requires: [admin])
+  isValid: Boolean! @auth(requires: [admin])
+}
+
+type ScheduleList {
+  total: Int!
+  schedules: [Schedule!]!
+}

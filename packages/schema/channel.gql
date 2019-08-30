@@ -1,0 +1,23 @@
+enum FillerControl {
+  random
+  sequential
+}
+
+enum ChannelPermission {
+  public
+  viewerOnly
+}
+
+type Channel {
+  id: String!
+  displayName: String!
+  createdBy: User! @auth(requires: [admin])
+  fillerSources: [TranscodedSource!]! @auth(requires: [admin])
+  fillerControl: FillerControl! @auth(requires: [admin])
+  permission: ChannelPermission! @auth(requires: [admin])
+}
+
+type ChannelList {
+  total: Int!
+  channels: [Channel!]!
+}

@@ -1,0 +1,27 @@
+overwrite: true
+schema:
+  - "./node_modules/@mitei/schema/*.gql"
+  - |
+   scalar Upload
+documents: null
+generates:
+  ./src/generated/graphql.ts:
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"
+config:
+  contextType: ../api/context#GqlContext
+  mappers:
+    FileSource: '@mitei/server-models#FileSourceDocument'
+    TranscodedSource: '@mitei/server-models#TranscodedSourceDocument'
+    User: '@mitei/server-models#UserDocument'
+    RtmpInput: '@mitei/server-models#RtmpInputDocument'
+    RecordSource: '@mitei/server-models#RecordSourceDocument'
+    TranscodePreset: '@mitei/server-models#TranscodePresetDocument'
+    Channel: '@mitei/server-models#ChannelDocument'
+    Schedule: '@mitei/server-models#ScheduleDocument'
+    Program: '@mitei/server-models#Program'
+    ViewerDevice: '@mitei/server-models#ViewerDeviceDocument'
+    ViewerRequest: ViewerRequestParam
+  scalars:
+    Date: Date

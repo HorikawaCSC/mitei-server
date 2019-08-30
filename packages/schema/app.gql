@@ -1,0 +1,136 @@
+scalar DateTime
+
+directive @auth(
+  requires: [UserKind!]! = [normal],
+) on OBJECT | FIELD_DEFINITION
+directive @deviceOnly on OBJECT | FIELD_DEFINITION
+
+type Query {
+  fileSource(sourceId: ID!): FileSource
+  fileSourceList(status: TranscodeStatus, skip: Int!, take: Int!): FileSourceList! @auth(requires: [admin])
+
+  recordSource(sourceId: ID!): RecordSource
+  recordSourceList(skip: Int!, take: Int!): RecordSourceList! @auth(requires: [admin])
+
+  source(sourceId: ID!): SourceReference!
+  sourceList(
+    type: SourceType,
+    status: TranscodeStatus,
+    skip: Int!,
+    take: Int!,
+  ): SourceList! @auth(requires: [admin])
+
+  rtmpInput(id: ID!): RtmpInput @auth(requires: [admin])
+  rtmpInputList(skip: Int!, take: Int!): RtmpInputList! @auth(requires: [admin])
+
+  users(kind: UserKind, type: IdPType, skip: Int!, take: Int!): Users! @auth(requires: [admin])
+
+  channel(id: String!): Channel
+  channelList(skip: Int!, take: Int!): ChannelList!
+
+  schedule(id: ID!): Schedule
+  scheduleList(
+    skip: Int!,
+    take: Int!,
+    startAt: DateTime,
+    endAt: DateTime,
+    channel: [String!],
+  ): ScheduleList!
+
+  transcodePreset(id: ID!): TranscodePreset @auth(requires: [admin])
+  transcodePresetList(skip: Int!, take: Int!): TranscodePresetList! @auth(requires: [admin])
+
+  viewerRequests: [ViewerChallengeRequest!]! @auth(requires: [admin])
+  viewerDevices(skip: Int!, take: Int!): ViewerDeviceList! @auth(requires: [admin])
+
+  # normal func
+  me: User
+  viewerChallengeResult(token: String!): ViewerChallengeResult!
+  viewerInfo: ViewerDevice
+}
+
+type Mutation {
+  # admin func
+  createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource! @auth(requires: [admin])
+  uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean! @auth(requires: [admin])
+  probeFileSource(sourceId: String!): Boolean! @auth(requires: [admin])
+
+  createRtmpInput(name: String!, presetId: ID!): RtmpInput! @auth(requires: [admin])
+  removeRtmpInput(id: ID!): Boolean! @auth(requires: [admin])
+
+  createTranscodePreset(name: String!, parameter: [String!]!): TranscodePreset! @auth(requires: [admin])
+
+  enqueueFileSourceTranscode(sourceId: ID!, presetId: ID!): Boolean! @auth(requires: [admin])
+
+  createChannel(
+    id: String!,
+    displayName: String!,
+    fillerSources: [ID!],
+    fillerControl: FillerControl,
+    permission: ChannelPermission,
+  ): Channel! @auth(requires: [admin])
+  updateChannel(
+    id: String!,
+    displayName: String,
+    fillerControl: FillerControl,
+    permission: ChannelPermission,
+  ): Channel! @auth(requires: [admin])
+  addFillerToChannel(
+    id: String!,
+    sources: [ID!]!,
+  ): [ID!]! @auth(requires: [admin])
+  removeFillerFromChannel(
+    id: String!,
+    sources: [ID!]!,
+  ): [ID!]! @auth(requires: [admin])
+
+  createSchedule(
+    channelId: String!,
+    startAt: DateTime!,
+    endAt: DateTime!,
+    title: String!,
+  ): Schedule! @auth(requires: [admin])
+  updateSchedule(
+    scheduleId: ID!,
+    title: String,
+    startAt: DateTime,
+    endAt: DateTime,
+  ): Schedule! @auth(requires: [admin])
+
+  addProgramToSchedule(
+    scheduleId: ID!,
+    before: ID,
+    duration: Float!,
+    type: ProgramType!,
+    sourceId: ID,
+  ): Schedule! @auth(requires: [admin])
+  removeProgramFromSchedule(
+    scheduleId: ID!,
+    programId: ID!
+  ): Schedule! @auth(requires: [admin])
+  updateProgram(
+    scheduleId: ID!,
+    programId: ID!,
+    duration: Float,
+    type: ProgramType,
+    sourceId: ID,
+  ): Schedule! @auth(requires: [admin])
+  updateProgramOrder(
+    scheduleId: ID!,
+    order: [ID!]!
+  ): Schedule! @auth(requires: [admin])
+
+  createViewerChallenge(device: DeviceType!): ViewerChallenge!
+  acceptViewerChallenge(deviceId: String!): Boolean! @auth(requires: [admin])
+  dispatchViewerRequest(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
+}
+
+type Subscription {
+  viewerRequest: ViewerRequest! @deviceOnly
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}

@@ -1,0 +1,23 @@
+overwrite: true
+schema:
+  - "node_modules/@mitei/schema/*.gql"
+  - |
+   scalar Upload
+documents:
+  - "./src/api/**/*.gql"
+generates:
+  ./src/api/generated/graphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+  ./src/api/generated/introspection-result.ts:
+    plugins:
+      - "fragment-matcher"
+config:
+  withHooks: true
+  withComponent: false
+  withHOC: false
+  scalars:
+    DateTime: string
+    Upload: Blob
