@@ -123,6 +123,7 @@ type Mutation {
   createViewerChallenge(device: DeviceType!): ViewerChallenge!
   acceptViewerChallenge(deviceId: String!): Boolean! @auth(requires: [admin])
   dispatchViewerRequest(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
+  reportViewerMetrics(metrics: ViewerMetricsParam!): Boolean! @deviceOnly
 }
 
 type Subscription {

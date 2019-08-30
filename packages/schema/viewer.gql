@@ -27,7 +27,9 @@ type ViewerDevice {
   id: String!
   type: DeviceType!
   displayName: String!
+  online: Boolean! @auth(requires: [admin])
   playingContent: Playbackable @auth(requires: [admin])
+  metrics: [ViewerMetrics!]! @auth(requires: [admin])
 }
 
 type ViewerDeviceList {
@@ -64,6 +66,7 @@ input ViewerRequestParam {
 enum ViewerMetricsType {
   elapsed
   error
+  ping
 }
 
 input ViewerMetricsParam {
@@ -71,3 +74,13 @@ input ViewerMetricsParam {
   elapsed: Float
   message: String
 }
+
+type ViewerElapsedMetrics {
+  elapsed: Float!
+}
+
+type ViewerErrorMetrics {
+  message: String!
+}
+
+union ViewerMetrics = ViewerElapsedMetrics | ViewerErrorMetrics

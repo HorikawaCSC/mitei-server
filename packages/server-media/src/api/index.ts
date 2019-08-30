@@ -12,6 +12,7 @@ import { rtmpInputResolvers } from './types/rtmp-input';
 import { scheduleResolvers } from './types/schedule';
 import { sourceReferenceResolvers } from './types/source-reference';
 import { transcodedSourceResolvers } from './types/transcoded-source';
+import { viewerDeviceResolvers } from './types/viewer-device';
 import { viewerRequestResolvers } from './types/viewer-request';
 
 export const resolvers: Resolvers = {
@@ -29,4 +30,5 @@ export const resolvers: Resolvers = {
   Subscription: subscriptionResolvers,
   ViewerRequest: viewerRequestResolvers,
   Playbackable: playbackableResolvers,
+  ViewerDevice: viewerDeviceResolvers,
 };
