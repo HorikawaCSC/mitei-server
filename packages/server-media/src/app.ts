@@ -16,7 +16,7 @@ import { liveHlsManager } from './workers/live-hls';
   await connectMongo(config.mongo, { useNewUrlParser: true });
   await connectRedis();
 
-  await liveHlsManager.cleanUpUnused();
+  liveHlsManager.cleanUpUnused();
 
   const callbackApp = express();
   callbackApp.use(callbackRouter);
@@ -40,5 +40,6 @@ import { liveHlsManager } from './workers/live-hls';
   app.use('/admin/*', (_req, res) =>
     res.sendFile(resolve('./packs/admin.html')),
   );
+  app.use('/cast/*', (_req, res) => res.sendFile(resolve('./packs/cast.html')));
   app.use('*', (_req, res) => res.sendFile(resolve('./packs/index.html')));
 })();

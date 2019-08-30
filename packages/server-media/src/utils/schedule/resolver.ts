@@ -216,7 +216,7 @@ export class ScheduleResolver {
 
     for (let index = 0; index < sources.length; index++) {
       const source = sources[index];
-      const sourceStartAt = source.createdAt!.getTime() - LIVE_DELAY_SEC * 1000;
+      const sourceStartAt = source.createdAt!.getTime() + LIVE_DELAY_SEC * 1000;
 
       // (source begin date) - (program start date)
       const durationBetweenStartAndSource = dateDiffSec(

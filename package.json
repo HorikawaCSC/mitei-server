@@ -1,23 +1,10 @@
 {
   "scripts": {
-    "start:server": "node dist/app.js",
-    "build:server": "tsc -p ./src/server",
-    "build:client": "webpack --mode=$NODE_ENV",
-    "test:tslint": "tslint './src/**/*.{ts,tsx}'",
-    "test:prettier": "prettier -c './src/**/*.{ts,tsx}'",
-    "test:tsc": "tsc -p ./src/client",
-    "test": "run-p test:*",
-    "build": "NODE_ENV=production run-p build:{server,client}",
-    "build:dev": "NODE_ENV=development run-p build:{server,client}",
-    "start:client": "webpack --mode=development --watch",
-    "start:client:dev": "webpack-dev-server",
-    "build:codegen:server": "gql-gen --config ./codegen.yml",
-    "build:codegen:client": "gql-gen --config ./codegen.client.yml",
-    "build:codegen": "run-p build:codegen:*"
+    "build": "lerna run build",
+    "test": "lerna run test"
   },
   "name": "mitei-server",
   "version": "1.0.0",
-  "main": "dist/app.js",
   "license": "GPL-3.0",
   "devDependencies": {
     "@material-ui/core": "^4.3.0",

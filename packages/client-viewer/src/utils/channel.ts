@@ -24,8 +24,15 @@ export const useChannelPlay = (channelId: string) => {
         now,
       });
     }, 1000 * 30);
+    const timer2 = setInterval(() => {
+      const now = DateTime.local().toISO();
+      setNow(now);
+    }, 1000 * 5);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      clearInterval(timer2);
+    };
   });
 
   const current = React.useMemo(() => {
@@ -51,7 +58,7 @@ export const useChannelPlay = (channelId: string) => {
   React.useEffect(() => {
     const now = Date.now();
     if (current) {
-      const toNextTime = new Date(current.endAt).getTime() - now - 1000 * 5;
+      const toNextTime = new Date(current.endAt).getTime() - now + 1000 * 5;
       if (toNextTime < 0) return;
 
       const timer = setTimeout(() => {
@@ -80,8 +87,8 @@ export const useChannelPlay = (channelId: string) => {
 
     return schedules.some(schedule => {
       return (
-        new Date(schedule.startAt).getTime() < now &&
-        new Date(schedule.endAt).getTime() > now
+        new Date(schedule.startAt).getTime() <= now &&
+        new Date(schedule.endAt).getTime() >= now
       );
     });
   }, [nearScheduleData, now]);

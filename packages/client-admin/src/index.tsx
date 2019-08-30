@@ -18,7 +18,7 @@ if (target) {
       <ApolloProvider client={apolloClient}>
         <MessageProvider>
           <MuiPickersUtilsProvider utils={LuxonUtils}>
-            <BrowserRouter>
+            <BrowserRouter basename='/admin'>
               <Root />
             </BrowserRouter>
           </MuiPickersUtilsProvider>

@@ -27,7 +27,7 @@ const config = isProd => ({
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/](@material-ui[\//]|react)/,
-          name: 'vendor',
+          name: 'admin-vendor',
           chunks: 'all',
         },
       },

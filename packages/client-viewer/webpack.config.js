@@ -76,6 +76,12 @@ const config = isProd => ({
       minify: isProd,
       alwaysWriteToDisk: true,
     }),
+    new HtmlWebpackPlugin({
+      filename: 'cast.html',
+      template: './cast.html',
+      minify: isProd,
+      alwaysWriteToDisk: true,
+    }),
 
     new HtmlWebpackHarddiskPlugin(),
 
