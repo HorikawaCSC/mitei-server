@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on: [push]
+
+jobs:
+  simpletest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+  push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag mitei-server
+    - name: Log into registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+    - name: Push image
+      run: |
+        IMAGE_ID=docker.pkg.github.com/horikawacsc/mitei-server/main
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        [ "$VERSION" == "master" ] && VERSION=latest
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
+        docker tag mitei-server $IMAGE_ID:$VERSION
+        docker push $IMAGE_ID:$VERSION
