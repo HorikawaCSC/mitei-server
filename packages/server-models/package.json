@@ -17,7 +17,7 @@
     "test:prettier": "prettier --config ../../.prettierrc.yml -c './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
-    "mongoose": "^5.6.3"
+    "mongoose": "^5.7.5"
   },
   "devDependencies": {
     "@types/mongoose": "^5.5.7",
