@@ -3,7 +3,6 @@ import {
   RecordSource,
   RecordSourceDocument,
   RtmpInputDocument,
-  RtmpStatus,
   TranscodeStatus,
 } from '@mitei/server-models';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
@@ -14,6 +13,7 @@ import { createInterface } from 'readline';
 import { config } from '../../config';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
+import { lockLiveSource, unlockLiveSource } from './lock';
 
 export class LiveHLSWorker extends EventEmitter {
   private ffmpegProcess: ChildProcessWithoutNullStreams | null = null;
@@ -125,6 +125,7 @@ export class LiveHLSWorker extends EventEmitter {
               lastManifestAppend: new Date(),
             },
           });
+          await lockLiveSource(this.source);
         }
       }
       buffer.push(line);
@@ -153,9 +154,8 @@ export class LiveHLSWorker extends EventEmitter {
   }
 
   private async finalize(status: TranscodeStatus) {
-    this.source.status = RtmpStatus.Unused;
-    await this.source.save();
     await this.setStatus(status);
+    await unlockLiveSource(this.source);
   }
 
   private async setStatus(status: TranscodeStatus) {
@@ -179,9 +179,6 @@ export class LiveHLSWorker extends EventEmitter {
     if (!this.source.id) throw new Error('uninitialized source');
 
     try {
-      this.source.status = RtmpStatus.Live;
-      await this.source.save();
-
       await this.createRecord();
       await this.createDir();
       await this.startTranscoder();

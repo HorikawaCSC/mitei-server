@@ -1,5 +1,6 @@
 import { config } from '../../config';
-import { RtmpInputResolvers } from '../../generated/graphql';
+import { RtmpInputResolvers, RtmpStatus } from '../../generated/graphql';
+import { checkLockLiveSource } from '../../workers/live-hls/lock';
 
 export const rtmpInputResolvers: RtmpInputResolvers = {
   createdBy: async source => {
@@ -13,6 +14,11 @@ export const rtmpInputResolvers: RtmpInputResolvers = {
     if (!source.preset) throw new Error('failed to populate');
 
     return source.preset;
+  },
+  status: async source => {
+    return (await checkLockLiveSource(source.id))
+      ? RtmpStatus.Live
+      : RtmpStatus.Unused;
   },
   publishUrl: source => {
     return `${config.streaming.rtmpClientEndpoint}/${source.id}`;

@@ -3,13 +3,8 @@ import { Document, model, Schema, SchemaTypes } from 'mongoose';
 import { TranscodePreset, TranscodePresetDocument } from './TranscodePreset';
 import { User, UserDocument } from './User';
 
-export enum RtmpStatus {
-  Live = 'live',
-  Unused = 'unused',
-}
 export interface RtmpInputDocument extends Document {
   name: string;
-  status: RtmpStatus;
   createdBy?: UserDocument;
   createdById: ObjectID;
   preset?: TranscodePresetDocument;
@@ -23,12 +18,6 @@ const schema = new Schema(
       type: SchemaTypes.String,
       required: true,
       default: 'input',
-    },
-    status: {
-      type: SchemaTypes.String,
-      required: true,
-      enum: Object.values(RtmpStatus),
-      default: RtmpStatus.Unused,
     },
     createdBy: {
       type: SchemaTypes.ObjectId,

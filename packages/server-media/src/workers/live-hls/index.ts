@@ -1,12 +1,7 @@
-import {
-  RecordSource,
-  RtmpInput,
-  RtmpInputDocument,
-  RtmpStatus,
-  TranscodeStatus,
-} from '@mitei/server-models';
+import { RtmpInputDocument } from '@mitei/server-models';
 import { config } from '../../config';
 import { liveHlsLogger } from '../../utils/logging';
+import { lockLiveSource } from './lock';
 import { LiveHLSWorker } from './worker';
 
 class LiveHLSManager {
@@ -19,7 +14,7 @@ class LiveHLSManager {
       throw new Error('too many streams');
     }
 
-    if (this.workers.has(source.id)) {
+    if (this.workers.has(source.id) || !(await lockLiveSource(source))) {
       liveHlsLogger.warn('Same source worker is still running');
       throw new Error('already broadcasting');
     }
@@ -51,62 +46,6 @@ class LiveHLSManager {
       if (worker) await worker.tryStop();
     } else {
       liveHlsLogger.debug('ffmpeg seemed to be stopped');
-    }
-  }
-
-  async cleanUpUnused() {
-    const liveInputs = await RtmpInput.find({ status: RtmpStatus.Live });
-    const now = Date.now();
-    for (const input of liveInputs) {
-      const records = await RecordSource.find({
-        source: input._id,
-        status: {
-          $in: [TranscodeStatus.Running, TranscodeStatus.Pending],
-        },
-      });
-      if (
-        records.filter(record => now - record.updatedAt!.getTime() < 1000 * 60)
-          .length > 0
-      ) {
-        continue;
-      }
-
-      for (const record of records) {
-        liveHlsLogger.warn(
-          'record:',
-          record.id,
-          ' by source:',
-          input.id,
-          ' seems to be failed',
-        );
-        await record.updateOne({
-          $set: {
-            status: TranscodeStatus.Failed,
-          },
-        });
-      }
-
-      liveHlsLogger.warn('source:', input.id, ' seems to be unused');
-      await input.updateOne({
-        $set: {
-          status: RtmpStatus.Unused,
-        },
-      });
-    }
-
-    const notUpdatedRunningSources = await RecordSource.find({
-      status: TranscodeStatus.Running,
-      lastManifestAppend: {
-        $lte: new Date(now - 1000 * 60 * 2),
-      },
-    });
-    for (const source of notUpdatedRunningSources) {
-      liveHlsLogger.warn('record:', source.id, ' seems to be failed');
-      await source.updateOne({
-        $set: {
-          status: TranscodeStatus.Failed,
-        },
-      });
     }
   }
 }

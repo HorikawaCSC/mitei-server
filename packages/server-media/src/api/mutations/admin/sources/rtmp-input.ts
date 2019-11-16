@@ -1,4 +1,4 @@
-import { RtmpInput, RtmpStatus, TranscodePreset } from '@mitei/server-models';
+import { RtmpInput, TranscodePreset } from '@mitei/server-models';
 import { MutationResolvers } from '../../../../generated/graphql';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 
@@ -9,7 +9,6 @@ export const rtmpInputMutationResolvers: MutationResolvers = {
       if (!preset) throw new Error('no preset');
 
       const input = new RtmpInput();
-      input.status = RtmpStatus.Unused;
       input.name = name;
       input.createdById = userInfo._id;
       input.presetId = preset._id;
@@ -17,14 +16,4 @@ export const rtmpInputMutationResolvers: MutationResolvers = {
       return await input.save();
     },
   ),
-  removeRtmpInput: ensureLoggedInAsAdmin(async (_parent, { id }) => {
-    const input = await RtmpInput.findById(id);
-    if (!input) throw new Error('not found');
-    if (input.status !== RtmpStatus.Unused)
-      throw new Error('stream is being used');
-
-    await input.remove();
-
-    return true;
-  }),
 };

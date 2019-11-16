@@ -1,4 +1,4 @@
-import { RtmpInput, RtmpStatus } from '@mitei/server-models';
+import { RtmpInput } from '@mitei/server-models';
 import { urlencoded } from 'body-parser';
 import { Router } from 'express';
 import { RtmpEvent } from '../../types/RtmpEvent';
@@ -30,10 +30,6 @@ router.post('/rtmp-events', async (req, res) => {
   try {
     if (event.call === 'play') {
       return res.status(200).end(); // TODO
-    }
-
-    if (source.status !== RtmpStatus.Unused) {
-      return res.status(503).end();
     }
 
     if (event.call === 'publish') {

@@ -10,13 +10,10 @@ import { router as callbackRouter } from './routes/callback';
 import { gqlServer } from './routes/gql';
 import { applyAuthenticateMiddleware } from './utils/auth';
 import { connectRedis } from './utils/redis';
-import { liveHlsManager } from './workers/live-hls';
 
 (async () => {
   await connectMongo(config.mongo, { useNewUrlParser: true });
   await connectRedis();
-
-  liveHlsManager.cleanUpUnused();
 
   const callbackApp = express();
   callbackApp.use(callbackRouter);
