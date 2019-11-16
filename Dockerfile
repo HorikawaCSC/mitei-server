@@ -18,7 +18,6 @@ COPY . /app/
 ENV NODE_ENV="production"
 RUN npx lerna bootstrap --hoist \
   && npm run build \
-  && npm run test \
   && du -d0 -h \
   && npx lerna clean --yes \
   && rm -rf ./node_modules

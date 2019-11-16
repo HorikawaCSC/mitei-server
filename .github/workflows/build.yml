@@ -1,13 +1,29 @@
-name: Docker Image CI
+name: Test / Build
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  simpletest:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-  push:
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 11.x
+    - uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: Setup env
+      run: |
+        npm ci
+        npx lerna bootstrap --hoist
+    - name: Test
+      run: npx lerna run test --stream
+  docker-build:
+    needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
