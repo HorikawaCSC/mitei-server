@@ -1,6 +1,7 @@
 import { ObjectID } from 'bson';
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
 import { User, UserDocument } from '../User';
+import { createRefIdVirtual } from '../utils/schema';
 import { Channel, ChannelDocument } from './Channel';
 
 export enum ProgramType {
@@ -47,7 +48,6 @@ const schema = new Schema(
       type: SchemaTypes.String,
       ref: Channel,
       required: true,
-      alias: 'channelId',
     },
     programs: [
       new Schema({
@@ -70,7 +70,6 @@ const schema = new Schema(
       type: SchemaTypes.ObjectId,
       ref: User,
       required: true,
-      alias: 'createdById',
     },
   },
   {
@@ -89,5 +88,8 @@ schema.method('isProgramValid', function(this: ScheduleDocument): boolean {
 
   return true;
 });
+
+createRefIdVirtual(schema, 'createdBy', 'createdById');
+createRefIdVirtual(schema, 'channel', 'channelId');
 
 export const Schedule = model<ScheduleDocument>('Schedule', schema);

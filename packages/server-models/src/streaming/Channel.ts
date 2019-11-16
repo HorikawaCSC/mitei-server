@@ -5,6 +5,7 @@ import {
   TranscodedSourceDocument,
 } from '../TranscodedSource';
 import { User, UserDocument } from '../User';
+import { createRefIdVirtual } from '../utils/schema';
 
 export enum FillerControl {
   Sequential = 'sequential',
@@ -41,7 +42,6 @@ const schema = new Schema(
       type: SchemaTypes.ObjectId,
       ref: User,
       required: true,
-      alias: 'createdById',
     },
     fillerSources: [
       {
@@ -87,5 +87,7 @@ schema
       (this.fillerSources as unknown) = value;
     }
   });
+
+createRefIdVirtual(schema, 'createdBy', 'createdById');
 
 export const Channel = model<ChannelDocument>('Channel', schema);

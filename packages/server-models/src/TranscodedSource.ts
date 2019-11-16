@@ -2,6 +2,7 @@ import { ObjectID } from 'bson';
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
 import { TranscodePreset, TranscodePresetDocument } from './TranscodePreset';
 import { User, UserDocument } from './User';
+import { createRefIdVirtual } from './utils/schema';
 
 export enum TranscodeStatus {
   Pending = 'pending',
@@ -42,7 +43,6 @@ const schema = new Schema(
       type: SchemaTypes.ObjectId,
       required: true,
       ref: User,
-      alias: 'createdById',
     },
     name: {
       type: SchemaTypes.String,
@@ -62,7 +62,6 @@ const schema = new Schema(
     preset: {
       type: SchemaTypes.ObjectId,
       ref: TranscodePreset,
-      alias: 'presetId',
     },
     duration: SchemaTypes.Number,
     thumbnailPath: SchemaTypes.String,
@@ -74,6 +73,9 @@ const schema = new Schema(
     discriminatorKey: 'type',
   },
 );
+
+createRefIdVirtual(schema, 'createdBy', 'createdById');
+createRefIdVirtual(schema, 'preset', 'presetId');
 
 export const TranscodedSource = model<TranscodedSourceDocument>(
   'TranscodedSource',

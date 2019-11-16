@@ -2,6 +2,7 @@ import { ObjectID } from 'bson';
 import { Schema, SchemaTypes } from 'mongoose';
 import { RtmpInput, RtmpInputDocument } from './RtmpInput';
 import { TranscodedSource, TranscodedSourceDocument } from './TranscodedSource';
+import { createRefIdVirtual } from './utils/schema';
 
 export interface RecordSourceDocument extends TranscodedSourceDocument {
   sourceId: ObjectID;
@@ -17,7 +18,6 @@ const schema = new Schema(
       type: SchemaTypes.ObjectId,
       ref: RtmpInput,
       required: true,
-      alias: 'sourceId',
     },
     lastManifestAppend: {
       type: SchemaTypes.Date,
@@ -29,6 +29,8 @@ const schema = new Schema(
     timestamps: true,
   },
 );
+
+createRefIdVirtual(schema, 'source', 'sourceId');
 
 export const RecordSource = TranscodedSource.discriminator<
   RecordSourceDocument

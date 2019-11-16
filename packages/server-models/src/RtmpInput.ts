@@ -2,6 +2,7 @@ import { ObjectID } from 'bson';
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
 import { TranscodePreset, TranscodePresetDocument } from './TranscodePreset';
 import { User, UserDocument } from './User';
+import { createRefIdVirtual } from './utils/schema';
 
 export interface RtmpInputDocument extends Document {
   name: string;
@@ -23,13 +24,11 @@ const schema = new Schema(
       type: SchemaTypes.ObjectId,
       required: true,
       ref: User,
-      alias: 'createdById',
     },
     preset: {
       type: SchemaTypes.ObjectId,
       required: true,
       ref: TranscodePreset,
-      alias: 'presetId',
     },
   },
   {
@@ -39,5 +38,8 @@ const schema = new Schema(
     },
   },
 );
+
+createRefIdVirtual(schema, 'createdBy', 'createdById');
+createRefIdVirtual(schema, 'preset', 'presetId');
 
 export const RtmpInput = model<RtmpInputDocument>('RtmpInput', schema);
