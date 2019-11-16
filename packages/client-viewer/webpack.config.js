@@ -109,6 +109,9 @@ const config = isProd => ({
       '/api/*': {
         target: 'http://localhost:3000',
       },
+      '/auth/*': {
+        target: 'http://localhost:3000',
+      },
       '/gql': {
         target: 'http://localhost:3000',
       },
