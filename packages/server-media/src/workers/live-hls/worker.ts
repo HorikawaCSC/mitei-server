@@ -31,6 +31,7 @@ export class LiveHLSWorker extends EventEmitter {
     this.record.source = this.source.id!;
     this.record.duration = 0;
     this.record.createdById = this.source.createdById;
+    this.record.presetId = this.source.presetId;
 
     return await this.record.save();
   }
@@ -179,6 +180,8 @@ export class LiveHLSWorker extends EventEmitter {
     if (!this.source.id) throw new Error('uninitialized source');
 
     try {
+      await this.source.populate('preset').execPopulate();
+
       await this.createRecord();
       await this.createDir();
       await this.startTranscoder();
