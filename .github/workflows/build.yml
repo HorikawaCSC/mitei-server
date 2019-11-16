@@ -21,7 +21,9 @@ jobs:
         npm ci
         npx lerna bootstrap --hoist
     - name: Test
-      run: npx lerna run test --stream
+      run: |
+        npx lerna run build --stream
+        npx lerna run test --stream
   build-docker:
     needs: test
     runs-on: ubuntu-latest
