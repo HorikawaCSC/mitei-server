@@ -5,6 +5,7 @@
   "author": "f0reachARR <f0reach@f0reach.me>",
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
   "license": "MIT",
+  "files": ["packs", "package.json"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HorikawaCSC/mitei-server.git"

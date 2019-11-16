@@ -22,7 +22,7 @@ jobs:
         npx lerna bootstrap --hoist
     - name: Test
       run: npx lerna run test --stream
-  docker-build:
+  build-docker:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'

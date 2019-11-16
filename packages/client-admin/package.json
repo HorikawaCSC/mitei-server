@@ -6,9 +6,7 @@
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
   "license": "MIT",
   "main": "src/index.tsx",
-  "publishConfig": {
-    "registry": "https://registry.yarnpkg.com"
-  },
+  "files": ["packs", "package.json"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HorikawaCSC/mitei-server.git"

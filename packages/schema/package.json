@@ -6,9 +6,6 @@
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
   "license": "MIT",
   "main": "schema.gql",
-  "publishConfig": {
-    "registry": "https://registry.yarnpkg.com"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HorikawaCSC/mitei-server.git"
