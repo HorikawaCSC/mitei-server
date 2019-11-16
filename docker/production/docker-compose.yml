@@ -1,19 +1,19 @@
 version: "3"
 services:
   app:
-    build: .
+    build: ../../
     image: horikawacsc/mitei-server
     env_file: .env
     ports:
       - 3000:3000
       - 3001:3001
     volumes:
-      - /mnt/data:/app/data
+      - ../../data:/app/data
     depends_on:
       - mongo
       - redis
   rtmp:
-    build: ./nginx
+    build: ../../nginx
     image: horikawacsc/mitei-server-nginx
     ports:
       - 8000:8000
@@ -25,12 +25,12 @@ services:
     restart: always
     image: redis:4.0-alpine
     volumes:
-      - ./redis:/data
+      - ../../redis:/data
   mongo:
     restart: always
     image: mongo:3.6
     volumes:
-      - ./mongo:/data/db
+      - ../../mongo:/data/db
   mongoui:
     restart: always
     image: mongo-express
