@@ -7,6 +7,9 @@
   "license": "MIT",
   "main": "src/index.tsx",
   "files": ["packs", "package.json"],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HorikawaCSC/mitei-server.git"
