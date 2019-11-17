@@ -38,24 +38,28 @@ export class LiveHLSWorker extends EventEmitter {
 
   private getTranscodeParam() {
     if (!this.record) throw new Error('record must not be null');
+    if (!this.source.preset) throw new Error('preset must not be null');
 
     return [
       '-i',
       `${config.streaming.rtmpAddress}/${this.source.id}`,
-      '-c',
-      'copy',
+      ...this.source.preset.parameter,
+      '-g',
+      '90',
       '-f',
       'hls',
       '-hls_time',
-      '5',
+      '1',
       '-hls_flags',
       'single_file',
       '-hls_list_size',
       '1',
       '-hls_ts_options',
       'mpegts_m2ts_mode=0',
+      '-mpegts_m2ts_mode',
+      '0',
       '-hls_segment_filename',
-      `${config.paths.source}/${this.record.id}/stream.m2ts`,
+      `${config.paths.source}/${this.record.id}/stream.mts`,
       '-',
     ];
   }
@@ -87,7 +91,7 @@ export class LiveHLSWorker extends EventEmitter {
     const buffer: string[] = [];
     readline.on('line', async line => {
       if (!this.record) return;
-      if (line.match(/\.m2ts/)) {
+      if (line.match(/\.mts/)) {
         if (
           buffer
             .join('\n')

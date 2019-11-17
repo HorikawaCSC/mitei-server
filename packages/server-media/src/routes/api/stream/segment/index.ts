@@ -10,7 +10,7 @@ export const router = Router();
 router.get('/ts/:sourceId([0-9a-f]+)/:segmentRef', async (req, res) => {
   const { sourceId, segmentRef } = req.params as Record<string, string>;
 
-  const sourcePath = resolve(config.paths.source, sourceId, 'stream.m2ts');
+  const sourcePath = resolve(config.paths.source, sourceId, 'stream.mts');
   const segmentInfo = decodeSegmentRef(segmentRef.replace(/\.ts$/, ''));
 
   const fh = await fs.open(sourcePath, 'r');

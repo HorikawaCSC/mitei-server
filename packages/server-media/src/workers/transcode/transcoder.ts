@@ -99,7 +99,7 @@ export class Transcoder extends EventEmitter {
       'hls',
       ...this.preset.parameter,
       '-hls_time',
-      '5',
+      '0',
       '-hls_flags',
       'single_file',
       '-hls_list_size',
@@ -107,7 +107,7 @@ export class Transcoder extends EventEmitter {
       '-hls_ts_options',
       'mpegts_m2ts_mode=0',
       '-hls_segment_filename',
-      `${config.paths.source}/${this.source.id}/stream.m2ts`,
+      `${config.paths.source}/${this.source.id}/stream.mts`,
       '-',
     ];
   }
@@ -175,7 +175,7 @@ export class Transcoder extends EventEmitter {
       }
 
       try {
-        if (line.match(/\.m2ts/)) {
+        if (line.match(/\.mts/)) {
           if (
             buffer
               .join('\n')
