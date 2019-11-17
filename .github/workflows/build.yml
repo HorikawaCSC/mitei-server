@@ -1,6 +1,8 @@
 name: Test / Build
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
 
 jobs:
   test:
@@ -27,20 +29,24 @@ jobs:
   build-docker:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event == 'push'
     steps:
     - uses: actions/checkout@v1
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag mitei-server
+    - name: Build the main Docker image
+      run: docker build . --tag mitei-server
+    - name: Build the nginx Docker image
+      run: docker build ./nginx --tag mitei-server-nginx
     - name: Log into registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
     - name: Push image
       run: |
-        IMAGE_ID=docker.pkg.github.com/horikawacsc/mitei-server/main
+        IMAGE_ID=docker.pkg.github.com/horikawacsc/mitei-server
         VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
         [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
         [ "$VERSION" == "master" ] && VERSION=latest
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
-        docker tag mitei-server $IMAGE_ID:$VERSION
-        docker push $IMAGE_ID:$VERSION
+        docker tag mitei-server $IMAGE_ID/main:$VERSION
+        docker tag mitei-server-nginx $IMAGE_ID/nginx:$VERSION
+        docker push $IMAGE_ID/main:$VERSION
+        docker push $IMAGE_ID/nginx:$VERSION
