@@ -24,21 +24,21 @@ router.get('/:sourceId/manifest.m3u8', async (req, res) => {
 
   if (source.type === SourceType.File) {
     if (source.status !== TranscodeStatus.Success) {
-      return res.status(404).end('source not found');
+      return res.status(404).end('source error');
     }
   } else if (source.type === SourceType.Record) {
     if (
       source.status !== TranscodeStatus.Running &&
       source.status !== TranscodeStatus.Success
     ) {
-      return res.status(404).end('source not found');
+      return res.status(404).end('source error');
     }
 
     if (
       source.status === TranscodeStatus.Running &&
-      source.manifest.length < 4
+      source.manifest.length < 2
     ) {
-      return res.status(404).end('source not found');
+      return res.status(404).end('source is not prepared');
     }
   }
 
