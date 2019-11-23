@@ -111,7 +111,7 @@ export class ManifestList {
         selectedDuration += item.duration;
         manifest.push(item);
 
-        if (selectedDuration > maxDuration && manifest.length >= minSegment)
+        if (selectedDuration >= maxDuration && manifest.length >= minSegment)
           break;
       } else {
         skips++;

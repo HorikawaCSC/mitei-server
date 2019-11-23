@@ -29,7 +29,7 @@ import {
 import { getSequenceStart, setSequenceStart } from './sequence';
 
 const SCHEDULE_CACHE_UPDATE_INTERVAL = 1000 * 30;
-const LIVE_DELAY_SEC = 20;
+const LIVE_DELAY_SEC = 25;
 const MANIFEST_DURATION = 15;
 const MANIFEST_MIN_SIZE = 4;
 
@@ -170,7 +170,9 @@ export class ScheduleResolver {
       })
       .exec();
 
-    return record;
+    return record.filter(
+      source => source.manifest.length >= MANIFEST_MIN_SIZE / 2,
+    );
   }
 
   private filterRtmpManifest(startAtTime: number, endAtTime: number) {
@@ -217,6 +219,7 @@ export class ScheduleResolver {
     for (let index = 0; index < sources.length; index++) {
       const source = sources[index];
       const sourceStartAt = source.createdAt!.getTime() + LIVE_DELAY_SEC * 1000;
+      // 現在時刻そのままだと、manifestに入らない(manifestは現在より未来を選択して返すため)
 
       // (source begin date) - (program start date)
       const durationBetweenStartAndSource = dateDiffSec(
