@@ -23,23 +23,25 @@ const createContext: ContextFunction<
   if (!request) return { requestAddr: '' }; // on subscription
 
   const requestAddr = request.ip;
+  const newContext: GqlContext = {
+    requestAddr,
+  };
   if (request.user) {
-    return { userInfo: request.user as UserDocument, requestAddr };
-  } else if (typeof request.headers['x-device-token'] === 'string') {
+    newContext.userInfo = request.user as UserDocument;
+  }
+  if (typeof request.headers['x-device-token'] === 'string') {
     const { type, deviceId } = parseToken(request.headers[
       'x-device-token'
     ] as string);
     if (type === TokenType.AuthorizedClient) {
       const device = await ViewerDevice.findById(deviceId);
       if (device) {
-        return { deviceInfo: device, requestAddr };
+        newContext.deviceInfo = device;
       }
     }
   }
 
-  return {
-    requestAddr,
-  };
+  return newContext;
 };
 
 const subscriptionOnConnect = async (
