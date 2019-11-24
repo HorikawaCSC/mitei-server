@@ -9,6 +9,7 @@ export const config = {
   streaming: {
     rtmpAddress: process.env.NGINX_RTMP_ADDR || '',
     rtmpClientEndpoint: process.env.NGINX_RTMP_ENDPOINT || '',
+    rtmpControlEndpoint: process.env.NGINX_RTMP_CONTROL || '',
   },
   paths: {
     source: process.env.SOURCES_DIR || '/app/data/source',

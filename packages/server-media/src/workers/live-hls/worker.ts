@@ -140,17 +140,18 @@ export class LiveHLSWorker extends EventEmitter {
       if (!this.ffmpegProcess) return resolve();
       this.ffmpegProcess.on('error', async err => {
         this.isExited = true;
-        this.emit('end');
+        this.emit('end', true);
         await this.finalize(TranscodeStatus.Failed);
         reject(err);
       });
       this.ffmpegProcess.on('exit', async code => {
         this.isExited = true;
-        this.emit('end');
         if (code === 0) {
+          this.emit('end');
           await this.finalize(TranscodeStatus.Success);
           resolve();
         } else {
+          this.emit('end', true);
           await this.finalize(TranscodeStatus.Failed);
           reject(`code: ${code}`);
         }

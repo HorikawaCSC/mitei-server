@@ -1,6 +1,7 @@
 import { RtmpInputDocument } from '@mitei/server-models';
 import { config } from '../../config';
 import { liveHlsLogger } from '../../utils/logging';
+import { dropConnection } from './control';
 import { lockLiveSource } from './lock';
 import { LiveHLSWorker } from './worker';
 
@@ -26,10 +27,13 @@ class LiveHLSManager {
 
     liveHlsLogger.debug('source:', source.id, 'started');
 
-    worker.on('end', () => {
+    worker.on('end', async (isError: boolean) => {
       if (!source.id) throw new Error('source invalid');
       this.workers.delete(source.id);
-      liveHlsLogger.debug('source:', source.id, 'stopped');
+      liveHlsLogger.debug('source:', source.id, 'stopped', 'err?:', isError);
+      if (isError) {
+        await dropConnection(source.id);
+      }
     });
 
     const record = worker.getRecord();
