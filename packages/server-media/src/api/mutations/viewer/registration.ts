@@ -9,7 +9,7 @@ import { createUniqueId } from '../../../utils/viewer/unique-id';
 export const viewerRegistrationMutationResolvers: MutationResolvers = {
   createViewerChallenge: async (_parent, { device }, { requestAddr }) => {
     const deviceId = createUniqueId();
-    const code = createUniqueId(2);
+    const code = createUniqueId(12);
     const deviceInfo: ViewerChallengeData = {
       type: device,
       date: Date.now(),
