@@ -1,11 +1,14 @@
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { NotFoundView } from '@mitei/client-common';
+import { NotFoundView, routes } from '@mitei/client-common';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { useGetFileSourceQuery } from '../../../api/generated/graphql';
+import {
+  TranscodeStatus,
+  useGetFileSourceQuery,
+} from '../../../api/generated/graphql';
+import { PreviewSection } from '../../../components/shared/PreviewSection';
 import { FileDataDetails } from '../../../components/sources/FileDataDetails';
 import { FileEncodeSection } from '../../../components/sources/FileEncodeSection';
-import { PreviewSection } from '../../../components/sources/PreviewSection';
 import { SourceDetails } from '../../../components/sources/SourceDetails';
 
 export const FileSourceDetails = ({
@@ -30,7 +33,9 @@ export const FileSourceDetails = ({
     <>
       <SourceDetails source={source} />
       <FileEncodeSection source={source} />
-      <PreviewSection source={source} />
+      {source.status === TranscodeStatus.Success && (
+        <PreviewSection source={routes.media.source(source.id)} />
+      )}
       <FileDataDetails source={source} />
     </>
   );

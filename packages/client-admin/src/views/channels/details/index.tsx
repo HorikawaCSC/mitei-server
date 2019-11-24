@@ -1,10 +1,11 @@
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { NotFoundView } from '@mitei/client-common';
+import { NotFoundView, routes } from '@mitei/client-common';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { useGetChannelDetailQuery } from '../../../api/generated/graphql';
 import { ChannelInfoSection } from '../../../components/channels/ChannelInfoSection';
 import { FillerListSection } from '../../../components/channels/FillerListSection';
+import { PreviewSection } from '../../../components/shared/PreviewSection';
 
 export const ChannelDetailView = ({
   match,
@@ -26,6 +27,9 @@ export const ChannelDetailView = ({
   return (
     <>
       <ChannelInfoSection channel={channel} refetch={refetch} />
+      <PreviewSection
+        source={routes.media.channel(channel.id)}
+      ></PreviewSection>
       <FillerListSection channel={channel} refetch={refetch} />
     </>
   );
