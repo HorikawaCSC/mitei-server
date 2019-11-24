@@ -20,7 +20,7 @@ config:
     TranscodePreset: '@mitei/server-models#TranscodePresetDocument'
     Channel: '@mitei/server-models#ChannelDocument'
     Schedule: '@mitei/server-models#ScheduleDocument'
-    Program: '@mitei/server-models#Program'
+    Program: '@mitei/server-models#ProgramDocument'
     ViewerDevice: '@mitei/server-models#ViewerDeviceDocument'
     ViewerRequest: ViewerRequestParam
   scalars:

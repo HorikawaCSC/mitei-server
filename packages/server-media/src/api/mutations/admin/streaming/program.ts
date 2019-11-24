@@ -1,4 +1,4 @@
-import { Program, Schedule } from '@mitei/server-models';
+import { ProgramDocument, Schedule } from '@mitei/server-models';
 import { ObjectId } from 'mongodb';
 import { MutationResolvers } from '../../../../generated/graphql';
 import { findIdCondition } from '../../../../utils/db';
@@ -18,7 +18,7 @@ export const programMutationResolvers: MutationResolvers = {
 
       if (prependIndex < 0) throw new Error('specified program not found');
 
-      const program: Program = {
+      const program: ProgramDocument = {
         _id: new ObjectId(),
         type,
         sourceId: sourceId ? new ObjectId(sourceId) : undefined,
@@ -118,7 +118,7 @@ export const programMutationResolvers: MutationResolvers = {
 
       const orderedPrograms = orderIds
         .map(id => schedule.programs.find(({ _id }) => _id.equals(id)))
-        .filter((program): program is Program => !!program);
+        .filter((program): program is ProgramDocument => !!program);
 
       if (orderedPrograms.length !== orderIds.length) {
         throw new Error('invalid order');

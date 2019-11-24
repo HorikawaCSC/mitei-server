@@ -10,7 +10,7 @@ export enum ProgramType {
   Empty = 'empty',
 }
 
-export interface Program {
+export interface ProgramDocument {
   _id: ObjectID;
   type: ProgramType;
   duration: number;
@@ -23,7 +23,7 @@ export interface ScheduleDocument extends Document {
   endAt: Date;
   channel?: ChannelDocument;
   channelId: string;
-  programs: Program[];
+  programs: ProgramDocument[];
   createdBy?: UserDocument;
   createdById: ObjectID;
 
