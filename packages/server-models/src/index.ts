@@ -7,3 +7,4 @@ export * from './RtmpInput';
 export * from './TranscodedSource';
 export * from './TranscodePreset';
 export * from './User';
+export { connect, connection, connections } from 'mongoose';

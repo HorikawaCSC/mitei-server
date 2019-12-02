@@ -1,5 +1,4 @@
-import { Channel, Schedule, ScheduleDocument } from '@mitei/server-models';
-import { Document } from 'mongoose';
+import { Channel, Schedule } from '@mitei/server-models';
 import { MutationResolvers } from '../../../../generated/graphql';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 import { checkOverlappedSchedule } from '../../../../utils/schedule/validate';
@@ -35,7 +34,7 @@ export const scheduleMutationResolvers: MutationResolvers = {
       schedule.endAt = endAt;
       schedule.programs = [];
 
-      return (await (schedule as Document).save()) as ScheduleDocument;
+      return await schedule.save();
     },
   ),
   updateSchedule: ensureLoggedInAsAdmin(

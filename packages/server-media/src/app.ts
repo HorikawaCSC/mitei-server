@@ -1,6 +1,6 @@
+import { connect as connectMongo } from '@mitei/server-models';
 import { json } from 'body-parser';
 import * as express from 'express';
-import { connect as connectMongo } from 'mongoose';
 import { resolve } from 'path';
 import { config } from './config';
 import { router as apiRouter } from './routes/api';

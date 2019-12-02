@@ -45,7 +45,6 @@
     "jsonwebtoken": "^8.5.1",
     "log4js": "^4.1.0",
     "luxon": "^1.17.2",
-    "mongoose": "^5.7.11",
     "node-fetch": "^2.6.0",
     "passport": "^0.4.0",
     "passport-twitter": "^1.0.4"
@@ -69,7 +68,6 @@
     "@types/http-errors": "^1.6.2",
     "@types/jsonwebtoken": "^8.3.3",
     "@types/luxon": "^1.15.1",
-    "@types/mongoose": "^5.5.31",
     "@types/node-fetch": "^2.5.4",
     "@types/passport": "^1.0.0",
     "@types/passport-twitter": "^1.0.34",

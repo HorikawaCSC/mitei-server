@@ -1,3 +1,4 @@
+import { connection } from '@mitei/server-models';
 import * as createMongoSessionStore from 'connect-mongo';
 import {
   Application,
@@ -7,7 +8,6 @@ import {
 } from 'express';
 import * as session from 'express-session';
 import { IncomingMessage } from 'http';
-import { connection } from 'mongoose';
 import * as passport from 'passport';
 import { config } from '../../config';
 
