@@ -66,13 +66,6 @@ export const HLSPlayer = (props: Props) => {
 
           hls.startLoad();
           break;
-        case Hls.ErrorTypes.MEDIA_ERROR:
-          if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
-            if (props.onStallBuffer) props.onStallBuffer();
-          }
-          console.log('fatal media error encountered, try to recover');
-          if (data.fatal) hls.recoverMediaError();
-          break;
         default:
           // cannot recover
           if (data.fatal) restartHls();
