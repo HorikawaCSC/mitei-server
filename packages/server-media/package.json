@@ -19,8 +19,8 @@
     "build:codegen": "gql-gen --config ./codegen.yml",
     "build:tsc": "tsc -p .",
     "build": "run-s build:*",
-    "test:tslint": "tslint './src/**/*.{ts,tsx}'",
-    "test:prettier": "prettier --config ../../.prettierrc.yml -c './src/**/*.{ts,tsx}'",
+    "test:tslint": "tslint \"./src/**/*.{ts,tsx}\"",
+    "test:prettier": "prettier --config ../../.prettierrc.yml -c \"./src/**/*.{ts,tsx}\"",
     "test": "run-p test:*",
     "start": "node ./dist/app.js"
   },

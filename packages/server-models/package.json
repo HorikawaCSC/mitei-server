@@ -20,8 +20,8 @@
   "scripts": {
     "build": "tsc -p .",
     "test": "run-p test:*",
-    "test:tslint": "tslint './src/**/*.{ts,tsx}'",
-    "test:prettier": "prettier --config ../../.prettierrc.yml -c './src/**/*.{ts,tsx}'"
+    "test:tslint": "tslint \"./src/**/*.{ts,tsx}\"",
+    "test:prettier": "prettier --config ../../.prettierrc.yml -c \"./src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "mongoose": "^5.7.11"

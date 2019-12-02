@@ -15,7 +15,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "test:tsc": "tsc -p .",
+    "test:tslint": "tslint \"./src/**/*.{ts,tsx}\"",
+    "test:prettier": "prettier --config ../../.prettierrc.yml -c \"./src/**/*.{ts,tsx}\""
   },
   "repository": {
     "type": "git",

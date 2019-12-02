@@ -21,8 +21,8 @@
     "build:webpack": "webpack --mode=production",
     "build": "run-s build:*",
     "test:tsc": "tsc -p .",
-    "test:tslint": "tslint './src/**/*.{ts,tsx}'",
-    "test:prettier": "prettier -c './src/**/*.{ts,tsx}'",
+    "test:tslint": "tslint \"./src/**/*.{ts,tsx}\"",
+    "test:prettier": "prettier --config ../../.prettierrc.yml -c \"./src/**/*.{ts,tsx}\"",
     "test": "run-p test:*",
     "start": "webpack-dev-server",
     "watch": "webpack --mode=development --watch"
