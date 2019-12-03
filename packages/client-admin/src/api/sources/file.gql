@@ -71,5 +71,6 @@ query getFileSource($id: ID!) {
       fileSize
       duration
     }
+    isProbing
   }
 }

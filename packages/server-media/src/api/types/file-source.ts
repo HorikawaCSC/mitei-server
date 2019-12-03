@@ -15,4 +15,11 @@ export const fileSourceResolvers: FileSourceResolvers = {
     }
     return source.status;
   },
+  isProbing: async source => {
+    const job = await transcodeWorker.getProbeJob(source);
+    if (!job) return false;
+
+    const state = await job.getState();
+    return state !== 'completed' && state !== 'failed';
+  },
 };

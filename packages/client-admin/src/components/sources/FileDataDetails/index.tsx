@@ -22,7 +22,9 @@ export const FileDataDetails = ({
   const [probeFileSource] = useProbeFileSourceMutation({
     variables: { sourceId: source.id },
   });
-  const [isProbeRequested, setProbeRequested] = React.useState(false);
+  const [isProbeRequested, setProbeRequested] = React.useState(
+    source.isProbing,
+  );
 
   const handleProbeFile = async () => {
     setProbeRequested(true);
