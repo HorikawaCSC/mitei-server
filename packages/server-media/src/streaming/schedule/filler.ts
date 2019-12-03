@@ -1,6 +1,6 @@
 import { FillerControl, Manifest } from '@mitei/server-models';
-import { schedulerLogger } from '../logging';
-import { redis } from '../redis';
+import { schedulerLogger } from '../../utils/logging';
+import { redis } from '../../utils/redis';
 
 const FILLER_EXPIRE = 60;
 const key = (channelId: string) => `mitei:chfill:${channelId}`;

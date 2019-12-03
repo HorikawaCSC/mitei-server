@@ -2,8 +2,8 @@ import { Router } from 'express';
 import { promises as fs } from 'fs';
 import { resolve } from 'path';
 import { config } from '../../../../config';
+import { decodeSegmentRef } from '../../../../streaming/hls/segment-ref';
 import { readFileHandle } from '../../../../utils/filehandle';
-import { decodeSegmentRef } from '../../../../utils/hls/segment-ref';
 
 export const router = Router();
 

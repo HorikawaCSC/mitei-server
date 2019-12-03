@@ -1,7 +1,7 @@
 import { ProgramType, Schedule, ScheduleDocument } from '@mitei/server-models';
 import { ObjectId } from 'mongodb';
-import { schedulerLogger } from '../logging';
-import { redis } from '../redis';
+import { schedulerLogger } from '../../utils/logging';
+import { redis } from '../../utils/redis';
 
 const SCHEDULE_EXPIRE = 90;
 const key = (channelId: string) => `mitei:sch:${channelId}`;

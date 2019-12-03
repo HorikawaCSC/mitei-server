@@ -9,8 +9,8 @@ import { config } from '../../../../config';
 import {
   generateManifest,
   ManifestInput,
-} from '../../../../utils/hls/manifest';
-import { encodeSegmentRef } from '../../../../utils/hls/segment-ref';
+} from '../../../../streaming/hls/manifest';
+import { encodeSegmentRef } from '../../../../streaming/hls/segment-ref';
 
 export const router = Router();
 

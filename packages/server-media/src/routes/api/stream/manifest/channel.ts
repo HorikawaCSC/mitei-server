@@ -1,7 +1,7 @@
 import { Channel } from '@mitei/server-models';
 import { Router } from 'express';
-import { generateManifest } from '../../../../utils/hls/manifest';
-import { createScheduleResolver } from '../../../../utils/schedule/resolver';
+import { generateManifest } from '../../../../streaming/hls/manifest';
+import { createScheduleResolver } from '../../../../streaming/schedule/resolver';
 
 export const router = Router();
 

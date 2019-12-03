@@ -1,5 +1,5 @@
-import { schedulerLogger } from '../logging';
-import { redis } from '../redis';
+import { schedulerLogger } from '../../utils/logging';
+import { redis } from '../../utils/redis';
 
 const SEQUENCE_EXPIRE = 20;
 const key = (scheduleId: string) => `mitei:seq:${scheduleId}`;

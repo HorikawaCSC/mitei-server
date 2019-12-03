@@ -1,7 +1,7 @@
 import { Channel, Schedule } from '@mitei/server-models';
 import { MutationResolvers } from '../../../../generated/graphql';
+import { checkOverlappedSchedule } from '../../../../streaming/schedule/validate';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
-import { checkOverlappedSchedule } from '../../../../utils/schedule/validate';
 
 export const scheduleMutationResolvers: MutationResolvers = {
   createSchedule: ensureLoggedInAsAdmin(

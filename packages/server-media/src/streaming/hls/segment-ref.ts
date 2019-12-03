@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, createHash } from 'crypto';
 import { config } from '../../config';
-import { base58 } from '../base58';
+import { base58 } from '../../utils/base58';
 
 const segBufSecret = createHash('md5')
   .update(config.secrets.segmentRef)

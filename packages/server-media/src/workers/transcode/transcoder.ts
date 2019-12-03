@@ -12,9 +12,9 @@ import { EventEmitter } from 'events';
 import { createInterface } from 'readline';
 import { TranscodeWorkerParam } from '.';
 import { config } from '../../config';
+import { ffprobe } from '../../streaming/transcode/ffprobe';
 import { AudioStream, VideoStream } from '../../types/ffprobe';
 import { transcodeLogger } from '../../utils/logging';
-import { ffprobe } from '../../utils/transcode/ffprobe';
 
 export class Transcoder extends EventEmitter {
   private source: FileSourceDocument | null = null;

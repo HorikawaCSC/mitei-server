@@ -1,9 +1,9 @@
 import { ProgramDocument, Schedule } from '@mitei/server-models';
 import { ObjectId } from 'mongodb';
 import { MutationResolvers } from '../../../../generated/graphql';
+import { checkTypeAndSource } from '../../../../streaming/schedule/validate';
 import { findIdCondition } from '../../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
-import { checkTypeAndSource } from '../../../../utils/schedule/validate';
 
 export const programMutationResolvers: MutationResolvers = {
   addProgramToSchedule: ensureLoggedInAsAdmin(
