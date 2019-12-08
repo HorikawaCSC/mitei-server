@@ -21,7 +21,12 @@ export const RecordSourceDetails = ({
   if (loading) {
     return <CircularProgress />;
   }
-  if (!data || !data.source || error) {
+  if (
+    !data ||
+    !data.source ||
+    data.source.__typename !== 'RecordSource' ||
+    error
+  ) {
     return <NotFoundView error={error ? error.message : ''} />;
   }
 

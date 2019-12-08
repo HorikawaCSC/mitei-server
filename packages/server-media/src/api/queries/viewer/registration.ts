@@ -5,9 +5,9 @@ import { parseToken, TokenType } from '../../../utils/viewer/token';
 
 export const viewerRegistrationQueryResolvers: QueryResolvers = {
   viewerRequests: async () => {
-    const requestIds = (await redis.keys(redisKeys.deviceChallenge('*'))).map(
-      key => key.replace(redisKeys.deviceChallenge(''), ''),
-    );
+    const requestIds = (
+      await redis.keys(redisKeys.deviceChallenge('*'))
+    ).map(key => key.replace(redisKeys.deviceChallenge(''), ''));
     if (requestIds.length === 0) {
       return [];
     }

@@ -70,8 +70,12 @@ export const ProgramItem = ({
   }, [programType, sourceId]);
 
   const handleApplyTimeFromSource = React.useCallback(() => {
-    if (durationData && durationData.source && durationData.source.duration)
-      setDuration(Math.ceil(durationData.source.duration));
+    if (
+      durationData &&
+      durationData.source &&
+      'duration' in durationData.source
+    )
+      setDuration(Math.ceil(durationData.source.duration || 0));
   }, [durationData]);
 
   const maxDuration = React.useMemo(() => {
@@ -180,7 +184,7 @@ export const ProgramItem = ({
       !!durationData &&
       !!durationData.source &&
       durationData.source.id === sourceId &&
-      !!durationData.source.duration,
+      'duration' in durationData.source,
     [durationData, sourceId],
   );
 

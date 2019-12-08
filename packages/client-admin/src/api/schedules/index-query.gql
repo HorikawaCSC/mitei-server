@@ -82,5 +82,8 @@ query getSourceDuration($id: ID!) {
       id
       duration
     }
+    ... on RtmpInput {
+      id
+    }
   }
 }

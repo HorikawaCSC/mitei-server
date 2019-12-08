@@ -1,7 +1,9 @@
 {
   "scripts": {
-    "build": "lerna run build",
-    "test": "lerna run test"
+    "bootstrap": "lerna bootstrap --hoist",
+    "clean": "lerna clean --yes",
+    "build": "lerna run build --stream",
+    "test": "lerna run test --stream"
   },
   "name": "mitei-server",
   "version": "1.0.0",

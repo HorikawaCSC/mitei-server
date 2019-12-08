@@ -30,9 +30,9 @@ const createContext: ContextFunction<
     newContext.userInfo = request.user as UserDocument;
   }
   if (typeof request.headers['x-device-token'] === 'string') {
-    const { type, deviceId } = parseToken(request.headers[
-      'x-device-token'
-    ] as string);
+    const { type, deviceId } = parseToken(
+      request.headers['x-device-token'] as string,
+    );
     if (type === TokenType.AuthorizedClient) {
       const device = await ViewerDevice.findById(deviceId);
       if (device) {

@@ -60,17 +60,19 @@ export const FileSourceList = () => {
       <List>
         {sources.map(source => {
           return (
-            <ListItem
-              key={source.id}
-              button
-              component={Link}
-              to={`/sources/file/${source.id}`}
-            >
-              <ListItemText
-                primary={source.name}
-                secondary={fileSourceSimpleDetailString(source)}
-              />
-            </ListItem>
+            source.__typename === 'FileSource' && (
+              <ListItem
+                key={source.id}
+                button
+                component={Link}
+                to={`/sources/file/${source.id}`}
+              >
+                <ListItemText
+                  primary={source.name}
+                  secondary={fileSourceSimpleDetailString(source)}
+                />
+              </ListItem>
+            )
           );
         })}
         {hasMore && <div ref={scrollRef} />}

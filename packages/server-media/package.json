@@ -37,7 +37,7 @@
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
     "express-session": "^1.16.2",
-    "graphql": "^14.4.2",
+    "graphql": "^14.5.3",
     "graphql-iso-date": "^3.6.1",
     "graphql-redis-subscriptions": "^2.1.1",
     "http-errors": "^1.7.3",
@@ -50,9 +50,9 @@
     "passport-twitter": "^1.0.4"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.5.0",
-    "@graphql-codegen/typescript": "^1.5.0",
-    "@graphql-codegen/typescript-resolvers": "^1.5.0",
+    "@graphql-codegen/cli": "^1.9.1",
+    "@graphql-codegen/typescript": "^1.9.1",
+    "@graphql-codegen/typescript-resolvers": "^1.9.1",
     "@mitei/schema": "^0.0.1-alpha.0",
     "@types/base-x": "^3.0.0",
     "@types/body-parser": "^1.17.0",

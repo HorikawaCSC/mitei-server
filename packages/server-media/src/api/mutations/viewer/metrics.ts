@@ -11,9 +11,12 @@ export const viewerMetricsMutationResolvers: MutationResolvers = {
       const key = redisKeys.viewerMetrics(deviceInfo.id);
       if (metrics.type === ViewerMetricsType.Ping) {
         await redis.hset(key, metrics.type, 1);
-      } else if (metrics.type === ViewerMetricsType.Elapsed) {
+      } else if (
+        metrics.type === ViewerMetricsType.Elapsed &&
+        metrics.elapsed
+      ) {
         await redis.hset(key, metrics.type, metrics.elapsed);
-      } else if (metrics.type === ViewerMetricsType.Error) {
+      } else if (metrics.type === ViewerMetricsType.Error && metrics.message) {
         await redis.hset(key, metrics.type, metrics.message);
       }
 

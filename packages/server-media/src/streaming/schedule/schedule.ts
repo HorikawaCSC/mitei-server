@@ -68,7 +68,9 @@ export const getScheduleCache = async (
   reExpire = false,
 ): Promise<ScheduleData[] | null> => {
   const keyName = key(channelId);
-  const schedules: Record<string, string> = await redis.hgetall(keyName);
+  const schedules: Record<string, string> = ((await redis.hgetall(
+    keyName,
+  )) as unknown) as Record<string, string>;
   if (schedules !== null) {
     const result: ScheduleData[] = Object.keys(schedules).map(id =>
       redisToData(id, JSON.parse(schedules[id])),

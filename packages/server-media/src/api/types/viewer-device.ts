@@ -13,9 +13,9 @@ export const viewerDeviceResolvers: ViewerDeviceResolvers = {
     return !!exists;
   },
   metrics: async device => {
-    const metrics: Record<string, string> = await redis.hgetall(
+    const metrics = ((await redis.hgetall(
       redisKeys.viewerMetrics(device.id),
-    );
+    )) as unknown) as Record<string, string>;
     return Object.keys(metrics)
       .map(type => {
         if (type === ViewerMetricsType.Elapsed) {
