@@ -96,6 +96,15 @@ export const HeaderMenu = () => {
               <ListItemText>配信予定一覧</ListItemText>
             </ListItem>
           </List>
+
+          <List subheader={<ListSubheader>サイネージ管理</ListSubheader>}>
+            <ListItem button component={Link} to='/viewers/all'>
+              <ListItemIcon>
+                <ListAlt />
+              </ListItemIcon>
+              <ListItemText>サイネージ一覧</ListItemText>
+            </ListItem>
+          </List>
         </div>
       </Drawer>
     </>

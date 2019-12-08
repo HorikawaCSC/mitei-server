@@ -10,6 +10,7 @@ import { LoginView } from '../login';
 import { PresetsList } from '../presets';
 import { ScheduleRoot } from '../schedules';
 import { SourcesRoot } from '../sources';
+import { ViewersRoot } from '../viewers';
 
 const useStyles = makeStyles({
   content: {
@@ -48,6 +49,7 @@ export const Root = () => {
           <Route path='/channels' component={ChannelsRoot} />
           <Route path='/schedules' component={ScheduleRoot} />
           <Route path='/presets' component={PresetsList} />
+          <Route path='/viewers' component={ViewersRoot} />
         </Switch>
       </Container>
       <MessageView />

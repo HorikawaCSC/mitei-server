@@ -16,13 +16,15 @@ export const viewerRegistrationQueryResolvers: QueryResolvers = {
       ...requestIds.map(id => redisKeys.deviceChallenge(id)),
     )) as string[]).map(data => JSON.parse(data));
 
-    return requestIds.map((id, i) => ({
-      id,
-      requestFrom: requests[i].from,
-      code: requests[i].code,
-      type: requests[i].type,
-      createdAt: new Date(requests[i].date),
-    }));
+    return requestIds
+      .filter((_id, i) => !requests[i].accept)
+      .map((id, i) => ({
+        id,
+        requestFrom: requests[i].from,
+        code: requests[i].code,
+        type: requests[i].type,
+        createdAt: new Date(requests[i].date),
+      }));
   },
   viewerChallengeResult: async (_parent, { token }) => {
     const { type, deviceId } = parseToken(token);

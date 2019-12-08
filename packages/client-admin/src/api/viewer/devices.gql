@@ -1,0 +1,25 @@
+query getViewerDevices($skip: Int!, $take: Int!) {
+  viewerDevices(skip: $skip, take: $take) {
+    total
+    devices {
+      id
+      displayName
+      online
+      type
+    }
+  }
+}
+
+query getViewerRegist {
+  viewerRequests {
+    id
+    code
+    type
+    createdAt
+    requestFrom
+  }
+}
+
+mutation acceptViewerRegist($id: String!) {
+  acceptViewerChallenge(deviceId: $id)
+}
