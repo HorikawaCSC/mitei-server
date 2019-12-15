@@ -4,6 +4,7 @@ import { FullscreenProgress } from '@mitei/client-common';
 import * as React from 'react';
 import { useGetViewerInfoQuery } from '../../api/generated/graphql';
 import { ViewerInfoProvider } from '../../components/shared/ViewerInfoContext';
+import { MericsProvider } from '../../features/metrics/MetricsContext';
 import { RegistrationView } from '../registration';
 import { ViewerRoot } from '../viewer';
 
@@ -26,9 +27,11 @@ export const Root = () => {
   if (data && data.viewerInfo) {
     return (
       <ViewerInfoProvider value={data.viewerInfo}>
-        <Box className={styles.viewer}>
-          <ViewerRoot />
-        </Box>
+        <MericsProvider>
+          <Box className={styles.viewer}>
+            <ViewerRoot />
+          </Box>
+        </MericsProvider>
       </ViewerInfoProvider>
     );
   } else {
