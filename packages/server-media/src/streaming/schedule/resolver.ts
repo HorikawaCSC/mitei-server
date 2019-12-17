@@ -348,7 +348,7 @@ export class ScheduleResolver {
     }
 
     const scheduleDuration = (schedule.endAt - schedule.startAt) / 1000;
-    if (scheduleDuration - manifestList.totalDuration > 2) {
+    if (scheduleDuration - manifestList.totalDuration > 3) {
       manifestList.loadFromList(
         await this.createFillerManifest(
           schedule.id,
@@ -450,6 +450,10 @@ export class ScheduleResolver {
         0,
       );
       manifest.push(...nextManifest);
+    } else if (duration > 0 && duration < MANIFEST_DURATION) {
+      schedulerLogger.debug(
+        'no schedule, channel will be shut down, add anti-stall filler',
+      );
     } else if (manifest.length === 0) {
       throw new NotFound('no schedule');
     }
@@ -463,7 +467,7 @@ export class ScheduleResolver {
           discontinuityBegin: item.discontiniuity,
         };
       }),
-      endList: false,
+      endList: duration < MANIFEST_DURATION && !next,
     };
   }
 }

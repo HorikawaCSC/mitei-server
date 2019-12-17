@@ -82,7 +82,7 @@ export class ManifestList {
     if (duration < EMPTY_FILLER_SEGMENT_DURATION)
       return EMPTY_FILLER_SEGMENT_DURATION;
 
-    const count = Math.floor(duration / EMPTY_FILLER_SEGMENT_DURATION);
+    const count = Math.round(duration / EMPTY_FILLER_SEGMENT_DURATION);
     const actualDuration = EMPTY_FILLER_SEGMENT_DURATION * count;
     this._manifest.push({
       type: 'empty',
@@ -90,7 +90,9 @@ export class ManifestList {
       offset: 0,
       length: EMPTY_FILLER_OFFSET[count - 1],
       duration: actualDuration,
-      discontiniuity: true,
+      discontiniuity:
+        this._manifest.length === 0 ||
+        this._manifest[this._manifest.length - 1].type !== 'empty',
     });
     this._totalDurationCache += actualDuration;
 
