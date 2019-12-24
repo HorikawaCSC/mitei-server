@@ -132,7 +132,7 @@ export class ScheduleResolver {
     ) {
       const filler = availableFillers[index];
 
-      remain -= manifestList.loadFromSource(
+      const loadedFiller = manifestList.loadFromSource(
         filler,
         (nextDuration, duration) => {
           return remain - duration - nextDuration > 5; // more than 5 seconds left
@@ -140,10 +140,16 @@ export class ScheduleResolver {
         true,
       );
 
-      if (remain < EMPTY_FILLER_MAX_DURATION) break;
+      if (
+        loadedFiller <= 0 ||
+        remain - loadedFiller < EMPTY_FILLER_MAX_DURATION
+      )
+        break;
+
+      remain -= loadedFiller;
     }
 
-    manifestList.loadEmptyFiller(remain);
+    manifestList.loadFromList(this.createEmptyFiller(remain));
 
     return manifestList;
   }
