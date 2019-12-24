@@ -44,7 +44,6 @@ export const HLSPlayer = (props: Props) => {
   }, [videoRef.current]);
 
   const restartHls = () => {
-    hls.detachMedia();
     hls.destroy();
 
     console.error('hls.js restarting');
@@ -69,6 +68,10 @@ export const HLSPlayer = (props: Props) => {
         default:
           // cannot recover
           if (data.fatal) restartHls();
+          // stall
+          if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+            restartHls();
+          }
           break;
       }
     });
