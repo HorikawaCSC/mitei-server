@@ -5,8 +5,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
-import { Clear, Done } from '@material-ui/icons';
-import { NotFoundView } from '@mitei/client-common';
+import { Done } from '@material-ui/icons';
+import { NotFoundView, useMessageSnack } from '@mitei/client-common';
 import * as React from 'react';
 import {
   useAcceptViewerRegistMutation,
@@ -19,9 +19,11 @@ export const ViewerRequestList = () => {
   });
 
   const [acceptRequest] = useAcceptViewerRegistMutation();
+  const showMessage = useMessageSnack();
 
   const createAcceptRequestHandler = (id: string) => async () => {
     await acceptRequest({ variables: { id } });
+    showMessage('承認されました');
     await refetch();
   };
 
@@ -47,9 +49,6 @@ export const ViewerRequestList = () => {
               onClick={createAcceptRequestHandler(request.id)}
             >
               <Done />
-            </IconButton>
-            <IconButton edge='end'>
-              <Clear />
             </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
