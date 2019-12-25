@@ -10,7 +10,7 @@ type Props = {
   onNotFound?: () => void;
   onPlay?: () => void;
   onEnded?: () => void;
-  onTimeUpdate?: () => void;
+  onTimeUpdate?: (time: number) => void;
   onHlsError?: (err: Hls.errorData) => void;
   onStallBuffer?: () => void;
 };
@@ -25,6 +25,7 @@ const createHls = () =>
 
 export const HLSPlayer = (props: Props) => {
   const [hls, setHls] = React.useState(() => createHls());
+  const [state, setState] = React.useState(() => 'IDLE');
   const videoRef = React.createRef<HTMLVideoElement>();
   const hlsJsSupported = React.useMemo(() => Hls.isSupported(), []);
   const nativeSupported = React.useMemo(
@@ -51,7 +52,7 @@ export const HLSPlayer = (props: Props) => {
   };
 
   // error handler
-  const setupErrorHandle = () => {
+  const setupEventHandle = () => {
     hls.on(Hls.Events.ERROR, (_e, data) => {
       console.log(data);
       if (props.onHlsError) props.onHlsError(data);
@@ -70,12 +71,33 @@ export const HLSPlayer = (props: Props) => {
           if (data.fatal) restartHls();
           // stall
           if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
-            restartHls();
+            if (data.buffer && data.buffer < 1) {
+              // video decoder failure
+              if (props.onStallBuffer) props.onStallBuffer();
+              restartHls();
+            } else {
+              console.log('normal stall');
+            }
           }
           break;
       }
     });
+    hls.on(Hls.Events.STREAM_STATE_TRANSITION, (_e, data) => {
+      setState(data.nextState || 'IDLE');
+    });
   };
+
+  const handleTimeUpdate = React.useCallback(() => {
+    if (!videoRef.current) return;
+    if (props.onTimeUpdate) props.onTimeUpdate(videoRef.current.currentTime);
+
+    if (
+      (state === 'ENDED' || state === 'STOPPED') &&
+      videoRef.current.currentTime === videoRef.current.duration
+    ) {
+      if (props.onEnded) props.onEnded();
+    }
+  }, [hls, videoRef.current, state]);
 
   React.useEffect(() => {
     if (!videoRef.current) return;
@@ -87,7 +109,7 @@ export const HLSPlayer = (props: Props) => {
       if (props.autoplay) {
         hls.once(Hls.Events.MANIFEST_PARSED, () => tryPlay());
       }
-      setupErrorHandle();
+      setupEventHandle();
     } else if (!hlsJsSupported && nativeSupported) {
       console.log('use native hls playback mode');
       videoRef.current.src = props.source;
@@ -105,8 +127,7 @@ export const HLSPlayer = (props: Props) => {
       controls={props.controls}
       autoPlay={props.autoplay}
       onPlay={props.onPlay}
-      onEnded={props.onEnded}
-      onTimeUpdate={props.onTimeUpdate}
+      onTimeUpdate={handleTimeUpdate}
     />
   ) : (
     <p>playback not supported</p>

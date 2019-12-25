@@ -17,33 +17,39 @@ type Props = {
   channelId: string;
 };
 export const ChannelPlayer = ({ channelId }: Props) => {
-  const [scheduleAvailable] = useChannelPlay(channelId);
+  const [scheduleAvailable, remain] = useChannelPlay(channelId);
   const [playing, setPlaying] = React.useState(false);
   const styles = useStyles();
 
   const handlePlay = () => {
     setPlaying(true);
+    console.log('play', scheduleAvailable, remain);
   };
   const handlePlayEnd = () => {
     setPlaying(false);
+    console.log('play end', scheduleAvailable, remain);
   };
-  const handleNotFound = () => {
-    console.log('not found');
-    setPlaying(false);
+  const handleStall = () => {
+    console.log('stall', scheduleAvailable, remain);
+    if (!scheduleAvailable) {
+      setPlaying(false);
+    }
   };
   const playable = React.useMemo(() => (playing ? true : scheduleAvailable), [
     scheduleAvailable,
     playing,
   ]);
+  console.log('playable', playable);
   return playable ? (
     <HLSPlayer
       onPlay={handlePlay}
       onEnded={handlePlayEnd}
       controls={isDebug}
       source={channelManifestUrl(channelId)}
-      onNotFound={handleNotFound}
       autoplay
       className={styles.video}
+      autoFix
+      onStallBuffer={handleStall}
     />
   ) : (
     <WaitingView />
