@@ -22,5 +22,6 @@ export const ViewerRoot = () => {
       return <ChannelPlayer channelId={source.channelId} />;
     }
   }
-  return null;
+
+  return <WaitingView />;
 };

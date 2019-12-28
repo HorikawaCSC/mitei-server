@@ -39,7 +39,6 @@ type ViewerDeviceList {
 
 enum ViewerRequestType {
   play
-  togglePause
   stop
   volume
 }
