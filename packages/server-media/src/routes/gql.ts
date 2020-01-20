@@ -10,8 +10,8 @@ import { resolvers as apiResolvers } from '../api';
 import { GqlContext } from '../api/context';
 import { AuthDirective } from '../api/directives/auth';
 import { DeviceDirective } from '../api/directives/device';
+import { parseToken, TokenType } from '../streaming/viewer/token';
 import { authenticateWebSocket } from '../utils/auth';
-import { parseToken, TokenType } from '../utils/viewer/token';
 
 type WSContext = { request: Request };
 const createContext: ContextFunction<

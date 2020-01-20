@@ -1,10 +1,10 @@
 import { ViewerDevice } from '@mitei/server-models';
 import { MutationResolvers } from '../../../generated/graphql';
+import { createToken, TokenType } from '../../../streaming/viewer/token';
 import { ViewerChallengeData } from '../../../types/viewer';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
 import { redis, redisKeys } from '../../../utils/redis';
-import { createToken, TokenType } from '../../../utils/viewer/token';
-import { createUniqueId } from '../../../utils/viewer/unique-id';
+import { createUniqueId } from '../../../utils/unique-id';
 
 export const viewerRegistrationMutationResolvers: MutationResolvers = {
   createViewerChallenge: async (_parent, { device }, { requestAddr }) => {

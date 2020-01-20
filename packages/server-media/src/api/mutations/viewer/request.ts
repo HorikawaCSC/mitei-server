@@ -1,6 +1,10 @@
-import { MutationResolvers } from '../../../generated/graphql';
+import { ViewerDevice } from '@mitei/server-models';
+import {
+  MutationResolvers,
+  ViewerRequestType,
+} from '../../../generated/graphql';
+import { validateViewerSource } from '../../../streaming/viewer/validate';
 import { redisKeys, redisPubSub } from '../../../utils/redis';
-import { validateViewerSource } from '../../../utils/viewer/validate';
 
 export const viewerRequestMutationResolvers: MutationResolvers = {
   dispatchViewerRequest: async (_parent, { request }) => {

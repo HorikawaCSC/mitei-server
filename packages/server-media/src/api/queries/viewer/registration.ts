@@ -1,7 +1,7 @@
 import { QueryResolvers } from '../../../generated/graphql';
+import { parseToken, TokenType } from '../../../streaming/viewer/token';
 import { ViewerChallengeData } from '../../../types/viewer';
 import { redis, redisKeys } from '../../../utils/redis';
-import { parseToken, TokenType } from '../../../utils/viewer/token';
 
 export const viewerRegistrationQueryResolvers: QueryResolvers = {
   viewerRequests: async () => {
