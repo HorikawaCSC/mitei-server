@@ -23,13 +23,22 @@ type ViewerChallengeResult {
   token: String!
 }
 
+enum ViewerState {
+  playing
+  stopped
+}
+
 type ViewerDevice {
   id: String!
   type: DeviceType!
   displayName: String!
+  volume: Int!
+  state: ViewerState!
+  playingContent: Playbackable
+
   online: Boolean! @auth(requires: [admin])
-  playingContent: Playbackable @auth(requires: [admin])
-  metrics: [ViewerMetrics!]! @auth(requires: [admin])
+  elapsed: Float @auth(requires: [admin])
+  message: String @auth(requires: [admin])
 }
 
 type ViewerDeviceList {
@@ -48,18 +57,12 @@ enum ViewerSourceType {
   source
 }
 
-type ViewerRequest {
-  type: ViewerRequestType!
-  source: Playbackable
-  volume: Float
-}
-
 input ViewerRequestParam {
   device: ID!
   type: ViewerRequestType!
   sourceType: ViewerSourceType
   sourceId: ID
-  volume: Float
+  volume: Int
 }
 
 enum ViewerMetricsType {
@@ -73,13 +76,3 @@ input ViewerMetricsParam {
   elapsed: Float
   message: String
 }
-
-type ViewerElapsedMetrics {
-  elapsed: Float!
-}
-
-type ViewerErrorMetrics {
-  message: String!
-}
-
-union ViewerMetrics = ViewerElapsedMetrics | ViewerErrorMetrics

@@ -13,7 +13,6 @@ import { scheduleResolvers } from './types/schedule';
 import { sourceReferenceResolvers } from './types/source-reference';
 import { transcodedSourceResolvers } from './types/transcoded-source';
 import { viewerDeviceResolvers } from './types/viewer-device';
-import { viewerRequestResolvers } from './types/viewer-request';
 
 export const resolvers: Resolvers = {
   DateTime: GraphQLDateTime,
@@ -28,7 +27,6 @@ export const resolvers: Resolvers = {
   Schedule: scheduleResolvers,
   Program: programResolvers,
   Subscription: subscriptionResolvers,
-  ViewerRequest: viewerRequestResolvers,
   Playbackable: playbackableResolvers,
   ViewerDevice: viewerDeviceResolvers,
 };

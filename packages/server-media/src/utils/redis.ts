@@ -9,8 +9,10 @@ export const redis = new Redis({
 
 export const redisKeys = {
   deviceChallenge: (deviceId: string) => `mitei:devc:${deviceId}`,
-  viewerRequest: (deviceId: string) => `mitei:vreq:${deviceId}`,
-  viewerMetrics: (deviceId: string) => `mitei:vmetr:${deviceId}`,
+  viewerUpdate: (deviceId: string) => `mitei:vupd:${deviceId}`,
+  viewerUpdateAll: () => `mitei:vupd:*`,
+  viewerOnline: (deviceId: string) => `mitei:vonl:${deviceId}`,
+  viewerState: (deviceId: string) => `mitei:vstate:${deviceId}`,
 };
 
 const pubsubConnection = new Redis({
