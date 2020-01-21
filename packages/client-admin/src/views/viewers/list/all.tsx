@@ -3,30 +3,11 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/styles';
 import { NotFoundView } from '@mitei/client-common';
-import clsx from 'clsx';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  GetViewerDevicesQuery,
-  useGetViewerDevicesQuery,
-} from '../../../api/generated/graphql';
-
-const detailString = (
-  item: GetViewerDevicesQuery['viewerDevices']['devices'][0],
-) => {
-  return `${item.online ? 'オンライン' : 'オフライン'} 種類: ${item.type}`;
-};
-
-const useStyles = makeStyles({
-  online: {
-    color: 'rgba(0, 255, 0, .8)',
-  },
-  offline: {
-    color: 'rgba(255, 0, 0, .8)',
-  },
-});
+import { useGetViewerDevicesQuery } from '../../../api/generated/graphql';
+import { OnlineBadge } from '../../../components/viewers/OnlineBadge';
 
 export const ViewerAllList = () => {
   const { error, data, loading } = useGetViewerDevicesQuery({
@@ -36,7 +17,6 @@ export const ViewerAllList = () => {
       take: 10,
     },
   });
-  const styles = useStyles();
 
   if (loading) return <CircularProgress />;
 
@@ -59,16 +39,7 @@ export const ViewerAllList = () => {
             >
               <ListItemText
                 primary={device.displayName}
-                secondary={
-                  <Typography
-                    className={clsx({
-                      [styles.online]: device.online,
-                      [styles.offline]: !device.online,
-                    })}
-                  >
-                    {detailString(device)}
-                  </Typography>
-                }
+                secondary={<OnlineBadge online={device.online} />}
               />
             </ListItem>
           );
