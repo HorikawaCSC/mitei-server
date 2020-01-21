@@ -42,6 +42,7 @@ type Query {
 
   viewerRequests: [ViewerChallengeRequest!]! @auth(requires: [admin])
   viewerDevices(skip: Int!, take: Int!): ViewerDeviceList! @auth(requires: [admin])
+  viewerDevice(id: ID!): ViewerDevice @auth(requires: [admin])
 
   # normal func
   me: User

@@ -17,4 +17,7 @@ export const viewerListQueryResolvers: QueryResolvers = {
       total,
     };
   },
+  viewerDevice: async (_parent, { id }) => {
+    return await ViewerDevice.findById(id);
+  },
 };
