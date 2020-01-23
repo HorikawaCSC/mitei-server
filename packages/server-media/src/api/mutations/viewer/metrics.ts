@@ -11,7 +11,12 @@ export const viewerMetricsMutationResolvers: MutationResolvers = {
     async (_parent, { metrics }, { deviceInfo }) => {
       switch (metrics.type) {
         case ViewerMetricsType.Ping:
-          await redis.set(redisKeys.viewerOnline(deviceInfo.id), 1, 'EX', 30);
+          await redis.set(
+            redisKeys.viewerOnline(deviceInfo.id),
+            Date.now(),
+            'NX',
+          );
+          await redis.expire(redisKeys.viewerOnline(deviceInfo.id), 30);
           break;
 
         case ViewerMetricsType.Elapsed:
@@ -21,7 +26,7 @@ export const viewerMetricsMutationResolvers: MutationResolvers = {
           break;
 
         case ViewerMetricsType.Error:
-          if (!metrics.message) throw new Error('elapsed is required');
+          if (!metrics.message) throw new Error('message is required');
 
           await setMessage(deviceInfo.id, metrics.message);
           break;
