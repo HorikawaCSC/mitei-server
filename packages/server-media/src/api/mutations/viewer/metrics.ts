@@ -4,7 +4,7 @@ import {
 } from '../../../generated/graphql';
 import { setElapsed, setMessage } from '../../../streaming/viewer/state';
 import { ensureDeviceUsed } from '../../../utils/gql/ensureUser';
-import { redis, redisKeys } from '../../../utils/redis';
+import { redis, redisKeys, redisPubSub } from '../../../utils/redis';
 
 export const viewerMetricsMutationResolvers: MutationResolvers = {
   reportViewerMetrics: ensureDeviceUsed(
@@ -23,12 +23,20 @@ export const viewerMetricsMutationResolvers: MutationResolvers = {
           if (!metrics.elapsed) throw new Error('elapsed is required');
 
           await setElapsed(deviceInfo.id, metrics.elapsed);
+          await redisPubSub.publish(
+            redisKeys.viewerUpdate(deviceInfo.id),
+            true,
+          );
           break;
 
         case ViewerMetricsType.Error:
           if (!metrics.message) throw new Error('message is required');
 
           await setMessage(deviceInfo.id, metrics.message);
+          await redisPubSub.publish(
+            redisKeys.viewerUpdate(deviceInfo.id),
+            true,
+          );
           break;
 
         default:

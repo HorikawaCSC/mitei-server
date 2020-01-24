@@ -130,7 +130,7 @@ type Mutation {
 
 type Subscription {
   viewerUpdate: ViewerDevice! @deviceOnly
-  viewerUpdateAll: ViewerDevice! @auth(requires: [admin])
+  viewerUpdateDevice(id: ID!): ViewerDevice! @auth(requires: [admin])
 }
 
 schema {
