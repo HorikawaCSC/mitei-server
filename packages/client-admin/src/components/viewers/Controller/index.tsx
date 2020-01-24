@@ -10,7 +10,7 @@ import { VolumeDispatcher } from '../VolumeDispatcher';
 
 type Props = {
   onDispatch: (request: Omit<ViewerRequestParam, 'device'>) => void;
-  device: ViewerDevice;
+  device: Pick<ViewerDevice, 'playingContent' | 'state' | 'volume' | 'id'>;
 };
 export const Controller = (props: Props) => {
   return (

@@ -51,3 +51,20 @@ query getViewerDevice($id: ID!) {
     message
   }
 }
+
+mutation updateViewerState($request: ViewerRequestParam!) {
+  updateViewerState(request: $request)
+}
+
+subscription viewerStateSingle($id: ID!) {
+  viewerUpdateDevice(id: $id) {
+    id
+    volume
+    state
+    playingContent {
+      ... viewerPlayingContentSimple
+    }
+    elapsed
+    message
+  }
+}

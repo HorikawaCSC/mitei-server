@@ -7,7 +7,9 @@ import {
 } from '../../../api/generated/graphql';
 import { Controller } from '../Controller';
 
-type Props = { device: ViewerDevice };
+type Props = {
+  device: Pick<ViewerDevice, 'playingContent' | 'state' | 'volume' | 'id'>;
+};
 export const DeviceDispatchSection = ({ device }: Props) => {
   const [updateViewer] = useUpdateViewerStateMutation({
     errorPolicy: 'all',
