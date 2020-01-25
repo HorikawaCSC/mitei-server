@@ -43,8 +43,10 @@ export const WaitingView = () => {
       </Typography>
       <ViewerInfoConsumer>
         {value => {
-          return (
+          return value ? (
             <Typography component='p'>デバイス: {value.displayName}</Typography>
+          ) : (
+            <Typography component='b'>初期化中</Typography>
           );
         }}
       </ViewerInfoConsumer>

@@ -1,0 +1,28 @@
+fragment viewerDeviceWithState on ViewerDevice {
+  id
+  displayName
+  volume
+  state
+  playingContent {
+    ... on TranscodedSource {
+      id
+      name
+    }
+    ... on Channel {
+      channelId: id
+      displayName
+    }
+  }
+}
+
+query getViewerInfo {
+  viewerInfo {
+    ...viewerDeviceWithState
+  }
+}
+
+subscription viewerUpdate {
+  viewerUpdate {
+    ...viewerDeviceWithState
+  }
+}

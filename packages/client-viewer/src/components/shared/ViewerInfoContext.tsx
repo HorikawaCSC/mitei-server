@@ -1,10 +1,8 @@
 import { createContext } from 'react';
+import { GetViewerInfoQuery } from '../../api/generated/graphql';
 
-type ViewerInfo = {
-  id: string;
-  displayName: string;
-};
-const context = createContext<ViewerInfo>({ id: '', displayName: '' });
+const context = createContext<GetViewerInfoQuery['viewerInfo'] | null>(null);
 
+export const ViewerInfoContext = context;
 export const ViewerInfoProvider = context.Provider;
 export const ViewerInfoConsumer = context.Consumer;

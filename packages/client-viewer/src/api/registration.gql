@@ -5,13 +5,6 @@ mutation createChallenge($type: DeviceType!) {
   }
 }
 
-query getViewerInfo {
-  viewerInfo {
-    id
-    displayName
-  }
-}
-
 query getChallengeResult($token: String!) {
   viewerChallengeResult(token: $token) {
     success

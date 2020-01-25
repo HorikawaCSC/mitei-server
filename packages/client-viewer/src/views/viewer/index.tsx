@@ -1,25 +1,35 @@
 import * as React from 'react';
 import {
-  useViewerRequestSubscription,
-  ViewerRequestType,
+  useViewerUpdateSubscription,
+  ViewerState,
 } from '../../api/generated/graphql';
 import { ChannelPlayer } from '../../components/ChannelPlayer';
+import { ViewerInfoContext } from '../../components/shared/ViewerInfoContext';
 import { WaitingView } from '../../components/shared/WaitingView';
 
 export const ViewerRoot = () => {
-  const { error, data } = useViewerRequestSubscription();
+  const initialDevice = React.useContext(ViewerInfoContext);
+  const {
+    error: realtimeError,
+    data: realtimeData,
+  } = useViewerUpdateSubscription();
 
-  if (error) {
-    return <p>an error occured: {error.message}</p>;
+  const state = React.useMemo(
+    () => (realtimeData ? realtimeData.viewerUpdate : initialDevice),
+    [realtimeData, initialDevice],
+  );
+
+  if (realtimeError) {
+    return <p>an error occured while polling: {realtimeError.message}</p>;
   }
 
-  if (!data) {
+  if (!state) {
     return <WaitingView />;
   }
-  const { type, source } = data.viewerRequest;
-  if (type === ViewerRequestType.Play && source) {
-    if (source.__typename === 'Channel') {
-      return <ChannelPlayer channelId={source.channelId} />;
+
+  if (state.state === ViewerState.Playing && state.playingContent) {
+    if (state.playingContent.__typename === 'Channel') {
+      return <ChannelPlayer channelId={state.playingContent.channelId} />;
     }
   }
 
