@@ -13,6 +13,7 @@ type Props = {
   onTimeUpdate?: (time: number) => void;
   onHlsError?: (err: Hls.errorData) => void;
   onStallBuffer?: () => void;
+  onAutoPlayFailure?: () => void;
 };
 
 const createHls = () =>
@@ -41,6 +42,7 @@ export const HLSPlayer = (props: Props) => {
       if (videoRef.current) await videoRef.current.play();
     } catch (err) {
       console.error('failed to play automatically', err);
+      if (props.onAutoPlayFailure) props.onAutoPlayFailure();
     }
   }, [videoRef.current]);
 
