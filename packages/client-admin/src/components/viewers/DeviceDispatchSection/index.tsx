@@ -2,13 +2,16 @@ import { PageContainer, useErrorDialog } from '@mitei/client-common';
 import * as React from 'react';
 import {
   useUpdateViewerStateMutation,
-  ViewerDevice,
   ViewerRequestParam,
+  ViewerStateSingleSubscription,
 } from '../../../api/generated/graphql';
 import { Controller } from '../Controller';
 
 type Props = {
-  device: Pick<ViewerDevice, 'playingContent' | 'state' | 'volume' | 'id'>;
+  device: Pick<
+    ViewerStateSingleSubscription['viewerUpdateDevice'],
+    'playingContent' | 'state' | 'volume' | 'id'
+  >;
 };
 export const DeviceDispatchSection = ({ device }: Props) => {
   const [updateViewer] = useUpdateViewerStateMutation({

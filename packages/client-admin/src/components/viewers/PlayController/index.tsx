@@ -11,18 +11,21 @@ import * as React from 'react';
 import {
   GetSourcesSimpleQuery,
   TranscodeStatus,
-  ViewerDevice,
   ViewerRequestParam,
   ViewerRequestType,
   ViewerSourceType,
   ViewerState,
+  ViewerStateSingleSubscription,
 } from '../../../api/generated/graphql';
 import { ChannelSelect } from '../../shared/ChannelSelect';
 import { SourceSelect } from '../../shared/SourceSelect';
 
 type Props = {
   onDispatch: (request: Omit<ViewerRequestParam, 'device'>) => void;
-  device: Pick<ViewerDevice, 'playingContent' | 'state'>;
+  device: Pick<
+    ViewerStateSingleSubscription['viewerUpdateDevice'],
+    'playingContent' | 'state'
+  >;
 };
 export const PlayController = (props: Props) => {
   const [sourceType, setSourceType] = React.useState<ViewerSourceType>(
@@ -41,10 +44,14 @@ export const PlayController = (props: Props) => {
     if (props.device.playingContent) {
       if (props.device.playingContent.__typename === 'Channel') {
         setSourceType(ViewerSourceType.Channel);
-      } else {
+        setSourceId(props.device.playingContent.channelId);
+      } else if (
+        props.device.playingContent.__typename === 'FileSource' ||
+        props.device.playingContent.__typename === 'RecordSource'
+      ) {
         setSourceType(ViewerSourceType.Source);
+        setSourceId(props.device.playingContent.id);
       }
-      setSourceId(props.device.playingContent.id);
     }
   }, [props.device]);
 

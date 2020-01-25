@@ -6,14 +6,14 @@ import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import * as React from 'react';
 import {
-  ViewerDevice,
   ViewerRequestParam,
   ViewerRequestType,
+  ViewerStateSingleSubscription,
 } from '../../../api/generated/graphql';
 
 type Props = {
   onDispatch: (request: Omit<ViewerRequestParam, 'device'>) => void;
-  device: Pick<ViewerDevice, 'volume'>;
+  device: Pick<ViewerStateSingleSubscription['viewerUpdateDevice'], 'volume'>;
 };
 export const VolumeDispatcher = (props: Props) => {
   const [volume, setVolume] = React.useState(props.device.volume || 100);
