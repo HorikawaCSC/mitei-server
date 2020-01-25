@@ -71,7 +71,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
             field._requiredAuthRole || objectType._requiredAuthRole;
 
           if (!requiredRole) {
-            return resolve.apply(this, args);
+            return subscribe.apply(this, args);
           }
 
           const context = args[2] as GqlContext;
