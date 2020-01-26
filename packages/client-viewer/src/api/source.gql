@@ -1,0 +1,11 @@
+query getSourceSimple($sourceId: ID!) {
+  source(sourceId: $sourceId) {
+    __typename
+    ... on FileSource {
+      name
+    }
+    ... on RecordSource {
+      name
+    }
+  }
+}

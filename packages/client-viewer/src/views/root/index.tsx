@@ -1,6 +1,10 @@
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
-import { FullscreenProgress } from '@mitei/client-common';
+import {
+  FullscreenProgress,
+  MessageSnackContextProvider,
+  MessageSnackView,
+} from '@mitei/client-common';
 import * as React from 'react';
 import { useGetViewerInfoQuery } from '../../api/generated/graphql';
 import { ViewerInfoProvider } from '../../components/shared/ViewerInfoContext';
@@ -28,9 +32,12 @@ export const Root = () => {
     return (
       <ViewerInfoProvider value={data.viewerInfo}>
         <MericsProvider>
-          <Box className={styles.viewer}>
-            <ViewerRoot />
-          </Box>
+          <MessageSnackContextProvider>
+            <Box className={styles.viewer}>
+              <ViewerRoot />
+              <MessageSnackView />
+            </Box>
+          </MessageSnackContextProvider>
         </MericsProvider>
       </ViewerInfoProvider>
     );

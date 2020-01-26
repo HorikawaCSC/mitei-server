@@ -6,6 +6,7 @@ import {
 import { ChannelPlayer } from '../../components/ChannelPlayer';
 import { ViewerInfoContext } from '../../components/shared/ViewerInfoContext';
 import { WaitingView } from '../../components/shared/WaitingView';
+import { SourcePlayer } from '../../components/SourcePlayer';
 
 export const ViewerRoot = () => {
   const initialDevice = React.useContext(ViewerInfoContext);
@@ -30,6 +31,11 @@ export const ViewerRoot = () => {
   if (state.state === ViewerState.Playing && state.playingContent) {
     if (state.playingContent.__typename === 'Channel') {
       return <ChannelPlayer channelId={state.playingContent.channelId} />;
+    } else if (
+      state.playingContent.__typename === 'FileSource' ||
+      state.playingContent.__typename === 'RecordSource'
+    ) {
+      return <SourcePlayer sourceId={state.playingContent.id} />;
     }
   }
 
