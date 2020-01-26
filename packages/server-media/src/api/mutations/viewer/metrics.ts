@@ -2,7 +2,11 @@ import {
   MutationResolvers,
   ViewerMetricsType,
 } from '../../../generated/graphql';
-import { setElapsed, setMessage } from '../../../streaming/viewer/state';
+import {
+  setElapsed,
+  setMessage,
+  setStopState,
+} from '../../../streaming/viewer/state';
 import { ensureDeviceUsed } from '../../../utils/gql/ensureUser';
 import { redis, redisKeys, redisPubSub } from '../../../utils/redis';
 
@@ -37,6 +41,10 @@ export const viewerMetricsMutationResolvers: MutationResolvers = {
             redisKeys.viewerUpdate(deviceInfo.id),
             true,
           );
+          break;
+
+        case ViewerMetricsType.Ended:
+          await setStopState(deviceInfo.id);
           break;
 
         default:

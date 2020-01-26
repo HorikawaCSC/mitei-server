@@ -69,6 +69,7 @@ enum ViewerMetricsType {
   elapsed
   error
   ping
+  ended
 }
 
 input ViewerMetricsParam {

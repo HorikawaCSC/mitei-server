@@ -23,6 +23,8 @@ export const setPlayState = async (
 };
 
 export const setStopState = async (deviceId: string) => {
+  await redis.hdel(redisKeys.viewerState(deviceId), 'sourceType');
+  await redis.hdel(redisKeys.viewerState(deviceId), 'sourceId');
   await redis.hset(
     redisKeys.viewerState(deviceId),
     'state',
