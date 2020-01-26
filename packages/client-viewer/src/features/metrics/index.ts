@@ -31,4 +31,8 @@ export const metricsReporter = {
       type: ViewerMetricsType.Error,
       message,
     }),
+  ended: () =>
+    report({
+      type: ViewerMetricsType.Ended,
+    }),
 };

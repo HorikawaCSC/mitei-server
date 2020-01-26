@@ -8,7 +8,7 @@ import {
 import * as React from 'react';
 import { useGetViewerInfoQuery } from '../../api/generated/graphql';
 import { ViewerInfoProvider } from '../../components/shared/ViewerInfoContext';
-import { MericsProvider } from '../../features/metrics/MetricsContext';
+import { PingMetricsReporter } from '../../features/metrics/PingReporter';
 import { RegistrationView } from '../registration';
 import { ViewerRoot } from '../viewer';
 
@@ -31,14 +31,13 @@ export const Root = () => {
   if (data && data.viewerInfo) {
     return (
       <ViewerInfoProvider value={data.viewerInfo}>
-        <MericsProvider>
-          <MessageSnackContextProvider>
-            <Box className={styles.viewer}>
-              <ViewerRoot />
-              <MessageSnackView />
-            </Box>
-          </MessageSnackContextProvider>
-        </MericsProvider>
+        <PingMetricsReporter />
+        <MessageSnackContextProvider>
+          <Box className={styles.viewer}>
+            <ViewerRoot />
+            <MessageSnackView />
+          </Box>
+        </MessageSnackContextProvider>
       </ViewerInfoProvider>
     );
   } else {
