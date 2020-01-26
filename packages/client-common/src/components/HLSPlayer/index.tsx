@@ -7,6 +7,8 @@ type Props = {
   autoFix?: boolean;
   controls?: boolean;
   autoplay?: boolean;
+  // Range: 0-100
+  volume?: number;
   onNotFound?: () => void;
   onPlay?: () => void;
   onEnded?: () => void;
@@ -122,13 +124,27 @@ export const HLSPlayer = (props: Props) => {
     return () => hls.destroy();
   }, [videoRef.current, hls]);
 
+  const handleOnPlay = React.useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = props.volume || 1;
+    }
+
+    if (props.onPlay) props.onPlay();
+  }, [props.volume, props.onPlay]);
+
+  React.useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = props.volume || 1;
+    }
+  }, [props.volume]);
+
   return hlsJsSupported || nativeSupported ? (
     <video
       className={props.className}
       ref={videoRef}
       controls={props.controls}
       autoPlay={props.autoplay}
-      onPlay={props.onPlay}
+      onPlay={handleOnPlay}
       onTimeUpdate={handleTimeUpdate}
     />
   ) : (
