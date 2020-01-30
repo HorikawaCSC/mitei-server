@@ -27,20 +27,12 @@ export const viewerMetricsMutationResolvers: MutationResolvers = {
           if (!metrics.elapsed) throw new Error('elapsed is required');
 
           await setElapsed(deviceInfo.id, metrics.elapsed);
-          await redisPubSub.publish(
-            redisKeys.viewerUpdate(deviceInfo.id),
-            true,
-          );
           break;
 
         case ViewerMetricsType.Error:
           if (!metrics.message) throw new Error('message is required');
 
           await setMessage(deviceInfo.id, metrics.message);
-          await redisPubSub.publish(
-            redisKeys.viewerUpdate(deviceInfo.id),
-            true,
-          );
           break;
 
         case ViewerMetricsType.Ended:
@@ -50,6 +42,8 @@ export const viewerMetricsMutationResolvers: MutationResolvers = {
         default:
           throw new Error('invalid metrics type');
       }
+
+      await redisPubSub.publish(redisKeys.viewerUpdate(deviceInfo.id), true);
 
       return true;
     },

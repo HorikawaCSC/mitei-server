@@ -30,12 +30,22 @@ export const ViewerRoot = () => {
 
   if (state.state === ViewerState.Playing && state.playingContent) {
     if (state.playingContent.__typename === 'Channel') {
-      return <ChannelPlayer channelId={state.playingContent.channelId} />;
+      return (
+        <ChannelPlayer
+          channelId={state.playingContent.channelId}
+          volume={state.volume / 100}
+        />
+      );
     } else if (
       state.playingContent.__typename === 'FileSource' ||
       state.playingContent.__typename === 'RecordSource'
     ) {
-      return <SourcePlayer sourceId={state.playingContent.id} />;
+      return (
+        <SourcePlayer
+          sourceId={state.playingContent.id}
+          volume={state.volume / 100}
+        />
+      );
     }
   }
 

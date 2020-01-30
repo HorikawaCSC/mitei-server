@@ -13,10 +13,12 @@ const useStyles = makeStyles({
     height: '100%',
   },
 });
+
 type Props = {
   channelId: string;
+  volume: number;
 };
-export const ChannelPlayer = ({ channelId }: Props) => {
+export const ChannelPlayer = ({ channelId, volume }: Props) => {
   const [scheduleAvailable, remain] = useChannelPlay(channelId);
   const [playing, setPlaying] = React.useState(false);
   const [showControls, setShowControls] = React.useState(isDebug);
@@ -64,6 +66,7 @@ export const ChannelPlayer = ({ channelId }: Props) => {
       autoFix
       onStallBuffer={handleStall}
       onAutoPlayFailure={handleAutoplayFail}
+      volume={volume}
     />
   ) : (
     <WaitingView />

@@ -2,6 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { HLSPlayer, useErrorSnack } from '@mitei/client-common';
 import * as React from 'react';
 import { useGetSourceSimpleQuery } from '../../api/generated/graphql';
+import { metricsReporter } from '../../features/metrics';
 import { isDebug } from '../../utils/config';
 import { sourceManifestUrl } from '../../utils/route';
 import { WaitingView } from '../shared/WaitingView';
@@ -13,10 +14,12 @@ const useStyles = makeStyles({
     height: '100%',
   },
 });
+
 type Props = {
   sourceId: string;
+  volume: number;
 };
-export const SourcePlayer = ({ sourceId }: Props) => {
+export const SourcePlayer = ({ sourceId, volume }: Props) => {
   const { data, error, loading } = useGetSourceSimpleQuery({
     variables: {
       sourceId,
@@ -28,6 +31,7 @@ export const SourcePlayer = ({ sourceId }: Props) => {
   const showSnack = useErrorSnack();
 
   const handlePlayEnd = React.useCallback(() => {
+    metricsReporter.ended();
     setPlaying(false);
   }, []);
 
@@ -57,6 +61,7 @@ export const SourcePlayer = ({ sourceId }: Props) => {
       className={styles.video}
       autoFix
       onAutoPlayFailure={handleAutoplayFail}
+      volume={volume}
     />
   );
 };
