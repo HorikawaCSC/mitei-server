@@ -29,6 +29,9 @@ export const SourcePlayer = ({ sourceId, volume }: Props) => {
   const [showControls, setShowControls] = React.useState(isDebug);
   const styles = useStyles();
   const showSnack = useErrorSnack();
+  const [previousReportTime, setPreviousReportTime] = React.useState(() =>
+    Date.now(),
+  );
 
   const handlePlayEnd = React.useCallback(() => {
     metricsReporter.ended();
@@ -43,6 +46,16 @@ export const SourcePlayer = ({ sourceId, volume }: Props) => {
   React.useEffect(() => {
     setPlaying(true);
   }, [sourceId]);
+
+  const handleTimeUpdate = React.useCallback(
+    time => {
+      if (Date.now() - previousReportTime > 1000 * 5) {
+        metricsReporter.elapsed(time);
+        setPreviousReportTime(Date.now());
+      }
+    },
+    [previousReportTime],
+  );
 
   if (error) {
     return <p>an error occured: {error.message}</p>;
@@ -62,6 +75,7 @@ export const SourcePlayer = ({ sourceId, volume }: Props) => {
       autoFix
       onAutoPlayFailure={handleAutoplayFail}
       volume={volume}
+      onTimeUpdate={handleTimeUpdate}
     />
   );
 };
