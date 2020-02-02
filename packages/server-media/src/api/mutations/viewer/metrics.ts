@@ -24,7 +24,8 @@ export const viewerMetricsMutationResolvers: MutationResolvers = {
           break;
 
         case ViewerMetricsType.Elapsed:
-          if (!metrics.elapsed) throw new Error('elapsed is required');
+          if (typeof metrics.elapsed !== 'number')
+            throw new Error('elapsed is required');
 
           await setElapsed(deviceInfo.id, metrics.elapsed);
           break;
