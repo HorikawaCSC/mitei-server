@@ -4,7 +4,11 @@ import {
   ViewerRequestType,
 } from '../../../generated/graphql';
 import { validateViewerSource } from '../../../streaming/viewer/source';
-import { setPlayState, setStopState } from '../../../streaming/viewer/state';
+import {
+  setElapsed,
+  setPlayState,
+  setStopState,
+} from '../../../streaming/viewer/state';
 import { redisKeys, redisPubSub } from '../../../utils/redis';
 
 export const viewerRequestMutationResolvers: MutationResolvers = {
@@ -29,6 +33,7 @@ export const viewerRequestMutationResolvers: MutationResolvers = {
         if (!(await validateViewerSource(request.sourceType, request.sourceId)))
           throw new Error('Specified source not found');
 
+        await setElapsed(device.id, 0);
         await setPlayState(device.id, request.sourceType, request.sourceId);
         break;
 
