@@ -12,7 +12,7 @@ type Props = {
   onDispatch: (request: Omit<ViewerRequestParam, 'device'>) => void;
   device: Pick<
     ViewerStateSingleSubscription['viewerUpdateDevice'],
-    'playingContent' | 'state' | 'volume' | 'id'
+    'playingContent' | 'state' | 'volume' | 'id' | 'elapsed'
   >;
 };
 export const Controller = (props: Props) => {

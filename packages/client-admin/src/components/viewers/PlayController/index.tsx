@@ -7,6 +7,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Typography from '@material-ui/core/Typography';
+import { Duration } from 'luxon';
 import * as React from 'react';
 import {
   GetSourcesSimpleQuery,
@@ -24,7 +25,7 @@ type Props = {
   onDispatch: (request: Omit<ViewerRequestParam, 'device'>) => void;
   device: Pick<
     ViewerStateSingleSubscription['viewerUpdateDevice'],
-    'playingContent' | 'state'
+    'playingContent' | 'state' | 'elapsed'
   >;
 };
 export const PlayController = (props: Props) => {
@@ -77,6 +78,20 @@ export const PlayController = (props: Props) => {
     () => props.device.state === ViewerState.Playing,
     [props.device.state],
   );
+
+  const stateMessage = React.useMemo(() => {
+    if (playing) {
+      if (props.device.elapsed) {
+        return `再生中 ${Duration.fromMillis(
+          props.device.elapsed * 1000,
+        ).toFormat('hh:mm:ss')}`;
+      } else {
+        return '再生中';
+      }
+    } else {
+      return '停止';
+    }
+  }, [playing, props.device, props.device.elapsed]);
 
   return (
     <Box>
@@ -131,7 +146,7 @@ export const PlayController = (props: Props) => {
           </ButtonGroup>
         </Grid>
       </Grid>
-      <Typography>{playing ? '再生中' : '停止中'}</Typography>
+      <Typography>{stateMessage}</Typography>
     </Box>
   );
 };
