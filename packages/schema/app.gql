@@ -131,6 +131,8 @@ type Mutation {
 type Subscription {
   viewerUpdate: ViewerDevice! @deviceOnly
   viewerUpdateDevice(id: ID!): ViewerDevice! @auth(requires: [admin])
+
+  viewerRequestsPolling: Int! @auth(requires: [admin])
 }
 
 schema {

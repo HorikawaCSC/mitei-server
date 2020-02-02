@@ -4,7 +4,7 @@ import {
   ensureDeviceUsed,
   ensureLoggedInAsAdmin,
 } from '../../../utils/gql/ensureUser';
-import { redisKeys, redisPubSub } from '../../../utils/redis';
+import { redis, redisKeys, redisPubSub } from '../../../utils/redis';
 
 export const viewerSubscriptionResolvers: SubscriptionResolvers = {
   viewerUpdate: {
@@ -40,5 +40,15 @@ export const viewerSubscriptionResolvers: SubscriptionResolvers = {
         return newDevice;
       },
     ),
+  },
+  viewerRequestsPolling: {
+    subscribe() {
+      return redisPubSub.asyncIterator<boolean>(
+        redisKeys.viewerChallengeReceived(),
+      );
+    },
+    async resolve() {
+      return (await redis.keys(redisKeys.deviceChallenge('*'))).length;
+    },
   },
 };

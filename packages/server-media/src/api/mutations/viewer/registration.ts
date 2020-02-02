@@ -3,7 +3,7 @@ import { MutationResolvers } from '../../../generated/graphql';
 import { createToken, TokenType } from '../../../streaming/viewer/token';
 import { ViewerChallengeData } from '../../../types/viewer';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
-import { redis, redisKeys } from '../../../utils/redis';
+import { redis, redisKeys, redisPubSub } from '../../../utils/redis';
 import { createUniqueId } from '../../../utils/unique-id';
 
 export const viewerRegistrationMutationResolvers: MutationResolvers = {
@@ -23,6 +23,8 @@ export const viewerRegistrationMutationResolvers: MutationResolvers = {
       'EX',
       60 * 5,
     );
+
+    await redisPubSub.publish(redisKeys.viewerChallengeReceived(), true);
 
     const token = createToken(TokenType.Registration, deviceId, 60 * 5);
 

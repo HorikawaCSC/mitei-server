@@ -13,6 +13,7 @@ export const redisKeys = {
   viewerUpdateAll: () => `mitei:vupd:*`,
   viewerOnline: (deviceId: string) => `mitei:vonl:${deviceId}`,
   viewerState: (deviceId: string) => `mitei:vstate:${deviceId}`,
+  viewerChallengeReceived: () => `mitei:devcp`,
 };
 
 const pubsubConnection = new Redis({
@@ -25,6 +26,7 @@ export const connectRedis = async () => {
   await redis.connect();
 };
 
+// @ts-ignore
 export const redisPubSub = new RedisPubSub({
   subscriber: pubsubConnection,
   publisher: redis,
