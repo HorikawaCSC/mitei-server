@@ -1,13 +1,13 @@
 import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 import { Add } from '@material-ui/icons';
 import { PageContainer, useErrorDialog } from '@mitei/client-common';
 import * as React from 'react';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import {
   GetScheduleQuery,
   useAddEmptyProgramMutation,
+  useReorderProgramMutation,
 } from '../../../api/generated/graphql';
 import { toDate } from '../../../utils/datetime';
 import { ProgramItem } from './item';
@@ -25,8 +25,10 @@ export const ProgramListSection = ({ schedule }: Props) => {
       scheduleId: schedule.id,
     },
   });
+  const [reorderProgram] = useReorderProgramMutation();
   const showError = useErrorDialog();
-  const [disabled, setDisabled] = React.useState(true);
+  const [disabled, setDisabled] = React.useState(false);
+  const [reorder, setReorder] = React.useState<string[]>([]);
 
   const scheduleDuration = React.useMemo(() => {
     return toDate(schedule.endAt)
@@ -48,28 +50,59 @@ export const ProgramListSection = ({ schedule }: Props) => {
     }
   }, []);
 
-  const handleDisabledChange = React.useCallback(
-    (_e: React.ChangeEvent, checked: boolean) => {
-      setDisabled(!checked);
+  const handleDropEnd = React.useCallback(
+    async (result: DropResult) => {
+      if (!result.destination) return;
+
+      const idList = schedule.programs.map(({ id }) => id);
+      const [removed] = idList.splice(result.source.index, 1);
+      idList.splice(result.destination.index, 0, removed);
+
+      setDisabled(true);
+      setReorder(idList);
+      await reorderProgram({
+        variables: {
+          scheduleId: schedule.id,
+          order: idList,
+        },
+      });
+      setReorder([]);
+      setDisabled(false);
     },
-    [disabled],
+    [schedule],
   );
+
+  const orderedPrograms = React.useMemo(() => {
+    if (reorder.length > 0) {
+      return reorder.map(
+        id => schedule.programs.find(program => program.id === id)!,
+      );
+    } else {
+      return schedule.programs;
+    }
+  }, [schedule, reorder]);
 
   return (
     <PageContainer title='プログラム一覧' mini>
-      <FormControlLabel
-        control={<Switch checked={!disabled} onChange={handleDisabledChange} />}
-        label='編集'
-      />
-      {schedule.programs.map((program, index) => (
-        <ProgramItem
-          index={index}
-          schedule={schedule}
-          scheduleDuration={scheduleDuration}
-          disabled={disabled}
-          key={program.id}
-        />
-      ))}
+      <DragDropContext onDragEnd={handleDropEnd}>
+        <Droppable droppableId='programs'>
+          {(provided, _snapshot) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {orderedPrograms.map((program, index) => (
+                <ProgramItem
+                  index={index}
+                  schedule={schedule}
+                  scheduleDuration={scheduleDuration}
+                  key={program.id}
+                  disabled={disabled}
+                />
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
       {scheduleDuration > programsDuration ? (
         <PageContainer title='自動フィラー' mini>
           <Typography>

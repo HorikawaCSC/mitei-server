@@ -2,16 +2,19 @@ import { ExecutionResult } from '@apollo/react-common';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import IconButton from '@material-ui/core/IconButton';
+import Paper from '@material-ui/core/Paper';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { Delete, Save, SettingsBackupRestore } from '@material-ui/icons';
+import Typography from '@material-ui/core/Typography';
+import { Delete, Save } from '@material-ui/icons';
 import {
-  PageContainer,
   useConfirmDialog,
   useErrorDialog,
   useMessageSnack,
 } from '@mitei/client-common';
 import * as React from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 import {
   GetScheduleQuery,
   ProgramType,
@@ -28,6 +31,15 @@ const useStyles = makeStyles(theme =>
   createStyles({
     buttonGroup: {
       margin: theme.spacing(1, 0, 0, 0),
+    },
+    paper: {
+      padding: theme.spacing(1, 2, 2, 2),
+      margin: theme.spacing(1, 0),
+    },
+    title: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
   }),
 );
@@ -106,16 +118,6 @@ export const ProgramItem = ({
     [],
   );
 
-  const handleReset = React.useCallback(() => {
-    setProgramType(program.type);
-    setSourceId(program.source ? program.source.id : '');
-    setDuration(program.duration);
-  }, [program]);
-
-  React.useEffect(() => {
-    if (disabled) handleReset();
-  }, [disabled]);
-
   const handleSave = React.useCallback(async () => {
     const { errors } = (await updateProgram({
       variables: {
@@ -128,7 +130,9 @@ export const ProgramItem = ({
     })) as ExecutionResult<{}>;
     if (errors) {
       showError(errors[0].message);
-      handleReset();
+      setProgramType(program.type);
+      setSourceId(program.source ? program.source.id : '');
+      setDuration(program.duration);
     } else {
       showMessage('保存しました');
     }
@@ -197,58 +201,70 @@ export const ProgramItem = ({
     return true;
   }, [programType, sourceId]);
   return (
-    <PageContainer title={`プログラム #${index}`} mini>
-      <Box className={commonStyles.centerBox}>
-        <SourceTypeSelect
-          value={programType}
-          onChange={handleChangeProgramType}
-          disabled={disabled}
-        />
-        {sourceSelector}
-      </Box>
-      <Box className={commonStyles.centerBox}>
-        <TextField
-          label={`長さ(秒 / 最大: ${maxDuration})`}
-          type='number'
-          value={duration}
-          error={duration > maxDuration}
-          onChange={handleDurationChange}
-          disabled={disabled}
-        />
-        <Button
-          disabled={!timeAppliable || disabled}
-          onClick={handleApplyTimeFromSource}
-          color='secondary'
-        >
-          長さをソースから適用
-        </Button>
-        <Button
-          onClick={handleApplyTimeFromMax}
-          disabled={disabled}
-          color='secondary'
-        >
-          長さを最大に
-        </Button>
-      </Box>
-      <ButtonGroup
-        color='primary'
-        variant='contained'
-        className={styles.buttonGroup}
-        disabled={disabled}
-      >
-        <Button onClick={handleSave} disabled={!saveEnable}>
-          <Save />
-          保存
-        </Button>
-        <Button onClick={handleReset}>
-          <SettingsBackupRestore />
-          リセット
-        </Button>
-        <Button onClick={handleRemove}>
-          <Delete />
-          削除
-        </Button>
-      </ButtonGroup>
-    </PageContainer>
+    <Draggable key={program.id} draggableId={program.id} index={index}>
+      {(provided, _snapshot) => (
+        <div {...provided.draggableProps} ref={provided.innerRef}>
+          <Paper className={styles.paper}>
+            <Box className={styles.title}>
+              <Typography {...provided.dragHandleProps} variant='h6'>
+                プログラム #{index}
+              </Typography>
+              <Box>
+                <IconButton
+                  onClick={handleRemove}
+                  disabled={disabled}
+                  edge='end'
+                >
+                  <Delete />
+                </IconButton>
+              </Box>
+            </Box>
+            <Box className={commonStyles.centerBox}>
+              <SourceTypeSelect
+                value={programType}
+                onChange={handleChangeProgramType}
+                disabled={disabled}
+              />
+              {sourceSelector}
+            </Box>
+            <Box className={commonStyles.centerBox}>
+              <TextField
+                label={`長さ(秒 / 最大: ${maxDuration})`}
+                type='number'
+                value={duration}
+                error={duration > maxDuration}
+                onChange={handleDurationChange}
+                disabled={disabled}
+              />
+              <Button
+                disabled={!timeAppliable || disabled}
+                onClick={handleApplyTimeFromSource}
+                color='secondary'
+              >
+                長さをソースから適用
+              </Button>
+              <Button
+                onClick={handleApplyTimeFromMax}
+                color='secondary'
+                disabled={disabled}
+              >
+                長さを最大に
+              </Button>
+            </Box>
+            <ButtonGroup
+              color='primary'
+              variant='contained'
+              className={styles.buttonGroup}
+              disabled={disabled}
+            >
+              <Button onClick={handleSave} disabled={!saveEnable || disabled}>
+                <Save />
+                保存
+              </Button>
+            </ButtonGroup>
+          </Paper>
+        </div>
+      )}
+    </Draggable>
   );
 };

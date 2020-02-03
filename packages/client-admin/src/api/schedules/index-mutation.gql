@@ -81,3 +81,12 @@ mutation removeProgram($scheduleId: ID!, $programId: ID!) {
     ...scheduleUpdate
   }
 }
+
+mutation reorderProgram($scheduleId: ID!, $order: [ID!]!) {
+  updateProgramOrder(
+    scheduleId: $scheduleId,
+    order: $order
+  ) {
+    ...scheduleUpdate
+  }
+}
