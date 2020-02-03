@@ -2,12 +2,12 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Typography from '@material-ui/core/Typography';
 import { NotFoundView } from '@mitei/client-common';
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import { useGetRecordSourcesSimpleQuery } from '../../../api/generated/graphql';
+import { TotalCount } from '../../../components/shared/TotalCount';
 import { recordSourceSimpleDetailString } from '../../../utils/sources';
 
 export const RecordSourceList = () => {
@@ -52,7 +52,7 @@ export const RecordSourceList = () => {
   const hasMore = total > sources.length;
   return (
     <>
-      <Typography>{total} 件</Typography>
+      <TotalCount count={total} />
       <List>
         {sources.map(source => {
           return (

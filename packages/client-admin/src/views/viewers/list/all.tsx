@@ -2,7 +2,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Typography from '@material-ui/core/Typography';
 import { NotFoundView } from '@mitei/client-common';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
@@ -10,6 +9,7 @@ import {
   useGetViewerDevicesQuery,
   ViewerState,
 } from '../../../api/generated/graphql';
+import { TotalCount } from '../../../components/shared/TotalCount';
 
 export const ViewerAllList = () => {
   const { error, data, loading } = useGetViewerDevicesQuery({
@@ -29,7 +29,7 @@ export const ViewerAllList = () => {
   const { total, devices } = data.viewerDevices;
   return (
     <>
-      <Typography>{total} 件</Typography>
+      <TotalCount count={total} />
       <List>
         {devices
           .sort(a => (a.online ? -1 : 1))

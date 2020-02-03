@@ -6,7 +6,6 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import Typography from '@material-ui/core/Typography';
 import { Add, Delete } from '@material-ui/icons';
 import {
   NotFoundView,
@@ -20,6 +19,7 @@ import {
   useGetRtmpInputListSimpleQuery,
   useRemoveRtmpInputMutation,
 } from '../../../api/generated/graphql';
+import { TotalCount } from '../../../components/shared/TotalCount';
 import { AddRtmpInputDialog } from '../../../components/sources/AddRtmpInputDialog';
 import { useCommonStyles } from '../../../styles/common';
 import { rtmpInputSimpleWithUrlString } from '../../../utils/sources';
@@ -101,7 +101,7 @@ export const RtmpInputList = () => {
   const hasMore = total > inputs.length;
   return (
     <>
-      <Typography>{total} 件</Typography>
+      <TotalCount count={total} />
       <List>
         {inputs.map(input => {
           return (
