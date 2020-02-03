@@ -6,8 +6,10 @@ import Typography from '@material-ui/core/Typography';
 import { NotFoundView } from '@mitei/client-common';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { useGetViewerDevicesQuery } from '../../../api/generated/graphql';
-import { OnlineBadge } from '../../../components/viewers/OnlineBadge';
+import {
+  useGetViewerDevicesQuery,
+  ViewerState,
+} from '../../../api/generated/graphql';
 
 export const ViewerAllList = () => {
   const { error, data, loading } = useGetViewerDevicesQuery({
@@ -29,21 +31,29 @@ export const ViewerAllList = () => {
     <>
       <Typography>{total} 件</Typography>
       <List>
-        {devices.map(device => {
-          return (
-            <ListItem
-              key={device.id}
-              button
-              component={Link}
-              to={`/viewers/-/${device.id}`}
-            >
-              <ListItemText
-                primary={device.displayName}
-                secondary={<OnlineBadge online={device.online} />}
-              />
-            </ListItem>
-          );
-        })}
+        {devices
+          .sort(a => (a.online ? -1 : 1))
+          .map(device => {
+            return (
+              <ListItem
+                key={device.id}
+                button
+                component={Link}
+                to={`/viewers/-/${device.id}`}
+              >
+                <ListItemText
+                  primary={device.displayName}
+                  secondary={
+                    device.online
+                      ? device.state === ViewerState.Playing
+                        ? 'オンライン - 再生中'
+                        : 'オンライン - 停止中'
+                      : 'オフライン'
+                  }
+                />
+              </ListItem>
+            );
+          })}
       </List>
     </>
   );
