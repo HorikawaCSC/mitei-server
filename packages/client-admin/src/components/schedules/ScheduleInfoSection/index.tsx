@@ -1,10 +1,8 @@
 import { ExecutionResult } from '@apollo/react-common';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
-import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 import { CheckCircle, Error } from '@material-ui/icons';
 import {
@@ -49,21 +47,12 @@ export const ScheduleInfoSection = ({ schedule }: Props) => {
   const [endAt, setEndAt] = React.useState(() => toDate(schedule.endAt));
   const [duration, setDuration] = React.useState(() => Duration.fromMillis(0));
   const channelUrl = `/channels/${channel.id}`;
-  const [editMode, setEditMode] = React.useState(false);
 
   const handleReset = React.useCallback(() => {
     setTitle(schedule.title);
     setStartAt(toDate(schedule.startAt));
     setEndAt(toDate(schedule.endAt));
   }, [schedule, title, startAt, endAt]);
-
-  const handleChangeEditMode = React.useCallback(
-    (_e: React.ChangeEvent, value: boolean) => {
-      setEditMode(value);
-      handleReset();
-    },
-    [editMode],
-  );
 
   const handleSave = React.useCallback(async () => {
     const { errors } = (await updateSchedule({
@@ -91,10 +80,6 @@ export const ScheduleInfoSection = ({ schedule }: Props) => {
 
   return (
     <PageContainer title='スケジュール詳細'>
-      <FormControlLabel
-        control={<Switch checked={editMode} onChange={handleChangeEditMode} />}
-        label='編集'
-      />
       <ScheduleEdit
         title={title}
         onChangeTitle={setTitle}
@@ -102,7 +87,6 @@ export const ScheduleInfoSection = ({ schedule }: Props) => {
         onChangeStartAt={setStartAt}
         endAt={endAt}
         onChangeEndAt={setEndAt}
-        disabled={!editMode}
         onChangeDuration={setDuration}
       />
       <Typography>
@@ -114,7 +98,7 @@ export const ScheduleInfoSection = ({ schedule }: Props) => {
       <Button
         variant='contained'
         color='primary'
-        disabled={!editMode || !valid}
+        disabled={!valid}
         onClick={handleSave}
       >
         保存
