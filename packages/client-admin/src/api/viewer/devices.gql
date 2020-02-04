@@ -21,7 +21,7 @@ query getViewerRegist {
   }
 }
 
-mutation acceptViewerRegist($id: String!) {
+mutation acceptViewerRegist($id: ID!) {
   acceptViewerChallenge(deviceId: $id)
 }
 

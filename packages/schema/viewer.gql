@@ -11,7 +11,7 @@ type ViewerChallenge {
 }
 
 type ViewerChallengeRequest {
-  id: String!
+  id: ID!
   requestFrom: String!
   code: String!
   type: DeviceType!
@@ -29,7 +29,7 @@ enum ViewerState {
 }
 
 type ViewerDevice {
-  id: String!
+  id: ID!
   type: DeviceType!
   displayName: String!
   volume: Int!

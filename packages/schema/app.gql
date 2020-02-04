@@ -53,8 +53,10 @@ type Query {
 type Mutation {
   # admin func
   createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource! @auth(requires: [admin])
-  uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean! @auth(requires: [admin])
-  probeFileSource(sourceId: String!): Boolean! @auth(requires: [admin])
+  uploadFileSourceChunk(sourceId: ID!, file: UploadFileChunk!): Boolean! @auth(requires: [admin])
+  probeFileSource(sourceId: ID!): Boolean! @auth(requires: [admin])
+
+  updateSource(sourceId: ID!, name: String): TranscodedSource! @auth(requires: [admin])
 
   createRtmpInput(name: String!, presetId: ID!): RtmpInput! @auth(requires: [admin])
   removeRtmpInput(id: ID!): Boolean! @auth(requires: [admin])
@@ -122,7 +124,7 @@ type Mutation {
   ): Schedule! @auth(requires: [admin])
 
   createViewerChallenge(device: DeviceType!): ViewerChallenge!
-  acceptViewerChallenge(deviceId: String!): Boolean! @auth(requires: [admin])
+  acceptViewerChallenge(deviceId: ID!): Boolean! @auth(requires: [admin])
 
   updateViewerState(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
   reportViewerMetrics(metrics: ViewerMetricsParam!): Boolean! @deviceOnly

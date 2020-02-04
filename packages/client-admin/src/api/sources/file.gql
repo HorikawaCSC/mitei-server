@@ -4,11 +4,11 @@ mutation createFileSourceUpload($fileInfo: UploadFileInfo!) {
   }
 }
 
-mutation uploadFileSourceChunk($sourceId: String!, $file: UploadFileChunk!) {
+mutation uploadFileSourceChunk($sourceId: ID!, $file: UploadFileChunk!) {
   uploadFileSourceChunk(sourceId: $sourceId, file: $file)
 }
 
-mutation probeFileSource($sourceId: String!) {
+mutation probeFileSource($sourceId: ID!) {
   probeFileSource(sourceId: $sourceId)
 }
 
