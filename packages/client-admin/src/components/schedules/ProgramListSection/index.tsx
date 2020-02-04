@@ -72,13 +72,12 @@ export const ProgramListSection = ({ schedule }: Props) => {
     [schedule],
   );
 
-  const orderedPrograms = React.useMemo(() => {
+  const orderedProgramIndexes = React.useMemo(() => {
+    const ids = schedule.programs.map(({ id }) => id);
     if (reorder.length > 0) {
-      return reorder.map(
-        id => schedule.programs.find(program => program.id === id)!,
-      );
+      return reorder.map(id => ids.indexOf(id));
     } else {
-      return schedule.programs;
+      return ids.map((_id, index) => index);
     }
   }, [schedule, reorder]);
 
@@ -88,12 +87,12 @@ export const ProgramListSection = ({ schedule }: Props) => {
         <Droppable droppableId='programs'>
           {(provided, _snapshot) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              {orderedPrograms.map((program, index) => (
+              {orderedProgramIndexes.map(index => (
                 <ProgramItem
                   index={index}
                   schedule={schedule}
                   scheduleDuration={scheduleDuration}
-                  key={program.id}
+                  key={`${index}-${schedule.programs[index].id}`}
                   disabled={disabled}
                 />
               ))}
