@@ -15,17 +15,19 @@
  * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { TranscodedSource } from '@mitei/server-models';
 import { MutationResolvers } from '../../../../generated/graphql';
-import { fileSourceMutationResolvers } from './file-source';
-import { rtmpInputMutationResolvers } from './rtmp-input';
-import { sourceMutationResolvers } from './source';
-import { transcodeMutationResolvers } from './transcode';
-import { transcodePresetMutationResolvers } from './transcode-preset';
 
-export const sourcesMutationResolvers: MutationResolvers = {
-  ...fileSourceMutationResolvers,
-  ...rtmpInputMutationResolvers,
-  ...transcodePresetMutationResolvers,
-  ...transcodeMutationResolvers,
-  ...sourceMutationResolvers,
+export const sourceMutationResolvers: MutationResolvers = {
+  updateSource: async (_parent, { sourceId, name }) => {
+    const source = await TranscodedSource.findById(sourceId);
+
+    if (!source) throw new Error('source not found');
+
+    if (name) {
+      source.name = name;
+    }
+
+    return await source.save();
+  },
 };
