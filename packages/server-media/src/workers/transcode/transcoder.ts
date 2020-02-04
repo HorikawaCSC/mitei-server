@@ -41,11 +41,10 @@ export class Transcoder extends EventEmitter {
     this.source = await FileSource.findById(this.params.sourceId);
     if (!this.source) throw new Error('source not found');
 
-    if (
-      this.source.status !== TranscodeStatus.Pending &&
-      (!this.transcodable || this.source.status !== TranscodeStatus.Failed) // probed but transcode error
-    )
-      throw new Error('the source has already been transcoded or failed');
+    if (this.transcodable) {
+      if (this.source.status !== TranscodeStatus.Pending)
+        throw new Error('the source has already been transcoded or failed');
+    }
     if (this.source.source.status !== SourceStatus.Available)
       throw new Error('the source is not available');
   }
@@ -68,6 +67,9 @@ export class Transcoder extends EventEmitter {
     if (!video) {
       throw new Error('no video');
     }
+    if (!video.width || !video.height) {
+      throw new Error('invalid video');
+    }
     if (audio) {
       if (audio.channels > 2) {
         throw new Error('audio must be stereo or mono');
@@ -76,7 +78,43 @@ export class Transcoder extends EventEmitter {
 
     this.source.source.width = video.width;
     this.source.source.height = video.height;
+
     this.source.source.duration = Number(video.duration);
+    if (isNaN(this.source.source.duration)) this.source.source.duration = 0;
+
+    this.source.status = TranscodeStatus.Pending;
+
+    await this.source.save();
+  }
+
+  async probeTranscoded() {
+    if (!this.source) throw new Error('source not set');
+
+    const result = await ffprobe(
+      `${config.paths.source}/${this.source.id}/stream.mts`,
+    );
+
+    const audio = result.streams.find(
+      (stream): stream is AudioStream => stream.codec_type === 'audio',
+    );
+    const video = result.streams.find(
+      (stream): stream is VideoStream => stream.codec_type === 'video',
+    );
+
+    if (!video) {
+      throw new Error('no video');
+    }
+    if (!video.width || !video.height) {
+      throw new Error('invalid video');
+    }
+    if (audio) {
+      if (audio.channels > 2) {
+        throw new Error('audio must be stereo or mono');
+      }
+    }
+
+    this.source.width = video.width;
+    this.source.height = video.height;
 
     await this.source.save();
   }
@@ -233,6 +271,10 @@ export class Transcoder extends EventEmitter {
       'duration:',
       this.transcodedDuration,
     );
+
+    await this.probeTranscoded();
+
+    transcodeLogger.info('transcoded source was probed');
 
     await this.setStatus(TranscodeStatus.Success);
   }
