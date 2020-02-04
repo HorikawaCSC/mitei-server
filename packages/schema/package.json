@@ -4,7 +4,7 @@
   "description": "mitei-server schema",
   "author": "f0reachARR <f0reach@f0reach.me>",
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "main": "schema.gql",
   "publishConfig": {
     "access": "public"
