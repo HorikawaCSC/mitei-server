@@ -32,8 +32,6 @@ export const ViewerDetails = (props: Props) => {
     variables: {
       id: props.match.params.id,
     },
-    errorPolicy: 'all',
-    fetchPolicy: 'no-cache',
   });
   const { data: realtimeDev } = useViewerStateSingleSubscription({
     variables: {
@@ -48,14 +46,14 @@ export const ViewerDetails = (props: Props) => {
     return <NotFoundView error={error ? error.message : ''} />;
   }
 
+  const device = realtimeDev
+    ? realtimeDev.viewerUpdateDevice
+    : data.viewerDevice;
+
   return (
     <>
-      <SummarySection device={data.viewerDevice} />
-      <DeviceDispatchSection
-        device={
-          realtimeDev ? realtimeDev.viewerUpdateDevice : data.viewerDevice
-        }
-      />
+      <SummarySection device={device} />
+      <DeviceDispatchSection device={device} />
     </>
   );
 };

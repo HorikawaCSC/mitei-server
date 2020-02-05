@@ -56,9 +56,19 @@ mutation updateViewerState($request: ViewerRequestParam!) {
   updateViewerState(request: $request)
 }
 
+mutation updateViewerName($id: ID!, $displayName: String!) {
+  updateViewer(deviceId: $id, displayName: $displayName) {
+    id
+    displayName
+  }
+}
+
 subscription viewerStateSingle($id: ID!) {
   viewerUpdateDevice(id: $id) {
     id
+    type
+    displayName
+    online
     volume
     state
     playingContent {
