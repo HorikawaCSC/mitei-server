@@ -18,15 +18,20 @@
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Edit } from '@material-ui/icons';
-import { PageContainer } from '@mitei/client-common';
+import { PageContainer, useErrorSnack } from '@mitei/client-common';
 import { Duration } from 'luxon';
 import * as React from 'react';
-import { TranscodeStatus } from '../../../api/generated/graphql';
+import {
+  TranscodeStatus,
+  useRenameSourceMutation,
+} from '../../../api/generated/graphql';
 import { toStringDate } from '../../../utils/datetime';
 import { transcodeStatusText } from '../../../utils/sources';
+import { RenameSourceDialog } from '../../shared/RenameDialog';
 
 type Props = {
   source: {
+    id: string;
     status: TranscodeStatus;
     width?: number | null;
     height?: number | null;
@@ -41,24 +46,68 @@ type Props = {
 
 export const SourceDetails = (props: Props) => {
   const { source } = props;
+  const [renameSource, { loading: renameLoading }] = useRenameSourceMutation({
+    errorPolicy: 'all',
+  });
+  const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
+  const showErrorSnack = useErrorSnack();
+
+  const handleShowRenameDialog = React.useCallback(() => {
+    setRenameDialogOpen(true);
+  }, [setRenameDialogOpen]);
+
+  const handleCloseRenameDialog = React.useCallback(() => {
+    setRenameDialogOpen(false);
+  }, [setRenameDialogOpen]);
+
+  const handleRename = React.useCallback(
+    async (name: string) => {
+      const { errors } = await renameSource({
+        variables: {
+          id: source.id,
+          name,
+        },
+      });
+
+      if (errors) {
+        showErrorSnack(errors[0].message);
+        throw errors[0];
+      }
+    },
+    [renameSource, source],
+  );
+
   return (
-    <PageContainer title={`ソース: ${source.name}`}>
-      <Typography>ステータス: {transcodeStatusText[source.status]}</Typography>
-      <Typography>
-        解像度: {source.width ? `${source.width}x${source.height}` : '不明'}
-      </Typography>
-      <Typography>
-        長さ:{' '}
-        {source.duration
-          ? Duration.fromMillis(source.duration * 1000).toFormat('hh:mm:ss')
-          : '不明'}
-      </Typography>
-      <Typography>作成日時: {toStringDate(source.createdAt)}</Typography>
-      {source.preset && <Typography>変換設定: {source.preset.name}</Typography>}
-      <Button color='secondary'>
-        <Edit />
-        <Typography component='span'>名前の変更</Typography>
-      </Button>
-    </PageContainer>
+    <>
+      <PageContainer title={`ソース: ${source.name}`}>
+        <Typography>
+          ステータス: {transcodeStatusText[source.status]}
+        </Typography>
+        <Typography>
+          解像度: {source.width ? `${source.width}x${source.height}` : '不明'}
+        </Typography>
+        <Typography>
+          長さ:{' '}
+          {source.duration
+            ? Duration.fromMillis(source.duration * 1000).toFormat('hh:mm:ss')
+            : '不明'}
+        </Typography>
+        <Typography>作成日時: {toStringDate(source.createdAt)}</Typography>
+        {source.preset && (
+          <Typography>変換設定: {source.preset.name}</Typography>
+        )}
+        <Button color='secondary' onClick={handleShowRenameDialog}>
+          <Edit />
+          <Typography component='span'>名前の変更</Typography>
+        </Button>
+      </PageContainer>
+      <RenameSourceDialog
+        open={renameDialogOpen}
+        loading={renameLoading}
+        onClose={handleCloseRenameDialog}
+        onApply={handleRename}
+        defaultName={source.name}
+      />
+    </>
   );
 };
