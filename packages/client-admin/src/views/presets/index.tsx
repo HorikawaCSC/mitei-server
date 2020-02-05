@@ -25,6 +25,7 @@ import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useGetTranscodePresetListQuery } from '../../api/generated/graphql';
 import { AddPresetSection } from '../../components/presets/AddPresetSection';
+import { HeadTitle } from '../../components/shared/HeadTitle';
 import { parameterString } from '../../utils/parameter';
 
 export const PresetsList = () => {
@@ -76,6 +77,7 @@ export const PresetsList = () => {
   const hasMore = total > presets.length;
   return (
     <>
+      <HeadTitle title='プリセット一覧' />
       <AddPresetSection refetch={refetch} />
       <PageContainer title='プリセット一覧' mini>
         <Typography>{total} 件</Typography>

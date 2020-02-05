@@ -23,6 +23,7 @@ import {
   useGetViewerDeviceQuery,
   useViewerStateSingleSubscription,
 } from '../../../api/generated/graphql';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { DeviceDispatchSection } from '../../../components/viewers/DeviceDispatchSection';
 import { SummarySection } from '../../../components/viewers/SummarySection';
 
@@ -52,6 +53,7 @@ export const ViewerDetails = (props: Props) => {
 
   return (
     <>
+      <HeadTitle title={`${device.displayName} - サイネージ詳細`} />
       <SummarySection device={device} />
       <DeviceDispatchSection device={device} />
     </>

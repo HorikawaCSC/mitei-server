@@ -23,6 +23,7 @@ import {
   TranscodeStatus,
   useGetFileSourceQuery,
 } from '../../../api/generated/graphql';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { PreviewSection } from '../../../components/shared/PreviewSection';
 import { FileDataDetails } from '../../../components/sources/FileDataDetails';
 import { FileEncodeSection } from '../../../components/sources/FileEncodeSection';
@@ -48,6 +49,7 @@ export const FileSourceDetails = ({
 
   return (
     <>
+      <HeadTitle title={`${source.name} - ファイルソース詳細`} />
       <SourceDetails source={source} />
       <FileEncodeSection source={source} />
       {source.status === TranscodeStatus.Success && (

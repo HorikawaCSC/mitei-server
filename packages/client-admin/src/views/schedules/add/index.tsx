@@ -30,6 +30,7 @@ import {
   useAddScheduleMutation,
 } from '../../../api/generated/graphql';
 import { ScheduleEdit } from '../../../components/schedules/ScheduleEdit';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -89,6 +90,7 @@ export const ScheduleCreateView = ({
 
   return (
     <PageContainer title='スケジュール追加'>
+      <HeadTitle title='スケジュール追加' />
       <ScheduleEdit
         title={title}
         onChangeTitle={setTitle}

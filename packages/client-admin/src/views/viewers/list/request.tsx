@@ -29,6 +29,7 @@ import {
   useAcceptViewerRegistMutation,
   useGetViewerRegistQuery,
 } from '../../../api/generated/graphql';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 
 export const ViewerRequestList = () => {
   const { data, error, loading, refetch } = useGetViewerRegistQuery({
@@ -51,25 +52,28 @@ export const ViewerRequestList = () => {
 
   const { viewerRequests } = data;
 
-  if (viewerRequests.length === 0) {
-    return <Typography>登録待ち端末はありません</Typography>;
-  }
-
   return (
-    <List>
-      {viewerRequests.map(request => (
-        <ListItem key={request.id}>
-          <ListItemText primary={`コード: ${request.code}`} />
-          <ListItemSecondaryAction>
-            <IconButton
-              edge='end'
-              onClick={createAcceptRequestHandler(request.id)}
-            >
-              <Done />
-            </IconButton>
-          </ListItemSecondaryAction>
-        </ListItem>
-      ))}
-    </List>
+    <>
+      <HeadTitle title='登録待ちサイネージ一覧' />
+      {viewerRequests.length === 0 ? (
+        <Typography>登録待ち端末はありません</Typography>
+      ) : (
+        <List>
+          {viewerRequests.map(request => (
+            <ListItem key={request.id}>
+              <ListItemText primary={`コード: ${request.code}`} />
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge='end'
+                  onClick={createAcceptRequestHandler(request.id)}
+                >
+                  <Done />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </>
   );
 };

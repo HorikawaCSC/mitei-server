@@ -22,6 +22,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { useGetChannelDetailQuery } from '../../../api/generated/graphql';
 import { ChannelInfoSection } from '../../../components/channels/ChannelInfoSection';
 import { FillerListSection } from '../../../components/channels/FillerListSection';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { PreviewSection } from '../../../components/shared/PreviewSection';
 
 export const ChannelDetailView = ({
@@ -30,7 +31,6 @@ export const ChannelDetailView = ({
   const { id } = match.params;
   const { loading, error, data, refetch } = useGetChannelDetailQuery({
     variables: { id },
-    fetchPolicy: 'network-only',
   });
 
   if (loading) return <CircularProgress />;
@@ -43,6 +43,7 @@ export const ChannelDetailView = ({
 
   return (
     <>
+      <HeadTitle title={`${channel.displayName} - チャンネル詳細`} />
       <ChannelInfoSection channel={channel} refetch={refetch} />
       <PreviewSection
         source={routes.media.channel(channel.id)}

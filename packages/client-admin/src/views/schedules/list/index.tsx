@@ -21,6 +21,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import useRouter from 'use-react-router';
 import { ChannelSelect } from '../../../components/shared/ChannelSelect';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { ScheduleList } from './list';
 
 export const ScheduleListSelector = ({
@@ -37,6 +38,7 @@ export const ScheduleListSelector = ({
 
   return (
     <>
+      <HeadTitle title='スケジュール一覧' />
       <PageContainer title='チャンネル選択'>
         <Typography component='p'>
           チャンネルを選択してスケジュールを表示

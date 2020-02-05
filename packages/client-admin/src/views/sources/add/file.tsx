@@ -38,6 +38,7 @@ import {
   useUploadFileSourceChunkMutation,
 } from '../../../api/generated/graphql';
 import { FileChooser } from '../../../components/shared/FileChooser';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { FILE_UPLOAD_CHUNK } from '../../../constant';
 
 export const FileSourceUploadView = () => {
@@ -132,6 +133,7 @@ export const FileSourceUploadView = () => {
 
   return (
     <PageContainer title='ソースアップロード'>
+      <HeadTitle title='ソースアップロード' />
       <Typography component='p'>
         動画ファイルをアップロードして変換します。
       </Typography>

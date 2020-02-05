@@ -36,6 +36,7 @@ import {
   useGetRtmpInputListSimpleQuery,
   useRemoveRtmpInputMutation,
 } from '../../../api/generated/graphql';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { TotalCount } from '../../../components/shared/TotalCount';
 import { AddRtmpInputDialog } from '../../../components/sources/AddRtmpInputDialog';
 import { useCommonStyles } from '../../../styles/common';
@@ -118,6 +119,7 @@ export const RtmpInputList = () => {
   const hasMore = total > inputs.length;
   return (
     <>
+      <HeadTitle title='生配信ソース一覧' />
       <TotalCount count={total} />
       <List>
         {inputs.map(input => {

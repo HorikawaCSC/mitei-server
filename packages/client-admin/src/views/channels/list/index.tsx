@@ -28,6 +28,7 @@ import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import { useGetChannelsSimpleQuery } from '../../../api/generated/graphql';
 import { AddChannelDialog } from '../../../components/channels/AddChannelDialog';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { useCommonStyles } from '../../../styles/common';
 
 export const ChannelsListView = () => {
@@ -90,6 +91,7 @@ export const ChannelsListView = () => {
   const hasMore = total > channels.length;
   return (
     <PageContainer title='チャンネル一覧'>
+      <HeadTitle title='チャンネル一覧' />
       <Typography>{total} 件</Typography>
       <List>
         {channels.map(channel => {

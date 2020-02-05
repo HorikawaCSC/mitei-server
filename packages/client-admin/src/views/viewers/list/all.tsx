@@ -26,6 +26,7 @@ import {
   useGetViewerDevicesQuery,
   ViewerState,
 } from '../../../api/generated/graphql';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { TotalCount } from '../../../components/shared/TotalCount';
 
 export const ViewerAllList = () => {
@@ -46,6 +47,7 @@ export const ViewerAllList = () => {
   const { total, devices } = data.viewerDevices;
   return (
     <>
+      <HeadTitle title='サイネージ一覧' />
       <TotalCount count={total} />
       <List>
         {devices

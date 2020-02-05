@@ -23,6 +23,7 @@ import {
   TranscodeStatus,
   useGetRecordSourceQuery,
 } from '../../../api/generated/graphql';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { PreviewSection } from '../../../components/shared/PreviewSection';
 import { SourceDetails } from '../../../components/sources/SourceDetails';
 
@@ -51,6 +52,7 @@ export const RecordSourceDetails = ({
 
   return (
     <>
+      <HeadTitle title={`${source.name} - 録画ソース詳細`} />
       <SourceDetails source={source} />
       {(source.status === TranscodeStatus.Success ||
         source.status === TranscodeStatus.Running) && (

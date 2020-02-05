@@ -137,8 +137,8 @@ export const ScheduleList = ({ channelId, day }: Props) => {
               className={clsx({ [styles.invalid]: !schedule.isValid })}
             >
               <TableCell>
+                <Typography>{schedule.isValid ? null : <Warning />}</Typography>
                 <Typography>
-                  {schedule.isValid || <Warning />}
                   {`${toStringDate(
                     schedule.startAt,
                     'HH:mm:ss',
@@ -159,7 +159,7 @@ export const ScheduleList = ({ channelId, day }: Props) => {
             </TableRow>
           ))}
           {hasMore && (
-            <TableRow ref={scrollRef}>
+            <TableRow innerRef={scrollRef}>
               <TableCell>Loading</TableCell>
             </TableRow>
           )}

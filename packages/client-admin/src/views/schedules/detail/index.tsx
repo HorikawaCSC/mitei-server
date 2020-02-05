@@ -22,6 +22,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { useGetScheduleQuery } from '../../../api/generated/graphql';
 import { ProgramListSection } from '../../../components/schedules/ProgramListSection';
 import { ScheduleInfoSection } from '../../../components/schedules/ScheduleInfoSection';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 
 export const ScheduleDetailView = ({
   match,
@@ -43,6 +44,9 @@ export const ScheduleDetailView = ({
 
   return (
     <>
+      <HeadTitle
+        title={`${schedule.title}[${schedule.channel.displayName}] - スケジュール詳細`}
+      />
       <ScheduleInfoSection schedule={schedule} />
       <ProgramListSection schedule={schedule} />
     </>

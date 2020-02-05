@@ -26,6 +26,7 @@ import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import { useGetFileSourcesSimpleQuery } from '../../../api/generated/graphql';
+import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { TotalCount } from '../../../components/shared/TotalCount';
 import { useCommonStyles } from '../../../styles/common';
 import { fileSourceSimpleDetailString } from '../../../utils/sources';
@@ -73,6 +74,7 @@ export const FileSourceList = () => {
   const hasMore = total > sources.length;
   return (
     <>
+      <HeadTitle title='ファイルソース一覧' />
       <TotalCount count={total} />
       <List>
         {sources.map(source => {
