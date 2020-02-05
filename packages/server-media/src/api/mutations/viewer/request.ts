@@ -59,7 +59,11 @@ export const viewerRequestMutationResolvers: MutationResolvers = {
         break;
 
       case ViewerRequestType.Volume:
-        if (!request.volume || request.volume < 0 || request.volume > 100)
+        if (
+          typeof request.volume !== 'number' ||
+          request.volume < 0 ||
+          request.volume > 100
+        )
           throw new Error('invalid volume');
         device.volume = request.volume;
         await device.save();
