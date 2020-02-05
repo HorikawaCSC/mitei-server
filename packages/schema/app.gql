@@ -126,6 +126,8 @@ type Mutation {
   createViewerChallenge(device: DeviceType!): ViewerChallenge!
   acceptViewerChallenge(deviceId: ID!): Boolean! @auth(requires: [admin])
 
+  updateViewer(deviceId: ID!, displayName: String): ViewerDevice! @auth(requires: [admin])
+
   updateViewerState(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
   reportViewerMetrics(metrics: ViewerMetricsParam!): Boolean! @deviceOnly
 }
