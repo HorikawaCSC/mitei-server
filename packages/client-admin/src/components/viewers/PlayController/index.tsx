@@ -49,16 +49,27 @@ export const PlayController = (props: Props) => {
   const [sourceType, setSourceType] = React.useState<ViewerSourceType>(
     ViewerSourceType.Channel,
   );
+  const [changed, setChanged] = React.useState(false);
   const handleSourceTypeChange = React.useCallback(
     (_e, value: string) => {
+      setChanged(true);
       setSourceType(value as ViewerSourceType);
     },
     [sourceType],
   );
 
   const [sourceId, setSourceId] = React.useState('');
+  const handleSourceIdChange = React.useCallback(
+    (id: string) => {
+      setChanged(true);
+      setSourceId(id);
+    },
+    [sourceId, setChanged],
+  );
 
   React.useEffect(() => {
+    if (changed) return;
+
     if (props.device.playingContent) {
       if (props.device.playingContent.__typename === 'Channel') {
         setSourceType(ViewerSourceType.Channel);
@@ -78,6 +89,7 @@ export const PlayController = (props: Props) => {
   ) => value.status === TranscodeStatus.Success;
 
   const dispatchPlay = React.useCallback(() => {
+    setChanged(false);
     props.onDispatch({
       type: ViewerRequestType.Play,
       sourceType,
@@ -86,6 +98,7 @@ export const PlayController = (props: Props) => {
   }, [sourceType, sourceId, props.onDispatch]);
 
   const dispatchStop = React.useCallback(() => {
+    setChanged(false);
     props.onDispatch({
       type: ViewerRequestType.Stop,
     });
@@ -115,7 +128,7 @@ export const PlayController = (props: Props) => {
       <Grid container alignItems='flex-end' spacing={2}>
         <Grid item md={3}>
           <FormGroup>
-            <FormLabel>ソース</FormLabel>
+            <FormLabel>ソース{changed && ' 変更あり'}</FormLabel>
             <RadioGroup value={sourceType} onChange={handleSourceTypeChange}>
               <FormControlLabel
                 value={ViewerSourceType.Channel}
@@ -132,11 +145,14 @@ export const PlayController = (props: Props) => {
         </Grid>
         <Grid item>
           {sourceType === ViewerSourceType.Channel ? (
-            <ChannelSelect value={sourceId} handleChange={setSourceId} />
+            <ChannelSelect
+              value={sourceId}
+              handleChange={handleSourceIdChange}
+            />
           ) : (
             <SourceSelect
               value={sourceId}
-              handleChange={setSourceId}
+              handleChange={handleSourceIdChange}
               filterItem={filterItem}
             />
           )}
@@ -148,6 +164,7 @@ export const PlayController = (props: Props) => {
               color='primary'
               size='large'
               onClick={dispatchPlay}
+              disabled={playing}
             >
               再生
             </Button>

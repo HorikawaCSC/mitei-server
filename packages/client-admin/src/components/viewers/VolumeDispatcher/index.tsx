@@ -34,19 +34,22 @@ type Props = {
 };
 export const VolumeDispatcher = (props: Props) => {
   const [volume, setVolume] = React.useState(props.device.volume || 100);
+  const [changed, setChanged] = React.useState(false);
 
   const handleVolumeChange = React.useCallback(
     (_e, value: number | number[]) => {
+      setChanged(true);
       setVolume(value as number);
     },
     [volume],
   );
 
   React.useEffect(() => {
-    setVolume(props.device.volume);
+    if (!changed) setVolume(props.device.volume);
   }, [props.device]);
 
   const dispatch = React.useCallback(() => {
+    setChanged(false);
     props.onDispatch({
       type: ViewerRequestType.Volume,
       volume,
@@ -56,7 +59,7 @@ export const VolumeDispatcher = (props: Props) => {
     <Box>
       <Grid container spacing={4}>
         <Grid item sm={2}>
-          <FormLabel>ボリューム</FormLabel>
+          <FormLabel>ボリューム{changed && ' 変更あり'}</FormLabel>
         </Grid>
         <Grid item sm={5} xs={8}>
           <FormGroup>
