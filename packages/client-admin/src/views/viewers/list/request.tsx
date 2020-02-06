@@ -28,6 +28,7 @@ import * as React from 'react';
 import {
   useAcceptViewerRegistMutation,
   useGetViewerRegistQuery,
+  useViewerRequestUpdateSubscription,
 } from '../../../api/generated/graphql';
 import { HeadTitle } from '../../../components/shared/HeadTitle';
 
@@ -35,7 +36,7 @@ export const ViewerRequestList = () => {
   const { data, error, loading, refetch } = useGetViewerRegistQuery({
     fetchPolicy: 'no-cache',
   });
-
+  const { data: viewerPolling } = useViewerRequestUpdateSubscription();
   const [acceptRequest] = useAcceptViewerRegistMutation();
   const showMessage = useMessageSnack();
 
@@ -45,6 +46,11 @@ export const ViewerRequestList = () => {
     await refetch();
   };
 
+  React.useEffect(() => {
+    if (viewerPolling && viewerPolling.viewerRequestsPolling > 0) {
+      refetch();
+    }
+  }, [viewerPolling]);
   if (loading) return <CircularProgress />;
   if (!data || !data.viewerRequests || error) {
     return <NotFoundView error={error ? error.message : ''} />;

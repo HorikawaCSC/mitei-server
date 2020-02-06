@@ -28,6 +28,7 @@ import { PresetsList } from '../presets';
 import { ScheduleRoot } from '../schedules';
 import { SourcesRoot } from '../sources';
 import { ViewersRoot } from '../viewers';
+import { NotifyRealtime } from './notify';
 
 const useStyles = makeStyles({
   content: {
@@ -69,6 +70,7 @@ export const Root = () => {
           <Route path='/viewers' component={ViewersRoot} />
         </Switch>
       </Container>
+      <NotifyRealtime />
       <MessageView />
     </>
   );

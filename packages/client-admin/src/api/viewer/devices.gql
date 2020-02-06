@@ -82,3 +82,7 @@ subscription viewerStateSingle($id: ID!) {
     message
   }
 }
+
+subscription viewerRequestUpdate {
+  viewerRequestsPolling
+}
