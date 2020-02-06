@@ -79,7 +79,7 @@ export const MessageDialogView = () => {
   };
 
   return (
-    <Dialog open={contextValue.isOpen} onClose={handleClose}>
+    <Dialog open={contextValue.isOpen} onClose={handleClose} fullWidth>
       <DialogTitle>{contextValue.title}</DialogTitle>
       <DialogContent>
         {contextValue.messages.map((text, i) => (
