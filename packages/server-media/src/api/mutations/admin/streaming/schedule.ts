@@ -80,4 +80,17 @@ export const scheduleMutationResolvers: MutationResolvers = {
       return await schedule.save();
     },
   ),
+  removeSchedule: async (_parent, { scheduleId }) => {
+    const schedule = await Schedule.findById(scheduleId);
+    if (!schedule) throw new Error('schedule not found');
+
+    const now = Date.now();
+    if (schedule.startAt.getTime() < now && schedule.endAt.getTime() > now) {
+      throw new Error('schedule is now running');
+    }
+
+    await schedule.remove();
+
+    return true;
+  },
 };

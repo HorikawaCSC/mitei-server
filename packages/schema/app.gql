@@ -99,6 +99,9 @@ type Mutation {
     startAt: DateTime,
     endAt: DateTime,
   ): Schedule! @auth(requires: [admin])
+  removeSchedule(
+    scheduleId: ID!,
+  ): Boolean! @auth(requires: [admin])
 
   addProgramToSchedule(
     scheduleId: ID!,
@@ -127,6 +130,7 @@ type Mutation {
   acceptViewerChallenge(deviceId: ID!): Boolean! @auth(requires: [admin])
 
   updateViewer(deviceId: ID!, displayName: String): ViewerDevice! @auth(requires: [admin])
+  removeViewer(deviceId: ID!): Boolean! @auth(requires: [admin])
 
   updateViewerState(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
   reportViewerMetrics(metrics: ViewerMetricsParam!): Boolean! @deviceOnly
