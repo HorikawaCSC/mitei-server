@@ -90,3 +90,7 @@ mutation reorderProgram($scheduleId: ID!, $order: [ID!]!) {
     ...scheduleUpdate
   }
 }
+
+mutation removeSchedule($scheduleId: ID!) {
+  removeSchedule(scheduleId: $scheduleId)
+}

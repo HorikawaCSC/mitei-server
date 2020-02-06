@@ -25,16 +25,24 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
-import { Edit, Warning } from '@material-ui/icons';
+import { Delete, Edit, Warning } from '@material-ui/icons';
 import { DatePicker } from '@material-ui/pickers';
-import { NotFoundView, PageContainer } from '@mitei/client-common';
+import {
+  NotFoundView,
+  PageContainer,
+  useConfirmDialog,
+  useErrorDialog,
+} from '@mitei/client-common';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import useRouter from 'use-react-router';
-import { useGetScheduleListSimpleQuery } from '../../../api/generated/graphql';
+import {
+  useGetScheduleListSimpleQuery,
+  useRemoveScheduleMutation,
+} from '../../../api/generated/graphql';
 import { ProgramListSimple } from '../../../components/schedules/ProgramListSimple';
 import { toStringDate } from '../../../utils/datetime';
 
@@ -59,7 +67,17 @@ export const ScheduleList = ({ channelId, day }: Props) => {
     [channelId, reqStartAt, reqEndAt],
   );
 
-  const { loading, data, error, fetchMore } = useGetScheduleListSimpleQuery({
+  const confirm = useConfirmDialog();
+  const showErrorDialog = useErrorDialog();
+  const [removeSchedule] = useRemoveScheduleMutation();
+
+  const {
+    loading,
+    data,
+    error,
+    fetchMore,
+    refetch,
+  } = useGetScheduleListSimpleQuery({
     variables: {
       ...param,
       skip: 0,
@@ -74,6 +92,30 @@ export const ScheduleList = ({ channelId, day }: Props) => {
       history.push(`/schedules/${channelId}?day=${date.toFormat('yyyyMMdd')}`);
     },
     [channelId],
+  );
+
+  const handleRemove = React.useCallback(
+    async (id: string, title: string) => {
+      if (
+        !(await confirm(
+          '削除しますか?',
+          `スケジュール: ${title}を削除しますか?`,
+        ))
+      )
+        return;
+
+      const { errors } = await removeSchedule({
+        variables: {
+          scheduleId: id,
+        },
+      });
+      if (errors) {
+        showErrorDialog(errors[0].message);
+        return;
+      }
+      refetch();
+    },
+    [data],
   );
 
   const [scrollRef, inView] = useInView();
@@ -154,6 +196,11 @@ export const ScheduleList = ({ channelId, day }: Props) => {
               <TableCell>
                 <IconButton component={Link} to={`/schedules/-/${schedule.id}`}>
                   <Edit />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleRemove(schedule.id, schedule.title)}
+                >
+                  <Delete />
                 </IconButton>
               </TableCell>
             </TableRow>
