@@ -16,27 +16,56 @@
  */
 
 import CircularProgress from '@material-ui/core/CircularProgress';
+import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import { NotFoundView } from '@mitei/client-common';
+import { Delete } from '@material-ui/icons';
+import {
+  NotFoundView,
+  useConfirmDialog,
+  useErrorDialog,
+} from '@mitei/client-common';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import {
   useGetViewerDevicesQuery,
+  useRemoveViewerMutation,
   ViewerState,
 } from '../../../api/generated/graphql';
 import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { TotalCount } from '../../../components/shared/TotalCount';
 
 export const ViewerAllList = () => {
-  const { error, data, loading } = useGetViewerDevicesQuery({
+  const { error, data, loading, refetch } = useGetViewerDevicesQuery({
     fetchPolicy: 'no-cache',
     variables: {
       skip: 0,
       take: 10,
     },
   });
+  const [removeViewer] = useRemoveViewerMutation();
+  const showErrorDialog = useErrorDialog();
+  const confirm = useConfirmDialog();
+
+  const handleDelete = React.useCallback(
+    async (id: string, displayName: string) => {
+      if (!(await confirm('削除しますか?', `デバイス: ${displayName}`))) return;
+
+      const { errors } = await removeViewer({
+        variables: {
+          id,
+        },
+      });
+
+      if (errors) {
+        showErrorDialog(errors[0].message);
+      }
+      refetch();
+    },
+    [removeViewer, showErrorDialog, confirm, refetch],
+  );
 
   if (loading) return <CircularProgress />;
 
@@ -70,6 +99,15 @@ export const ViewerAllList = () => {
                       : 'オフライン'
                   }
                 />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge='end'
+                    onClick={() => handleDelete(device.id, device.displayName)}
+                    disabled={device.online}
+                  >
+                    <Delete />
+                  </IconButton>
+                </ListItemSecondaryAction>
               </ListItem>
             );
           })}

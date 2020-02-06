@@ -63,6 +63,10 @@ mutation updateViewerName($id: ID!, $displayName: String!) {
   }
 }
 
+mutation removeViewer($id: ID!) {
+  removeViewer(deviceId: $id)
+}
+
 subscription viewerStateSingle($id: ID!) {
   viewerUpdateDevice(id: $id) {
     id

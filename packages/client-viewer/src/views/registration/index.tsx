@@ -73,7 +73,7 @@ export const RegistrationView = ({ refetch }: Props) => {
       if (challengeResult.viewerChallengeResult.success) {
         storage.set('devToken', challengeResult.viewerChallengeResult.token);
         setSuccess(true);
-        refetch();
+        setTimeout(() => refetch(), 1000 * 5);
       }
     }
   }, [challengeResult]);
