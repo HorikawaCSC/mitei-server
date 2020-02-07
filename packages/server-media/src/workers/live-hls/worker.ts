@@ -30,6 +30,7 @@ import { createInterface } from 'readline';
 import { config } from '../../config';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
+import { thumbnailWorker } from '../thumbnail';
 import { lockLiveSource, unlockLiveSource } from './lock';
 
 export class LiveHLSWorker extends EventEmitter {
@@ -179,6 +180,10 @@ export class LiveHLSWorker extends EventEmitter {
   private async finalize(status: TranscodeStatus) {
     await this.setStatus(status);
     await unlockLiveSource(this.source);
+
+    if (status === TranscodeStatus.Success) {
+      await thumbnailWorker.enqueue(this.record!);
+    }
   }
 
   private async setStatus(status: TranscodeStatus) {

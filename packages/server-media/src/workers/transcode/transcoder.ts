@@ -32,6 +32,7 @@ import { config } from '../../config';
 import { ffprobe } from '../../streaming/transcode/ffprobe';
 import { AudioStream, VideoStream } from '../../types/ffprobe';
 import { transcodeLogger } from '../../utils/logging';
+import { thumbnailWorker } from '../thumbnail';
 
 export class Transcoder extends EventEmitter {
   private source: FileSourceDocument | null = null;
@@ -294,5 +295,7 @@ export class Transcoder extends EventEmitter {
     transcodeLogger.info('transcoded source was probed');
 
     await this.setStatus(TranscodeStatus.Success);
+
+    await thumbnailWorker.enqueue(this.source!);
   }
 }
