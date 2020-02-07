@@ -22,6 +22,9 @@ query getFileTranscodeStatus($id: ID!) {
       id
       status
       transcodeProgress
+      duration
+      width
+      height
     }
   }
 }
