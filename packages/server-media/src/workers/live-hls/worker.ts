@@ -28,6 +28,8 @@ import { existsSync, promises as fs } from 'fs';
 import { DateTime } from 'luxon';
 import { createInterface } from 'readline';
 import { config } from '../../config';
+import { ffprobe } from '../../streaming/transcode/ffprobe';
+import { AudioStream, VideoStream } from '../../types/ffprobe';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
 import { thumbnailWorker } from '../thumbnail';
@@ -177,9 +179,43 @@ export class LiveHLSWorker extends EventEmitter {
     });
   }
 
+  async probeTranscoded() {
+    if (!this.record) throw new Error('record not set');
+
+    const result = await ffprobe(
+      `${config.paths.source}/${this.record.id}/stream.mts`,
+    );
+
+    const audio = result.streams.find(
+      (stream): stream is AudioStream => stream.codec_type === 'audio',
+    );
+    const video = result.streams.find(
+      (stream): stream is VideoStream => stream.codec_type === 'video',
+    );
+
+    if (!video) {
+      throw new Error('no video');
+    }
+    if (!video.width || !video.height) {
+      throw new Error('invalid video');
+    }
+    if (audio) {
+      if (audio.channels > 2) {
+        throw new Error('audio must be stereo or mono');
+      }
+    }
+
+    this.record.width = video.width;
+    this.record.height = video.height;
+
+    await this.record.save();
+  }
+
   private async finalize(status: TranscodeStatus) {
     await this.setStatus(status);
     await unlockLiveSource(this.source);
+
+    await this.probeTranscoded();
 
     if (status === TranscodeStatus.Success) {
       await thumbnailWorker.enqueue(this.record!);
