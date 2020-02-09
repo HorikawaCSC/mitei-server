@@ -1,0 +1,11 @@
+query getAdminUsers($skip: Int!, $take: Int!) {
+  users(kind: admin, skip: $skip, take: $take) {
+    total
+    users {
+      id
+      iconUrl
+      screenName
+      type
+    }
+  }
+}

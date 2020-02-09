@@ -27,6 +27,7 @@ import { LoginView } from '../login';
 import { PresetsList } from '../presets';
 import { ScheduleRoot } from '../schedules';
 import { SourcesRoot } from '../sources';
+import { UsersRoot } from '../users';
 import { ViewersRoot } from '../viewers';
 import { NotifyRealtime } from './notify';
 
@@ -68,6 +69,7 @@ export const Root = () => {
           <Route path='/schedules' component={ScheduleRoot} />
           <Route path='/presets' component={PresetsList} />
           <Route path='/viewers' component={ViewersRoot} />
+          <Route path='/users' component={UsersRoot} />
         </Switch>
       </Container>
       <NotifyRealtime />

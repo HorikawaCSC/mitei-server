@@ -33,6 +33,7 @@ import {
   ListAlt,
   Menu as MenuIcon,
   MovieCreation,
+  SupervisorAccount,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import * as React from 'react';
@@ -120,6 +121,15 @@ export const HeaderMenu = () => {
                 <ListAlt />
               </ListItemIcon>
               <ListItemText>サイネージ一覧</ListItemText>
+            </ListItem>
+          </List>
+
+          <List subheader={<ListSubheader>ユーザ管理</ListSubheader>}>
+            <ListItem button component={Link} to='/users/admin'>
+              <ListItemIcon>
+                <SupervisorAccount />
+              </ListItemIcon>
+              <ListItemText>管理者一覧</ListItemText>
             </ListItem>
           </List>
         </div>
