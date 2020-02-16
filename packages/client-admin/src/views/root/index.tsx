@@ -28,6 +28,7 @@ import { PresetsList } from '../presets';
 import { ScheduleRoot } from '../schedules';
 import { SourcesRoot } from '../sources';
 import { UsersRoot } from '../users';
+import { InviteConsume } from '../users/invite';
 import { ViewersRoot } from '../viewers';
 import { NotifyRealtime } from './notify';
 
@@ -42,7 +43,27 @@ export const Root = () => {
   const { loading, data, error } = useGetMyselfSimpleQuery();
 
   if (loading) return <FullscreenProgress />;
-  if (error) return <p>error</p>;
+  if (error) {
+    if (
+      error.graphQLErrors.length > 0 &&
+      error.graphQLErrors[0].message === 'not authorized'
+    ) {
+      return (
+        <>
+          <CssBaseline />
+          <Container fixed>
+            <Switch>
+              <Route path='/consume/:id' component={InviteConsume} exact />
+              <Route
+                render={() => <p>管理者ではありません。招待を利用できます</p>}
+              />
+            </Switch>
+          </Container>
+        </>
+      );
+    }
+    return <p>error</p>;
+  }
 
   if (!data || !data.me || data.me.role !== 'admin') {
     return (
@@ -51,6 +72,7 @@ export const Root = () => {
         <Container fixed>
           <Switch>
             <Route path='/login' component={LoginView} exact />
+            <Route path='/consume/:id' component={InviteConsume} exact />
             <Route render={() => <Redirect to='/login' />} />
           </Switch>
         </Container>
@@ -70,6 +92,7 @@ export const Root = () => {
           <Route path='/presets' component={PresetsList} />
           <Route path='/viewers' component={ViewersRoot} />
           <Route path='/users' component={UsersRoot} />
+          <Route path='/consume/:id' render={() => <Redirect to='/' />} exact />
         </Switch>
       </Container>
       <NotifyRealtime />

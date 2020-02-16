@@ -21,3 +21,10 @@ query getAdminUsers($skip: Int!, $take: Int!) {
 mutation createAdminInvite {
   createPromoteInvite(role: admin)
 }
+
+mutation consumeInvite($id: String!) {
+  consumePromoteInvite(id: $id) {
+    id
+    role
+  }
+}
