@@ -32,7 +32,7 @@ export const ensureLoggedInAsAdmin = <TResult, TParent = {}, TArgs = {}>(
   input: ResolverFn<TResult, TParent, UserLoggedInContext, TArgs>,
 ): ResolverFn<TResult, TParent, GqlContext, TArgs> => {
   return (parent, args, context, info) => {
-    if (!context.userInfo || context.userInfo.kind !== 'admin') {
+    if (!context.userInfo || context.userInfo.role !== 'admin') {
       throw new AuthenticationError('you do not have admin perm');
     }
 

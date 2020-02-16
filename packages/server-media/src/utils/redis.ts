@@ -31,6 +31,7 @@ export const redisKeys = {
   viewerOnline: (deviceId: string) => `mitei:vonl:${deviceId}`,
   viewerState: (deviceId: string) => `mitei:vstate:${deviceId}`,
   viewerChallengeReceived: () => `mitei:devcp`,
+  roleInvite: (id: string) => `mitei:uinv:${id}`,
 };
 
 const pubsubConnection = new Redis({

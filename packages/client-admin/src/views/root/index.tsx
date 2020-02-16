@@ -44,7 +44,7 @@ export const Root = () => {
   if (loading) return <FullscreenProgress />;
   if (error) return <p>error</p>;
 
-  if (!data || !data.me || data.me.kind !== 'admin') {
+  if (!data || !data.me || data.me.role !== 'admin') {
     return (
       <>
         <CssBaseline />

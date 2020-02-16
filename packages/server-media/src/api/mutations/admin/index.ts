@@ -17,8 +17,10 @@
 
 import { sourcesMutationResolvers } from './sources';
 import { streamingMutationResolvers } from './streaming';
+import { usersMutationResolvers } from './users';
 
 export const adminMutationResolvers = {
   ...sourcesMutationResolvers,
   ...streamingMutationResolvers,
+  ...usersMutationResolvers,
 };

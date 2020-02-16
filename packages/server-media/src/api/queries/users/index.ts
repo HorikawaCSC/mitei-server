@@ -23,9 +23,9 @@ export const usersQueryResolver: QueryResolvers = {
   me: (_parent, _args, { userInfo }) => {
     return userInfo || null;
   },
-  users: async (_parent, { kind, type, skip, take }) => {
+  users: async (_parent, { role, type, skip, take }) => {
     const conditions = omitUndefined({
-      kind,
+      role,
       type,
     });
 

@@ -17,7 +17,7 @@
 
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
 
-export enum UserKind {
+export enum UserRole {
   Admin = 'admin',
   Normal = 'normal',
 }
@@ -32,7 +32,7 @@ export interface UserDocument extends Document {
   tokenSecret: string;
   screenName: string;
   iconUrl?: string;
-  kind: UserKind;
+  role: UserRole;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -65,11 +65,11 @@ const schema = new Schema<UserDocument>(
       default: '',
     },
     iconUrl: SchemaTypes.String,
-    kind: {
+    role: {
       type: SchemaTypes.String,
-      enum: Object.values(UserKind),
+      enum: Object.values(UserRole),
       required: true,
-      default: UserKind.Normal,
+      default: UserRole.Normal,
     },
   },
   {

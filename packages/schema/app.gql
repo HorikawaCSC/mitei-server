@@ -1,7 +1,7 @@
 scalar DateTime
 
 directive @auth(
-  requires: [UserKind!]! = [normal],
+  requires: [UserRole!]! = [normal],
 ) on OBJECT | FIELD_DEFINITION
 directive @deviceOnly on OBJECT | FIELD_DEFINITION
 
@@ -23,7 +23,7 @@ type Query {
   rtmpInput(id: ID!): RtmpInput @auth(requires: [admin])
   rtmpInputList(skip: Int!, take: Int!): RtmpInputList! @auth(requires: [admin])
 
-  users(kind: UserKind, type: IdPType, skip: Int!, take: Int!): Users! @auth(requires: [admin])
+  users(role: UserRole, type: IdPType, skip: Int!, take: Int!): Users! @auth(requires: [admin])
 
   channel(id: String!): Channel
   channelList(skip: Int!, take: Int!): ChannelList!
@@ -134,6 +134,9 @@ type Mutation {
 
   updateViewerState(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
   reportViewerMetrics(metrics: ViewerMetricsParam!): Boolean! @deviceOnly
+
+  createPromoteInvite(role: UserRole!): String! @auth(requires: [admin])
+  consumePromoteInvite(id: String!): User! @auth(requires: [admin, normal])
 }
 
 type Subscription {

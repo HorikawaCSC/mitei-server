@@ -23,21 +23,21 @@ import {
   GraphQLObjectType,
 } from 'graphql';
 import { SchemaDirectiveVisitor } from 'graphql-tools';
-import { UserKind } from '../../generated/graphql';
+import { UserRole } from '../../generated/graphql';
 import { GqlContext } from '../context';
 
 interface AuthObjectType extends GraphQLObjectType {
-  _requiredAuthRole: UserKind[];
+  _requiredAuthRole: UserRole[];
   _authFieldsWrapped: boolean;
 }
 
 interface AuthInterfaceType extends GraphQLInterfaceType {
-  _requiredAuthRole: UserKind[];
+  _requiredAuthRole: UserRole[];
   _authFieldsWrapped: boolean;
 }
 
 interface AuthField extends GraphQLField<unknown, unknown> {
-  _requiredAuthRole: UserKind[];
+  _requiredAuthRole: UserRole[];
   _authFieldsWrapped: boolean;
 }
 
@@ -76,7 +76,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
 
         const context = args[2] as GqlContext;
         const user = context.userInfo;
-        if (!user || !requiredRole.includes(user.kind)) {
+        if (!user || !requiredRole.includes(user.role)) {
           throw new AuthenticationError('not authorized');
         }
 
@@ -93,7 +93,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
 
           const context = args[2] as GqlContext;
           const user = context.userInfo;
-          if (!user || !requiredRole.includes(user.kind)) {
+          if (!user || !requiredRole.includes(user.role)) {
             throw new AuthenticationError('not authorized');
           }
 
