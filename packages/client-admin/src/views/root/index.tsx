@@ -31,6 +31,7 @@ import { UsersRoot } from '../users';
 import { InviteConsume } from '../users/invite';
 import { ViewersRoot } from '../viewers';
 import { NotifyRealtime } from './notify';
+import { Welcome } from './welcome';
 
 const useStyles = makeStyles({
   content: {
@@ -93,6 +94,7 @@ export const Root = () => {
           <Route path='/viewers' component={ViewersRoot} />
           <Route path='/users' component={UsersRoot} />
           <Route path='/consume/:id' render={() => <Redirect to='/' />} exact />
+          <Route path='/' component={Welcome} exact />
         </Switch>
       </Container>
       <NotifyRealtime />
