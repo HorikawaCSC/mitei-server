@@ -3,50 +3,74 @@ name: Test / Build
 on:
   pull_request:
   push:
+    branches: "*"
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: github.event_name != 'push'
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
-        node-version: 11.x
+        node-version: 12.x
     - uses: actions/cache@v1
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
-    - name: Setup env
-      run: |
-        npm ci
-        npm run bootstrap
-    - name: Test
-      run: |
-        npm run build
-        npm run test
-  build-docker:
-    needs: test
+    - name: Install packages of root directory
+      run: npm ci
+    - name: Install dependencies packages
+      run: npm run bootstrap
+      env:
+        CI: true
+    - name: Build
+      run: npm run build
+      env:
+        NODE_ENV: development
+    - name: Test codes
+      run: npm run test
+
+  test-build-publish:
     runs-on: ubuntu-latest
-    if: github.event == 'push'
+    if: github.event_name == 'push'
     steps:
-    - uses: actions/checkout@v1
-    - name: Build the main Docker image
-      run: docker build . --tag mitei-server
-    - name: Build the nginx Docker image
-      run: docker build ./nginx --tag mitei-server-nginx
-    - name: Log into registry
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-    - name: Push image
+    - uses: actions/checkout@v2
+    - name: Fetch all tags
+      if: contains(github.ref, '/staging') || contains(github.ref, '/master') || contains(github.ref, '/develop')
       run: |
-        IMAGE_ID=docker.pkg.github.com/horikawacsc/mitei-server
-        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-        [ "$VERSION" == "master" ] && VERSION=latest
-        echo IMAGE_ID=$IMAGE_ID
-        echo VERSION=$VERSION
-        docker tag mitei-server $IMAGE_ID/main:$VERSION
-        docker tag mitei-server-nginx $IMAGE_ID/nginx:$VERSION
-        docker push $IMAGE_ID/main:$VERSION
-        docker push $IMAGE_ID/nginx:$VERSION
+        git fetch origin +refs/tags/*:refs/tags/*
+        git fetch --prune --unshallow
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+        registry-url: 'https://registry.npmjs.org'
+    - uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: Install packages of root directory
+      run: npm ci
+    - name: Install dependencies packages
+      run: npm run bootstrap
+      env:
+        CI: true
+    - name: Build (production)
+      run: npm run build
+      env:
+        NODE_ENV: production
+    - name: Test codes
+      run: npm run test
+    - name: Reset & Reattach HEAD
+      run: |
+        git reset --hard
+    - name: Publish
+      run: perl ./tools/publish.pl
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_SECRET }}
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
+
