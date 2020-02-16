@@ -105,7 +105,8 @@ export const programMutationResolvers: MutationResolvers = {
 
       if (sourceId)
         schedule.programs[targetIndex].sourceId = new ObjectId(sourceId);
-      if (duration) schedule.programs[targetIndex].duration = duration;
+      if (typeof duration === 'number')
+        schedule.programs[targetIndex].duration = duration;
       if (type) schedule.programs[targetIndex].type = type;
 
       if (
