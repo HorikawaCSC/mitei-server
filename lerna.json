@@ -1,4 +1,15 @@
 {
+  "command": {
+    "version": {
+      "allowBranch": [
+        "master",
+        "staging"
+      ]
+    },
+    "bootstrap": {
+      "hoist": true
+    }
+  },
   "packages": [
     "packages/*"
   ],
