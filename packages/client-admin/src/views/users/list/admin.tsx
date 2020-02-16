@@ -30,6 +30,7 @@ import { useInView } from 'react-intersection-observer';
 import { useGetAdminUsersQuery } from '../../../api/generated/graphql';
 import { HeadTitle } from '../../../components/shared/HeadTitle';
 import { TotalCount } from '../../../components/shared/TotalCount';
+import { InviteIssuer } from '../../../components/users/InviteIssuer';
 
 export const AdminUsersList = () => {
   const { data, error, loading, fetchMore } = useGetAdminUsersQuery({
@@ -73,6 +74,7 @@ export const AdminUsersList = () => {
   return (
     <>
       <HeadTitle title='管理ユーザ一覧' />
+      <InviteIssuer />
       <PageContainer title='管理ユーザ一覧'>
         <TotalCount count={total} />
         <List>
