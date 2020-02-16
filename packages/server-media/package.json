@@ -25,6 +25,8 @@
     "start": "node ./dist/app.js"
   },
   "dependencies": {
+    "@mitei/client-admin": "^0.0.1-alpha.0",
+    "@mitei/client-viewer": "^0.0.1-alpha.0",
     "@mitei/server-models": "^0.0.1-alpha.0",
     "apollo-resolvers": "^1.4.1",
     "apollo-server-express": "^2.6.3",

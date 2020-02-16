@@ -18,12 +18,12 @@
 import { connect as connectMongo } from '@mitei/server-models';
 import { json } from 'body-parser';
 import * as express from 'express';
-import { resolve } from 'path';
 import { config } from './config';
 import { router as apiRouter } from './routes/api';
 import { arenaApp } from './routes/arena';
 import { router as authRouter } from './routes/auth';
 import { router as callbackRouter } from './routes/callback';
+import { router as frontendRouter } from './routes/frontend';
 import { gqlServer } from './routes/gql';
 import { applyAuthenticateMiddleware } from './utils/auth';
 import { connectRedis } from './utils/redis';
@@ -43,7 +43,6 @@ import { connectRedis } from './utils/redis';
 
   app.use('/auth', authRouter);
   app.use('/api', apiRouter);
-  app.use('/packs', express.static(resolve('./packs')));
   if (!config.prod) {
     app.use('/', arenaApp);
   }
@@ -51,9 +50,5 @@ import { connectRedis } from './utils/redis';
   gqlServer.installSubscriptionHandlers(server);
   gqlServer.applyMiddleware({ app, path: '/gql' });
 
-  app.use('/admin/*', (_req, res) =>
-    res.sendFile(resolve('./packs/admin.html')),
-  );
-  app.use('/cast/*', (_req, res) => res.sendFile(resolve('./packs/cast.html')));
-  app.use('*', (_req, res) => res.sendFile(resolve('./packs/index.html')));
+  app.use(frontendRouter);
 })();
