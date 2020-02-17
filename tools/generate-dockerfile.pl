@@ -3,12 +3,14 @@
 use strict;
 use utf8;
 
-my $latest_tag = (exec_command('git describe --abbrev=0'))[0];
+my @versions = exec_command('npx lerna list -lp');
 
-if($latest_tag =~ /fatal/) {
-  print "Failed to get latest tag\n";
-  die;
+my $latest_tag = undef;
+foreach(@versions) {
+  $latest_tag = $1 if $_ =~ m|\@mitei/server-media:(.+)|;
 }
+
+die "No version available" unless $latest_tag;
 
 print "Latest version: $latest_tag\n";
 
