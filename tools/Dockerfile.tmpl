@@ -1,0 +1,21 @@
+FROM node:12.14.0-alpine AS prod
+
+WORKDIR /app
+
+# install pkgs
+RUN apk -U upgrade && apk add git ffmpeg \
+  && rm -rf /var/cache/apk/*
+
+COPY ./resource /app/resource
+
+# install server packages
+ENV NODE_ENV="production"
+RUN npm i -g @mitei/server-media@{VERSION}
+
+VOLUME [ "/app/sources" ]
+EXPOSE 3000 3001
+
+ENV RESOURCE_DIR=/app/resource
+ENV SOURCES_DIR=/app/sources
+
+CMD /usr/local/bin/mitei-server-media

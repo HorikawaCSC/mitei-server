@@ -73,4 +73,12 @@ jobs:
       env:
         NPM_TOKEN: ${{ secrets.NPM_SECRET }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
+    - name: Docker Login
+      if: contains(github.ref, '/master')
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+    - name: Docker build
+      if: contains(github.ref, '/master')
+      run: sh ./tools/docker-build.sh
+      env:
+        REPO: ${{ github.repository }}
 

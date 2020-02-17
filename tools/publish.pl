@@ -18,7 +18,7 @@ print "## Current Branch: $branch\n";
 
 sleep 5;
 
-if($branch =~ /(master|staging)/) {
+if($branch =~ /master/) {
   my $latest_tag = (exec_command('git describe --exact-match --abbrev=0'))[0];
   chomp $latest_tag;
   if($latest_tag !~ /fatal/) {
