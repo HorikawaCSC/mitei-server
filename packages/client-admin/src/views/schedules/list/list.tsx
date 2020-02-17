@@ -1,3 +1,20 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import IconButton from '@material-ui/core/IconButton';
@@ -8,16 +25,24 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
-import { Edit, Warning } from '@material-ui/icons';
+import { Delete, Edit, Warning } from '@material-ui/icons';
 import { DatePicker } from '@material-ui/pickers';
-import { NotFoundView, PageContainer } from '@mitei/client-common';
+import {
+  NotFoundView,
+  PageContainer,
+  useConfirmDialog,
+  useErrorDialog,
+} from '@mitei/client-common';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import * as React from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import useRouter from 'use-react-router';
-import { useGetScheduleListSimpleQuery } from '../../../api/generated/graphql';
+import {
+  useGetScheduleListSimpleQuery,
+  useRemoveScheduleMutation,
+} from '../../../api/generated/graphql';
 import { ProgramListSimple } from '../../../components/schedules/ProgramListSimple';
 import { toStringDate } from '../../../utils/datetime';
 
@@ -42,7 +67,17 @@ export const ScheduleList = ({ channelId, day }: Props) => {
     [channelId, reqStartAt, reqEndAt],
   );
 
-  const { loading, data, error, fetchMore } = useGetScheduleListSimpleQuery({
+  const confirm = useConfirmDialog();
+  const showErrorDialog = useErrorDialog();
+  const [removeSchedule] = useRemoveScheduleMutation();
+
+  const {
+    loading,
+    data,
+    error,
+    fetchMore,
+    refetch,
+  } = useGetScheduleListSimpleQuery({
     variables: {
       ...param,
       skip: 0,
@@ -57,6 +92,30 @@ export const ScheduleList = ({ channelId, day }: Props) => {
       history.push(`/schedules/${channelId}?day=${date.toFormat('yyyyMMdd')}`);
     },
     [channelId],
+  );
+
+  const handleRemove = React.useCallback(
+    async (id: string, title: string) => {
+      if (
+        !(await confirm(
+          '削除しますか?',
+          `スケジュール: ${title}を削除しますか?`,
+        ))
+      )
+        return;
+
+      const { errors } = await removeSchedule({
+        variables: {
+          scheduleId: id,
+        },
+      });
+      if (errors) {
+        showErrorDialog(errors[0].message);
+        return;
+      }
+      refetch();
+    },
+    [data],
   );
 
   const [scrollRef, inView] = useInView();
@@ -120,8 +179,8 @@ export const ScheduleList = ({ channelId, day }: Props) => {
               className={clsx({ [styles.invalid]: !schedule.isValid })}
             >
               <TableCell>
+                <Typography>{schedule.isValid ? null : <Warning />}</Typography>
                 <Typography>
-                  {schedule.isValid || <Warning />}
                   {`${toStringDate(
                     schedule.startAt,
                     'HH:mm:ss',
@@ -138,11 +197,16 @@ export const ScheduleList = ({ channelId, day }: Props) => {
                 <IconButton component={Link} to={`/schedules/-/${schedule.id}`}>
                   <Edit />
                 </IconButton>
+                <IconButton
+                  onClick={() => handleRemove(schedule.id, schedule.title)}
+                >
+                  <Delete />
+                </IconButton>
               </TableCell>
             </TableRow>
           ))}
           {hasMore && (
-            <TableRow ref={scrollRef}>
+            <TableRow innerRef={scrollRef}>
               <TableCell>Loading</TableCell>
             </TableRow>
           )}

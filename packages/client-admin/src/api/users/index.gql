@@ -1,0 +1,30 @@
+query getMyselfSimple {
+  me {
+    id
+    iconUrl
+    role
+  }
+}
+
+query getAdminUsers($skip: Int!, $take: Int!) {
+  users(role: admin, skip: $skip, take: $take) {
+    total
+    users {
+      id
+      iconUrl
+      screenName
+      type
+    }
+  }
+}
+
+mutation createAdminInvite {
+  createPromoteInvite(role: admin)
+}
+
+mutation consumeInvite($id: String!) {
+  consumePromoteInvite(id: $id) {
+    id
+    role
+  }
+}

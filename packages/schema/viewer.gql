@@ -11,7 +11,7 @@ type ViewerChallenge {
 }
 
 type ViewerChallengeRequest {
-  id: String!
+  id: ID!
   requestFrom: String!
   code: String!
   type: DeviceType!
@@ -23,11 +23,22 @@ type ViewerChallengeResult {
   token: String!
 }
 
+enum ViewerState {
+  playing
+  stopped
+}
+
 type ViewerDevice {
-  id: String!
+  id: ID!
   type: DeviceType!
   displayName: String!
-  playingContent: Playbackable @auth(requires: [admin])
+  volume: Int!
+  state: ViewerState!
+  playingContent: Playbackable
+
+  online: Boolean! @auth(requires: [admin])
+  elapsed: Float @auth(requires: [admin])
+  message: String @auth(requires: [admin])
 }
 
 type ViewerDeviceList {
@@ -37,7 +48,6 @@ type ViewerDeviceList {
 
 enum ViewerRequestType {
   play
-  togglePause
   stop
   volume
 }
@@ -47,23 +57,19 @@ enum ViewerSourceType {
   source
 }
 
-type ViewerRequest {
-  type: ViewerRequestType!
-  source: Playbackable
-  volume: Float
-}
-
 input ViewerRequestParam {
   device: ID!
   type: ViewerRequestType!
   sourceType: ViewerSourceType
   sourceId: ID
-  volume: Float
+  volume: Int
 }
 
 enum ViewerMetricsType {
   elapsed
   error
+  ping
+  ended
 }
 
 input ViewerMetricsParam {

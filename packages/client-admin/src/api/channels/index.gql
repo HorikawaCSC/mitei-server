@@ -11,6 +11,13 @@ mutation updateChannelFillerControl($id: String!, $mode: FillerControl) {
   }
 }
 
+mutation updateChannelName($id: String!, $name: String) {
+  updateChannel(id: $id, displayName: $name) {
+    id
+    displayName
+  }
+}
+
 mutation removeFiller($id: String!, $source: ID!) {
   removeFillerFromChannel(id: $id, sources: [$source])
 }

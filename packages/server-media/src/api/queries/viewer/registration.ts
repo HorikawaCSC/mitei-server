@@ -1,13 +1,30 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { QueryResolvers } from '../../../generated/graphql';
+import { parseToken, TokenType } from '../../../streaming/viewer/token';
 import { ViewerChallengeData } from '../../../types/viewer';
 import { redis, redisKeys } from '../../../utils/redis';
-import { parseToken, TokenType } from '../../../utils/viewer/token';
 
 export const viewerRegistrationQueryResolvers: QueryResolvers = {
   viewerRequests: async () => {
-    const requestIds = (await redis.keys(redisKeys.deviceChallenge('*'))).map(
-      key => key.replace(redisKeys.deviceChallenge(''), ''),
-    );
+    const requestIds = (
+      await redis.keys(redisKeys.deviceChallenge('*'))
+    ).map(key => key.replace(redisKeys.deviceChallenge(''), ''));
     if (requestIds.length === 0) {
       return [];
     }
@@ -16,13 +33,15 @@ export const viewerRegistrationQueryResolvers: QueryResolvers = {
       ...requestIds.map(id => redisKeys.deviceChallenge(id)),
     )) as string[]).map(data => JSON.parse(data));
 
-    return requestIds.map((id, i) => ({
-      id,
-      requestFrom: requests[i].from,
-      code: requests[i].code,
-      type: requests[i].type,
-      createdAt: new Date(requests[i].date),
-    }));
+    return requestIds
+      .filter((_id, i) => !requests[i].accept)
+      .map((id, i) => ({
+        id,
+        requestFrom: requests[i].from,
+        code: requests[i].code,
+        type: requests[i].type,
+        createdAt: new Date(requests[i].date),
+      }));
   },
   viewerChallengeResult: async (_parent, { token }) => {
     const { type, deviceId } = parseToken(token);

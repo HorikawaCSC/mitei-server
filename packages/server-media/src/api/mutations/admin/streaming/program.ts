@@ -1,9 +1,26 @@
-import { Program, Schedule } from '@mitei/server-models';
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { ProgramDocument, Schedule } from '@mitei/server-models';
 import { ObjectId } from 'mongodb';
 import { MutationResolvers } from '../../../../generated/graphql';
+import { checkTypeAndSource } from '../../../../streaming/schedule/validate';
 import { findIdCondition } from '../../../../utils/db';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
-import { checkTypeAndSource } from '../../../../utils/schedule/validate';
 
 export const programMutationResolvers: MutationResolvers = {
   addProgramToSchedule: ensureLoggedInAsAdmin(
@@ -18,7 +35,7 @@ export const programMutationResolvers: MutationResolvers = {
 
       if (prependIndex < 0) throw new Error('specified program not found');
 
-      const program: Program = {
+      const program: ProgramDocument = {
         _id: new ObjectId(),
         type,
         sourceId: sourceId ? new ObjectId(sourceId) : undefined,
@@ -88,7 +105,8 @@ export const programMutationResolvers: MutationResolvers = {
 
       if (sourceId)
         schedule.programs[targetIndex].sourceId = new ObjectId(sourceId);
-      if (duration) schedule.programs[targetIndex].duration = duration;
+      if (typeof duration === 'number')
+        schedule.programs[targetIndex].duration = duration;
       if (type) schedule.programs[targetIndex].type = type;
 
       if (
@@ -118,7 +136,7 @@ export const programMutationResolvers: MutationResolvers = {
 
       const orderedPrograms = orderIds
         .map(id => schedule.programs.find(({ _id }) => _id.equals(id)))
-        .filter((program): program is Program => !!program);
+        .filter((program): program is ProgramDocument => !!program);
 
       if (orderedPrograms.length !== orderIds.length) {
         throw new Error('invalid order');

@@ -75,6 +75,7 @@ type FileSource implements TranscodedSource {
   source: FileSourceOrignalInfo!
   error: String @auth(requires: [admin])
   transcodeProgress: Float @auth(requires: [admin])
+  isProbing: Boolean! @auth(requires: [admin])
 }
 
 type FileSourceList {

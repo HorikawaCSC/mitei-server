@@ -1,15 +1,32 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { ViewerDevice } from '@mitei/server-models';
 import { MutationResolvers } from '../../../generated/graphql';
+import { createToken, TokenType } from '../../../streaming/viewer/token';
 import { ViewerChallengeData } from '../../../types/viewer';
 import { ensureLoggedInAsAdmin } from '../../../utils/gql/ensureUser';
-import { redis, redisKeys } from '../../../utils/redis';
-import { createToken, TokenType } from '../../../utils/viewer/token';
-import { createUniqueId } from '../../../utils/viewer/unique-id';
+import { redis, redisKeys, redisPubSub } from '../../../utils/redis';
+import { createUniqueId } from '../../../utils/unique-id';
 
 export const viewerRegistrationMutationResolvers: MutationResolvers = {
   createViewerChallenge: async (_parent, { device }, { requestAddr }) => {
     const deviceId = createUniqueId();
-    const code = createUniqueId(2);
+    const code = createUniqueId(12);
     const deviceInfo: ViewerChallengeData = {
       type: device,
       date: Date.now(),
@@ -23,6 +40,8 @@ export const viewerRegistrationMutationResolvers: MutationResolvers = {
       'EX',
       60 * 5,
     );
+
+    await redisPubSub.publish(redisKeys.viewerChallengeReceived(), true);
 
     const token = createToken(TokenType.Registration, deviceId, 60 * 5);
 

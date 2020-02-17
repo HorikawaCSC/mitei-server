@@ -1,7 +1,7 @@
 scalar DateTime
 
 directive @auth(
-  requires: [UserKind!]! = [normal],
+  requires: [UserRole!]! = [normal],
 ) on OBJECT | FIELD_DEFINITION
 directive @deviceOnly on OBJECT | FIELD_DEFINITION
 
@@ -23,7 +23,7 @@ type Query {
   rtmpInput(id: ID!): RtmpInput @auth(requires: [admin])
   rtmpInputList(skip: Int!, take: Int!): RtmpInputList! @auth(requires: [admin])
 
-  users(kind: UserKind, type: IdPType, skip: Int!, take: Int!): Users! @auth(requires: [admin])
+  users(role: UserRole, type: IdPType, skip: Int!, take: Int!): Users! @auth(requires: [admin])
 
   channel(id: String!): Channel
   channelList(skip: Int!, take: Int!): ChannelList!
@@ -42,6 +42,7 @@ type Query {
 
   viewerRequests: [ViewerChallengeRequest!]! @auth(requires: [admin])
   viewerDevices(skip: Int!, take: Int!): ViewerDeviceList! @auth(requires: [admin])
+  viewerDevice(id: ID!): ViewerDevice @auth(requires: [admin])
 
   # normal func
   me: User
@@ -52,8 +53,10 @@ type Query {
 type Mutation {
   # admin func
   createFileSourceUpload(fileInfo: UploadFileInfo!): FileSource! @auth(requires: [admin])
-  uploadFileSourceChunk(sourceId: String!, file: UploadFileChunk!): Boolean! @auth(requires: [admin])
-  probeFileSource(sourceId: String!): Boolean! @auth(requires: [admin])
+  uploadFileSourceChunk(sourceId: ID!, file: UploadFileChunk!): Boolean! @auth(requires: [admin])
+  probeFileSource(sourceId: ID!): Boolean! @auth(requires: [admin])
+
+  updateSource(sourceId: ID!, name: String): TranscodedSource! @auth(requires: [admin])
 
   createRtmpInput(name: String!, presetId: ID!): RtmpInput! @auth(requires: [admin])
   removeRtmpInput(id: ID!): Boolean! @auth(requires: [admin])
@@ -96,6 +99,9 @@ type Mutation {
     startAt: DateTime,
     endAt: DateTime,
   ): Schedule! @auth(requires: [admin])
+  removeSchedule(
+    scheduleId: ID!,
+  ): Boolean! @auth(requires: [admin])
 
   addProgramToSchedule(
     scheduleId: ID!,
@@ -121,12 +127,23 @@ type Mutation {
   ): Schedule! @auth(requires: [admin])
 
   createViewerChallenge(device: DeviceType!): ViewerChallenge!
-  acceptViewerChallenge(deviceId: String!): Boolean! @auth(requires: [admin])
-  dispatchViewerRequest(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
+  acceptViewerChallenge(deviceId: ID!): Boolean! @auth(requires: [admin])
+
+  updateViewer(deviceId: ID!, displayName: String): ViewerDevice! @auth(requires: [admin])
+  removeViewer(deviceId: ID!): Boolean! @auth(requires: [admin])
+
+  updateViewerState(request: ViewerRequestParam!): Boolean! @auth(requires: [admin])
+  reportViewerMetrics(metrics: ViewerMetricsParam!): Boolean! @deviceOnly
+
+  createPromoteInvite(role: UserRole!): String! @auth(requires: [admin])
+  consumePromoteInvite(id: String!): User! @auth(requires: [admin, normal])
 }
 
 type Subscription {
-  viewerRequest: ViewerRequest! @deviceOnly
+  viewerUpdate: ViewerDevice! @deviceOnly
+  viewerUpdateDevice(id: ID!): ViewerDevice! @auth(requires: [admin])
+
+  viewerRequestsPolling: Int! @auth(requires: [admin])
 }
 
 schema {

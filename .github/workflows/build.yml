@@ -1,0 +1,84 @@
+name: Test / Build
+
+on:
+  pull_request:
+  push:
+    branches: "*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'push'
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: Install packages of root directory
+      run: npm ci
+    - name: Install dependencies packages
+      run: npm run bootstrap
+      env:
+        CI: true
+    - name: Build
+      run: npm run build
+      env:
+        NODE_ENV: development
+    - name: Test codes
+      run: npm run test
+
+  test-build-publish:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Fetch all tags
+      if: contains(github.ref, '/staging') || contains(github.ref, '/master') || contains(github.ref, '/develop')
+      run: |
+        git fetch origin +refs/tags/*:refs/tags/*
+        git fetch --prune --unshallow
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+        registry-url: 'https://registry.npmjs.org'
+    - uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: Install packages of root directory
+      run: npm ci
+    - name: Install dependencies packages
+      run: npm run bootstrap
+      env:
+        CI: true
+    - name: Build (production)
+      run: npm run build
+      env:
+        NODE_ENV: production
+    - name: Test codes
+      run: npm run test
+    - name: Reset & Reattach HEAD
+      run: |
+        git reset --hard
+    - name: Publish
+      run: perl ./tools/publish.pl
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_SECRET }}
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
+    - name: Docker Login
+      if: contains(github.ref, '/master')
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+    - name: Docker build
+      if: contains(github.ref, '/master')
+      run: sh ./tools/docker-build.sh
+      env:
+        REPO: ${{ github.repository }}
+

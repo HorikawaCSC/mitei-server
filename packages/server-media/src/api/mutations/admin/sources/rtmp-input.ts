@@ -1,4 +1,21 @@
-import { RtmpInput, RtmpStatus, TranscodePreset } from '@mitei/server-models';
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { RtmpInput, TranscodePreset } from '@mitei/server-models';
 import { MutationResolvers } from '../../../../generated/graphql';
 import { ensureLoggedInAsAdmin } from '../../../../utils/gql/ensureUser';
 
@@ -9,7 +26,6 @@ export const rtmpInputMutationResolvers: MutationResolvers = {
       if (!preset) throw new Error('no preset');
 
       const input = new RtmpInput();
-      input.status = RtmpStatus.Unused;
       input.name = name;
       input.createdById = userInfo._id;
       input.presetId = preset._id;
@@ -17,14 +33,4 @@ export const rtmpInputMutationResolvers: MutationResolvers = {
       return await input.save();
     },
   ),
-  removeRtmpInput: ensureLoggedInAsAdmin(async (_parent, { id }) => {
-    const input = await RtmpInput.findById(id);
-    if (!input) throw new Error('not found');
-    if (input.status !== RtmpStatus.Unused)
-      throw new Error('stream is being used');
-
-    await input.remove();
-
-    return true;
-  }),
 };

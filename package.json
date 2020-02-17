@@ -1,17 +1,21 @@
 {
   "scripts": {
-    "build": "lerna run build",
-    "test": "lerna run test"
+    "bootstrap": "lerna bootstrap --hoist",
+    "clean": "lerna clean --yes",
+    "build": "lerna run build --stream",
+    "test": "lerna run test --stream",
+    "publish:canary": "lerna publish from-package --canary --yes",
+    "publish:production": "lerna publish from-package --yes"
   },
   "name": "mitei-server",
-  "version": "1.0.0",
+  "version": "v0.0.1-alpha.0",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@material-ui/core": "^4.3.0",
+    "@material-ui/core": "^4.8.1",
     "@material-ui/icons": "^4.2.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "typescript": "^3.5.2"
+    "typescript": "^3.7.3"
   },
   "dependencies": {
     "lerna": "^3.16.4"

@@ -1,9 +1,20 @@
 {
   "name": "@mitei/server-media",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "author": "f0reachARR <f0reach@f0reach.me>",
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
-  "license": "MIT",
+  "license": "GPL-3.0",
+  "main": "./dist/app.js",
+  "bin": {
+    "mitei-server-media": "./dist/app.js"
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HorikawaCSC/mitei-server.git"
@@ -12,13 +23,15 @@
     "build:codegen": "gql-gen --config ./codegen.yml",
     "build:tsc": "tsc -p .",
     "build": "run-s build:*",
-    "test:tslint": "tslint './src/**/*.{ts,tsx}'",
-    "test:prettier": "prettier --config ../../.prettierrc.yml -c './src/**/*.{ts,tsx}'",
+    "test:tslint": "tslint \"./src/**/*.{ts,tsx}\"",
+    "test:prettier": "prettier --config ../../.prettierrc.yml -c \"./src/**/*.{ts,tsx}\"",
     "test": "run-p test:*",
     "start": "node ./dist/app.js"
   },
   "dependencies": {
-    "@mitei/server-models": "^0.0.0",
+    "@mitei/client-admin": "^1.0.0",
+    "@mitei/client-viewer": "^1.0.0",
+    "@mitei/server-models": "^1.0.0",
     "apollo-resolvers": "^1.4.1",
     "apollo-server-express": "^2.6.3",
     "base-x": "^3.0.6",
@@ -30,23 +43,23 @@
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
     "express-session": "^1.16.2",
-    "graphql": "^14.4.2",
+    "graphql": "^14.5.3",
     "graphql-iso-date": "^3.6.1",
     "graphql-redis-subscriptions": "^2.1.1",
     "http-errors": "^1.7.3",
-    "luxon": "^1.17.2",
     "ioredis": "^4.14.0",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^4.1.0",
-    "mongoose": "^5.6.3",
+    "luxon": "^1.17.2",
+    "node-fetch": "^2.6.0",
     "passport": "^0.4.0",
     "passport-twitter": "^1.0.4"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.5.0",
-    "@graphql-codegen/typescript": "^1.5.0",
-    "@graphql-codegen/typescript-resolvers": "^1.5.0",
-    "@mitei/schema": "^0.0.1",
+    "@graphql-codegen/cli": "^1.9.1",
+    "@graphql-codegen/typescript": "^1.9.1",
+    "@graphql-codegen/typescript-resolvers": "^1.9.1",
+    "@mitei/schema": "^1.0.0",
     "@types/base-x": "^3.0.0",
     "@types/body-parser": "^1.17.0",
     "@types/bull": "^3.5.11",
@@ -59,15 +72,15 @@
     "@types/graphql-iso-date": "^3.3.1",
     "@types/graphql-upload": "^8.0.0",
     "@types/http-errors": "^1.6.2",
-    "@types/luxon": "^1.15.1",
     "@types/jsonwebtoken": "^8.3.3",
-    "@types/mongoose": "^5.5.7",
+    "@types/luxon": "^1.15.1",
+    "@types/node-fetch": "^2.5.4",
     "@types/passport": "^1.0.0",
     "@types/passport-twitter": "^1.0.34",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.16.4",
     "style-loader": "^0.23.1",
     "tslint": "^5.15.0",
-    "typescript": "^3.5.2"
+    "typescript": "^3.7.3"
   }
 }

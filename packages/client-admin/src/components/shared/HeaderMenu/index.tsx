@@ -1,3 +1,20 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import {
   AppBar,
   Divider,
@@ -16,6 +33,7 @@ import {
   ListAlt,
   Menu as MenuIcon,
   MovieCreation,
+  SupervisorAccount,
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import * as React from 'react';
@@ -94,6 +112,24 @@ export const HeaderMenu = () => {
                 <CalendarToday />
               </ListItemIcon>
               <ListItemText>配信予定一覧</ListItemText>
+            </ListItem>
+          </List>
+
+          <List subheader={<ListSubheader>サイネージ管理</ListSubheader>}>
+            <ListItem button component={Link} to='/viewers/all'>
+              <ListItemIcon>
+                <ListAlt />
+              </ListItemIcon>
+              <ListItemText>サイネージ一覧</ListItemText>
+            </ListItem>
+          </List>
+
+          <List subheader={<ListSubheader>ユーザ管理</ListSubheader>}>
+            <ListItem button component={Link} to='/users/admin'>
+              <ListItemIcon>
+                <SupervisorAccount />
+              </ListItemIcon>
+              <ListItemText>管理者一覧</ListItemText>
             </ListItem>
           </List>
         </div>

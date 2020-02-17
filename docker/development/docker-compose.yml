@@ -1,0 +1,11 @@
+version: "3"
+services:
+  rtmp:
+    build: ../../nginx
+    image: horikawacsc/mitei-server-nginx
+    ports:
+      - 8000:8000
+      - 8001:8001
+      - 1935:1935
+    extra_hosts:
+      - app:10.0.0.16

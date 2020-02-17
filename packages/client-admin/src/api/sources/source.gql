@@ -14,3 +14,10 @@ query getSourcesSimple($skip: Int!, $take: Int!) {
     }
   }
 }
+
+mutation renameSource($id: ID!, $name: String!) {
+  updateSource(sourceId: $id, name: $name) {
+    id
+    name
+  }
+}

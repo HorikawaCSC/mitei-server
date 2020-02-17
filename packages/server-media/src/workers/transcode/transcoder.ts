@@ -1,3 +1,20 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import {
   FileSource,
   FileSourceDocument,
@@ -12,9 +29,10 @@ import { EventEmitter } from 'events';
 import { createInterface } from 'readline';
 import { TranscodeWorkerParam } from '.';
 import { config } from '../../config';
+import { ffprobe } from '../../streaming/transcode/ffprobe';
 import { AudioStream, VideoStream } from '../../types/ffprobe';
 import { transcodeLogger } from '../../utils/logging';
-import { ffprobe } from '../../utils/transcode/ffprobe';
+import { thumbnailWorker } from '../thumbnail';
 
 export class Transcoder extends EventEmitter {
   private source: FileSourceDocument | null = null;
@@ -41,11 +59,10 @@ export class Transcoder extends EventEmitter {
     this.source = await FileSource.findById(this.params.sourceId);
     if (!this.source) throw new Error('source not found');
 
-    if (
-      this.source.status !== TranscodeStatus.Pending &&
-      (!this.transcodable || this.source.status !== TranscodeStatus.Failed) // probed but transcode error
-    )
-      throw new Error('the source has already been transcoded or failed');
+    if (this.transcodable) {
+      if (this.source.status !== TranscodeStatus.Pending)
+        throw new Error('the source has already been transcoded or failed');
+    }
     if (this.source.source.status !== SourceStatus.Available)
       throw new Error('the source is not available');
   }
@@ -68,6 +85,9 @@ export class Transcoder extends EventEmitter {
     if (!video) {
       throw new Error('no video');
     }
+    if (!video.width || !video.height) {
+      throw new Error('invalid video');
+    }
     if (audio) {
       if (audio.channels > 2) {
         throw new Error('audio must be stereo or mono');
@@ -76,7 +96,43 @@ export class Transcoder extends EventEmitter {
 
     this.source.source.width = video.width;
     this.source.source.height = video.height;
+
     this.source.source.duration = Number(video.duration);
+    if (isNaN(this.source.source.duration)) this.source.source.duration = 0;
+
+    this.source.status = TranscodeStatus.Pending;
+
+    await this.source.save();
+  }
+
+  async probeTranscoded() {
+    if (!this.source) throw new Error('source not set');
+
+    const result = await ffprobe(
+      `${config.paths.source}/${this.source.id}/stream.mts`,
+    );
+
+    const audio = result.streams.find(
+      (stream): stream is AudioStream => stream.codec_type === 'audio',
+    );
+    const video = result.streams.find(
+      (stream): stream is VideoStream => stream.codec_type === 'video',
+    );
+
+    if (!video) {
+      throw new Error('no video');
+    }
+    if (!video.width || !video.height) {
+      throw new Error('invalid video');
+    }
+    if (audio) {
+      if (audio.channels > 2) {
+        throw new Error('audio must be stereo or mono');
+      }
+    }
+
+    this.source.width = video.width;
+    this.source.height = video.height;
 
     await this.source.save();
   }
@@ -99,7 +155,7 @@ export class Transcoder extends EventEmitter {
       'hls',
       ...this.preset.parameter,
       '-hls_time',
-      '5',
+      '0',
       '-hls_flags',
       'single_file',
       '-hls_list_size',
@@ -107,7 +163,7 @@ export class Transcoder extends EventEmitter {
       '-hls_ts_options',
       'mpegts_m2ts_mode=0',
       '-hls_segment_filename',
-      `${config.paths.source}/${this.source.id}/stream.m2ts`,
+      `${config.paths.source}/${this.source.id}/stream.mts`,
       '-',
     ];
   }
@@ -175,7 +231,7 @@ export class Transcoder extends EventEmitter {
       }
 
       try {
-        if (line.match(/\.m2ts/)) {
+        if (line.match(/\.mts/)) {
           if (
             buffer
               .join('\n')
@@ -188,6 +244,8 @@ export class Transcoder extends EventEmitter {
               Number(RegExp.$2),
               Number(RegExp.$3),
             ];
+
+            if (length <= 0) continue;
 
             transcodeLogger.trace(
               'segment',
@@ -232,6 +290,12 @@ export class Transcoder extends EventEmitter {
       this.transcodedDuration,
     );
 
+    await this.probeTranscoded();
+
+    transcodeLogger.info('transcoded source was probed');
+
     await this.setStatus(TranscodeStatus.Success);
+
+    await thumbnailWorker.enqueue(this.source!);
   }
 }

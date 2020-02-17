@@ -1,4 +1,4 @@
-enum UserKind {
+enum UserRole {
   normal
   admin
 }
@@ -12,7 +12,7 @@ type User {
   userId: ID! @auth(requires: [admin])
   screenName: String!
   iconUrl: String
-  kind: UserKind! @auth(requires: [admin])
+  role: UserRole! @auth(requires: [admin])
   type: IdPType! @auth(requires: [admin])
 }
 

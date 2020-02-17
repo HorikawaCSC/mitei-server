@@ -1,13 +1,13 @@
 {
   "name": "@mitei/schema",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "mitei-server schema",
   "author": "f0reachARR <f0reach@f0reach.me>",
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "main": "schema.gql",
   "publishConfig": {
-    "registry": "https://registry.yarnpkg.com"
+    "access": "public"
   },
   "repository": {
     "type": "git",

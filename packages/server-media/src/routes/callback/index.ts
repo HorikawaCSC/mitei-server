@@ -1,4 +1,21 @@
-import { RtmpInput, RtmpStatus } from '@mitei/server-models';
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { RtmpInput } from '@mitei/server-models';
 import { urlencoded } from 'body-parser';
 import { Router } from 'express';
 import { RtmpEvent } from '../../types/RtmpEvent';
@@ -30,10 +47,6 @@ router.post('/rtmp-events', async (req, res) => {
   try {
     if (event.call === 'play') {
       return res.status(200).end(); // TODO
-    }
-
-    if (source.status !== RtmpStatus.Unused) {
-      return res.status(503).end();
     }
 
     if (event.call === 'publish') {

@@ -1,9 +1,25 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import {
   Manifest,
   RecordSource,
   RecordSourceDocument,
   RtmpInputDocument,
-  RtmpStatus,
   TranscodeStatus,
 } from '@mitei/server-models';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
@@ -12,8 +28,12 @@ import { existsSync, promises as fs } from 'fs';
 import { DateTime } from 'luxon';
 import { createInterface } from 'readline';
 import { config } from '../../config';
+import { ffprobe } from '../../streaming/transcode/ffprobe';
+import { AudioStream, VideoStream } from '../../types/ffprobe';
 import { liveHlsLogger } from '../../utils/logging';
 import { sleep } from '../../utils/sleep';
+import { thumbnailWorker } from '../thumbnail';
+import { lockLiveSource, unlockLiveSource } from './lock';
 
 export class LiveHLSWorker extends EventEmitter {
   private ffmpegProcess: ChildProcessWithoutNullStreams | null = null;
@@ -31,30 +51,35 @@ export class LiveHLSWorker extends EventEmitter {
     this.record.source = this.source.id!;
     this.record.duration = 0;
     this.record.createdById = this.source.createdById;
+    this.record.presetId = this.source.presetId;
 
     return await this.record.save();
   }
 
   private getTranscodeParam() {
     if (!this.record) throw new Error('record must not be null');
+    if (!this.source.preset) throw new Error('preset must not be null');
 
     return [
       '-i',
       `${config.streaming.rtmpAddress}/${this.source.id}`,
-      '-c',
-      'copy',
+      ...this.source.preset.parameter,
+      '-g',
+      '90',
       '-f',
       'hls',
       '-hls_time',
-      '5',
+      '1',
       '-hls_flags',
       'single_file',
       '-hls_list_size',
       '1',
       '-hls_ts_options',
       'mpegts_m2ts_mode=0',
+      '-mpegts_m2ts_mode',
+      '0',
       '-hls_segment_filename',
-      `${config.paths.source}/${this.record.id}/stream.m2ts`,
+      `${config.paths.source}/${this.record.id}/stream.mts`,
       '-',
     ];
   }
@@ -86,7 +111,7 @@ export class LiveHLSWorker extends EventEmitter {
     const buffer: string[] = [];
     readline.on('line', async line => {
       if (!this.record) return;
-      if (line.match(/\.m2ts/)) {
+      if (line.match(/\.mts/)) {
         if (
           buffer
             .join('\n')
@@ -125,6 +150,7 @@ export class LiveHLSWorker extends EventEmitter {
               lastManifestAppend: new Date(),
             },
           });
+          await lockLiveSource(this.source);
         }
       }
       buffer.push(line);
@@ -134,17 +160,18 @@ export class LiveHLSWorker extends EventEmitter {
       if (!this.ffmpegProcess) return resolve();
       this.ffmpegProcess.on('error', async err => {
         this.isExited = true;
-        this.emit('end');
+        this.emit('end', true);
         await this.finalize(TranscodeStatus.Failed);
         reject(err);
       });
       this.ffmpegProcess.on('exit', async code => {
         this.isExited = true;
-        this.emit('end');
         if (code === 0) {
+          this.emit('end');
           await this.finalize(TranscodeStatus.Success);
           resolve();
         } else {
+          this.emit('end', true);
           await this.finalize(TranscodeStatus.Failed);
           reject(`code: ${code}`);
         }
@@ -152,10 +179,47 @@ export class LiveHLSWorker extends EventEmitter {
     });
   }
 
+  async probeTranscoded() {
+    if (!this.record) throw new Error('record not set');
+
+    const result = await ffprobe(
+      `${config.paths.source}/${this.record.id}/stream.mts`,
+    );
+
+    const audio = result.streams.find(
+      (stream): stream is AudioStream => stream.codec_type === 'audio',
+    );
+    const video = result.streams.find(
+      (stream): stream is VideoStream => stream.codec_type === 'video',
+    );
+
+    if (!video) {
+      throw new Error('no video');
+    }
+    if (!video.width || !video.height) {
+      throw new Error('invalid video');
+    }
+    if (audio) {
+      if (audio.channels > 2) {
+        throw new Error('audio must be stereo or mono');
+      }
+    }
+
+    this.record.width = video.width;
+    this.record.height = video.height;
+
+    await this.record.save();
+  }
+
   private async finalize(status: TranscodeStatus) {
-    this.source.status = RtmpStatus.Unused;
-    await this.source.save();
     await this.setStatus(status);
+    await unlockLiveSource(this.source);
+
+    await this.probeTranscoded();
+
+    if (status === TranscodeStatus.Success) {
+      await thumbnailWorker.enqueue(this.record!);
+    }
   }
 
   private async setStatus(status: TranscodeStatus) {
@@ -179,8 +243,7 @@ export class LiveHLSWorker extends EventEmitter {
     if (!this.source.id) throw new Error('uninitialized source');
 
     try {
-      this.source.status = RtmpStatus.Live;
-      await this.source.save();
+      await this.source.populate('preset').execPopulate();
 
       await this.createRecord();
       await this.createDir();

@@ -1,0 +1,88 @@
+query getViewerDevices($skip: Int!, $take: Int!) {
+  viewerDevices(skip: $skip, take: $take) {
+    total
+    devices {
+      id
+      displayName
+      online
+      type
+      state
+    }
+  }
+}
+
+query getViewerRegist {
+  viewerRequests {
+    id
+    code
+    type
+    createdAt
+    requestFrom
+  }
+}
+
+mutation acceptViewerRegist($id: ID!) {
+  acceptViewerChallenge(deviceId: $id)
+}
+
+fragment viewerPlayingContentSimple on Playbackable {
+  ... on TranscodedSource {
+    id
+    name
+  }
+  ... on Channel {
+    channelId: id
+    displayName
+  }
+}
+
+query getViewerDevice($id: ID!) {
+  viewerDevice(id: $id) {
+    id
+    type
+    displayName
+    volume
+    state
+    online
+    playingContent {
+      ... viewerPlayingContentSimple
+    }
+    elapsed
+    message
+  }
+}
+
+mutation updateViewerState($request: ViewerRequestParam!) {
+  updateViewerState(request: $request)
+}
+
+mutation updateViewerName($id: ID!, $displayName: String!) {
+  updateViewer(deviceId: $id, displayName: $displayName) {
+    id
+    displayName
+  }
+}
+
+mutation removeViewer($id: ID!) {
+  removeViewer(deviceId: $id)
+}
+
+subscription viewerStateSingle($id: ID!) {
+  viewerUpdateDevice(id: $id) {
+    id
+    type
+    displayName
+    online
+    volume
+    state
+    playingContent {
+      ... viewerPlayingContentSimple
+    }
+    elapsed
+    message
+  }
+}
+
+subscription viewerRequestUpdate {
+  viewerRequestsPolling
+}

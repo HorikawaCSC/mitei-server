@@ -1,6 +1,24 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { ObjectID } from 'bson';
 import { Document, model, Schema, SchemaTypes } from 'mongoose';
 import { User, UserDocument } from '../User';
+import { createRefIdVirtual } from '../utils/schema';
 import { Channel, ChannelDocument } from './Channel';
 
 export enum ProgramType {
@@ -9,7 +27,7 @@ export enum ProgramType {
   Empty = 'empty',
 }
 
-export interface Program {
+export interface ProgramDocument {
   _id: ObjectID;
   type: ProgramType;
   duration: number;
@@ -22,7 +40,7 @@ export interface ScheduleDocument extends Document {
   endAt: Date;
   channel?: ChannelDocument;
   channelId: string;
-  programs: Program[];
+  programs: ProgramDocument[];
   createdBy?: UserDocument;
   createdById: ObjectID;
 
@@ -47,7 +65,6 @@ const schema = new Schema(
       type: SchemaTypes.String,
       ref: Channel,
       required: true,
-      alias: 'channelId',
     },
     programs: [
       new Schema({
@@ -70,7 +87,6 @@ const schema = new Schema(
       type: SchemaTypes.ObjectId,
       ref: User,
       required: true,
-      alias: 'createdById',
     },
   },
   {
@@ -89,5 +105,8 @@ schema.method('isProgramValid', function(this: ScheduleDocument): boolean {
 
   return true;
 });
+
+createRefIdVirtual(schema, 'createdBy', 'createdById');
+createRefIdVirtual(schema, 'channel', 'channelId');
 
 export const Schedule = model<ScheduleDocument>('Schedule', schema);

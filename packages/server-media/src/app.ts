@@ -1,22 +1,36 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { connect as connectMongo } from '@mitei/server-models';
 import { json } from 'body-parser';
 import * as express from 'express';
-import { connect as connectMongo } from 'mongoose';
-import { resolve } from 'path';
 import { config } from './config';
 import { router as apiRouter } from './routes/api';
 import { arenaApp } from './routes/arena';
 import { router as authRouter } from './routes/auth';
 import { router as callbackRouter } from './routes/callback';
+import { router as frontendRouter } from './routes/frontend';
 import { gqlServer } from './routes/gql';
 import { applyAuthenticateMiddleware } from './utils/auth';
 import { connectRedis } from './utils/redis';
-import { liveHlsManager } from './workers/live-hls';
 
 (async () => {
   await connectMongo(config.mongo, { useNewUrlParser: true });
   await connectRedis();
-
-  liveHlsManager.cleanUpUnused();
 
   const callbackApp = express();
   callbackApp.use(callbackRouter);
@@ -29,7 +43,6 @@ import { liveHlsManager } from './workers/live-hls';
 
   app.use('/auth', authRouter);
   app.use('/api', apiRouter);
-  app.use('/packs', express.static(resolve('./packs')));
   if (!config.prod) {
     app.use('/', arenaApp);
   }
@@ -37,9 +50,5 @@ import { liveHlsManager } from './workers/live-hls';
   gqlServer.installSubscriptionHandlers(server);
   gqlServer.applyMiddleware({ app, path: '/gql' });
 
-  app.use('/admin/*', (_req, res) =>
-    res.sendFile(resolve('./packs/admin.html')),
-  );
-  app.use('/cast/*', (_req, res) => res.sendFile(resolve('./packs/cast.html')));
-  app.use('*', (_req, res) => res.sendFile(resolve('./packs/index.html')));
+  app.use(frontendRouter);
 })();

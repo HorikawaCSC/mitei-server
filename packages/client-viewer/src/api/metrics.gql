@@ -1,0 +1,3 @@
+mutation reportMetrics($data: ViewerMetricsParam!) {
+  reportViewerMetrics(metrics: $data)
+}

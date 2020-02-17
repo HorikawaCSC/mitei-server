@@ -4,11 +4,11 @@ mutation createFileSourceUpload($fileInfo: UploadFileInfo!) {
   }
 }
 
-mutation uploadFileSourceChunk($sourceId: String!, $file: UploadFileChunk!) {
+mutation uploadFileSourceChunk($sourceId: ID!, $file: UploadFileChunk!) {
   uploadFileSourceChunk(sourceId: $sourceId, file: $file)
 }
 
-mutation probeFileSource($sourceId: String!) {
+mutation probeFileSource($sourceId: ID!) {
   probeFileSource(sourceId: $sourceId)
 }
 
@@ -22,6 +22,9 @@ query getFileTranscodeStatus($id: ID!) {
       id
       status
       transcodeProgress
+      duration
+      width
+      height
     }
   }
 }
@@ -71,5 +74,6 @@ query getFileSource($id: ID!) {
       fileSize
       duration
     }
+    isProbing
   }
 }

@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 
 // eslint-disable-next-line no-console
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -18,8 +19,8 @@ const config = isProd => ({
   output: {
     filename: isProd ? '[name]-[hash].js' : '[name].js',
     chunkFilename: isProd ? '[name]-[hash].js' : '[name].js',
-    path: path.resolve(__dirname, 'packs'),
-    publicPath: '/packs/',
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/dist/',
   },
 
   optimization: {
@@ -48,7 +49,7 @@ const config = isProd => ({
             loader: 'file-loader',
             options: {
               name: isProd ? '[name]-[hash].[ext]' : '[name].[ext]',
-              publicPath: '/packs/',
+              publicPath: '/dist/',
             },
           },
         ],
@@ -90,11 +91,13 @@ const config = isProd => ({
       filename: isProd ? '[name].[hash].css' : '[name].css',
       chunkFilename: isProd ? '[id].[hash].css' : '[id].css',
     }),
+
+    new ManifestPlugin(),
   ].filter(plugin => !!plugin),
 
   devServer: {
     compress: true,
-    contentBase: path.join(__dirname, 'packs'),
+    contentBase: path.join(__dirname, 'dist'),
     disableHostCheck: true,
     historyApiFallback: true,
     hot: true,
@@ -108,6 +111,9 @@ const config = isProd => ({
         ws: true,
       },
       '/api/*': {
+        target: 'http://localhost:3000',
+      },
+      '/auth/*': {
         target: 'http://localhost:3000',
       },
       '/gql': {

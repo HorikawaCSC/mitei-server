@@ -1,17 +1,43 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { ExecutionResult } from '@apollo/react-common';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Collapse from '@material-ui/core/Collapse';
+import IconButton from '@material-ui/core/IconButton';
+import Paper from '@material-ui/core/Paper';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { Delete, Save, SettingsBackupRestore } from '@material-ui/icons';
+import Typography from '@material-ui/core/Typography';
 import {
-  PageContainer,
+  Create,
+  Delete,
+  DragIndicator,
+  Save,
+  SettingsBackupRestore,
+} from '@material-ui/icons';
+import {
   useConfirmDialog,
   useErrorDialog,
   useMessageSnack,
 } from '@mitei/client-common';
 import * as React from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 import {
   GetScheduleQuery,
   ProgramType,
@@ -20,6 +46,7 @@ import {
   useUpdateProgramMutation,
 } from '../../../api/generated/graphql';
 import { useCommonStyles } from '../../../styles/common';
+import { programText } from '../../../utils/schedule';
 import { RtmpInputSelect } from '../../shared/RtmpInputSelect';
 import { SourceSelect } from '../../shared/SourceSelect';
 import { SourceTypeSelect } from '../../shared/SourceTypeSelect';
@@ -28,6 +55,24 @@ const useStyles = makeStyles(theme =>
   createStyles({
     buttonGroup: {
       margin: theme.spacing(1, 0, 0, 0),
+    },
+    paper: {
+      padding: theme.spacing(1, 2, 2, 2),
+      margin: theme.spacing(1, 0),
+    },
+    title: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    titleBox: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    titleText: {
+      display: 'flex',
+      alignItems: 'center',
+      paddingRight: '10px',
     },
   }),
 );
@@ -62,16 +107,21 @@ export const ProgramItem = ({
     program.source ? program.source.id : '',
   );
   const [duration, setDuration] = React.useState(program.duration);
+  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (programType === ProgramType.Transcoded) {
       getSourceDuration({ variables: { id: sourceId } });
     }
-  }, [programType, sourceId]);
+  }, [programType, sourceId, getSourceDuration]);
 
   const handleApplyTimeFromSource = React.useCallback(() => {
-    if (durationData && durationData.source && durationData.source.duration)
-      setDuration(Math.ceil(durationData.source.duration));
+    if (
+      durationData &&
+      durationData.source &&
+      'duration' in durationData.source
+    )
+      setDuration(Math.ceil(durationData.source.duration || 0));
   }, [durationData]);
 
   const maxDuration = React.useMemo(() => {
@@ -108,10 +158,6 @@ export const ProgramItem = ({
     setDuration(program.duration);
   }, [program]);
 
-  React.useEffect(() => {
-    if (disabled) handleReset();
-  }, [disabled]);
-
   const handleSave = React.useCallback(async () => {
     const { errors } = (await updateProgram({
       variables: {
@@ -128,7 +174,17 @@ export const ProgramItem = ({
     } else {
       showMessage('保存しました');
     }
-  }, [schedule, program, duration, programType, sourceId]);
+  }, [
+    schedule,
+    program,
+    duration,
+    programType,
+    sourceId,
+    handleReset,
+    showError,
+    showMessage,
+    updateProgram,
+  ]);
 
   const handleRemove = React.useCallback(async () => {
     if (!(await confirm('確認', '削除しますか'))) return;
@@ -143,7 +199,19 @@ export const ProgramItem = ({
     } else {
       showMessage('削除しました');
     }
-  }, [schedule, program]);
+  }, [schedule, program, showError, showMessage, removeProgram, confirm]);
+
+  const handleOpen = React.useCallback(() => {
+    if (open) {
+      handleSave();
+    }
+    setOpen(!open);
+  }, [open, handleSave]);
+
+  const handleResetButton = React.useCallback(() => {
+    handleReset();
+    setOpen(false);
+  }, [handleReset]);
 
   const sourceSelector = React.useMemo(
     () =>
@@ -180,7 +248,7 @@ export const ProgramItem = ({
       !!durationData &&
       !!durationData.source &&
       durationData.source.id === sourceId &&
-      !!durationData.source.duration,
+      'duration' in durationData.source,
     [durationData, sourceId],
   );
 
@@ -193,58 +261,79 @@ export const ProgramItem = ({
     return true;
   }, [programType, sourceId]);
   return (
-    <PageContainer title={`プログラム #${index}`} mini>
-      <Box className={commonStyles.centerBox}>
-        <SourceTypeSelect
-          value={programType}
-          onChange={handleChangeProgramType}
-          disabled={disabled}
-        />
-        {sourceSelector}
-      </Box>
-      <Box className={commonStyles.centerBox}>
-        <TextField
-          label={`長さ(秒 / 最大: ${maxDuration})`}
-          type='number'
-          value={duration}
-          error={duration > maxDuration}
-          onChange={handleDurationChange}
-          disabled={disabled}
-        />
-        <Button
-          disabled={!timeAppliable || disabled}
-          onClick={handleApplyTimeFromSource}
-          color='secondary'
-        >
-          長さをソースから適用
-        </Button>
-        <Button
-          onClick={handleApplyTimeFromMax}
-          disabled={disabled}
-          color='secondary'
-        >
-          長さを最大に
-        </Button>
-      </Box>
-      <ButtonGroup
-        color='primary'
-        variant='contained'
-        className={styles.buttonGroup}
-        disabled={disabled}
-      >
-        <Button onClick={handleSave} disabled={!saveEnable}>
-          <Save />
-          保存
-        </Button>
-        <Button onClick={handleReset}>
-          <SettingsBackupRestore />
-          リセット
-        </Button>
-        <Button onClick={handleRemove}>
-          <Delete />
-          削除
-        </Button>
-      </ButtonGroup>
-    </PageContainer>
+    <Draggable key={program.id} draggableId={program.id} index={index}>
+      {(provided, _snapshot) => (
+        <div {...provided.draggableProps} ref={provided.innerRef}>
+          <Paper className={styles.paper}>
+            <Box className={styles.title}>
+              <Box {...provided.dragHandleProps} className={styles.titleBox}>
+                <Typography className={styles.titleText} variant='h6'>
+                  <DragIndicator />
+                  プログラム #{index}
+                </Typography>
+                <Typography variant='subtitle2'>
+                  {programText(program)}
+                </Typography>
+              </Box>
+              <Box>
+                <IconButton disabled={disabled} onClick={handleOpen} edge='end'>
+                  {open ? <Save /> : <Create />}
+                </IconButton>
+                {open && (
+                  <IconButton
+                    disabled={disabled}
+                    onClick={handleResetButton}
+                    edge='end'
+                  >
+                    <SettingsBackupRestore />
+                  </IconButton>
+                )}
+                <IconButton
+                  onClick={handleRemove}
+                  disabled={!saveEnable || disabled}
+                  edge='end'
+                >
+                  <Delete />
+                </IconButton>
+              </Box>
+            </Box>
+            <Collapse in={open} timeout='auto'>
+              <Box className={commonStyles.centerBox}>
+                <SourceTypeSelect
+                  value={programType}
+                  onChange={handleChangeProgramType}
+                  disabled={disabled}
+                />
+                {sourceSelector}
+              </Box>
+              <Box className={commonStyles.centerBox}>
+                <TextField
+                  label={`長さ(秒 / 最大: ${maxDuration})`}
+                  type='number'
+                  value={duration}
+                  error={duration > maxDuration}
+                  onChange={handleDurationChange}
+                  disabled={disabled}
+                />
+                <Button
+                  disabled={!timeAppliable || disabled}
+                  onClick={handleApplyTimeFromSource}
+                  color='secondary'
+                >
+                  長さをソースから適用
+                </Button>
+                <Button
+                  onClick={handleApplyTimeFromMax}
+                  color='secondary'
+                  disabled={disabled}
+                >
+                  長さを最大に
+                </Button>
+              </Box>
+            </Collapse>
+          </Paper>
+        </div>
+      )}
+    </Draggable>
   );
 };

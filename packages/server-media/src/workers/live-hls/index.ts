@@ -1,12 +1,25 @@
-import {
-  RecordSource,
-  RtmpInput,
-  RtmpInputDocument,
-  RtmpStatus,
-  TranscodeStatus,
-} from '@mitei/server-models';
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { RtmpInputDocument } from '@mitei/server-models';
 import { config } from '../../config';
 import { liveHlsLogger } from '../../utils/logging';
+import { dropConnection } from './control';
+import { lockLiveSource } from './lock';
 import { LiveHLSWorker } from './worker';
 
 class LiveHLSManager {
@@ -19,7 +32,7 @@ class LiveHLSManager {
       throw new Error('too many streams');
     }
 
-    if (this.workers.has(source.id)) {
+    if (this.workers.has(source.id) || !(await lockLiveSource(source))) {
       liveHlsLogger.warn('Same source worker is still running');
       throw new Error('already broadcasting');
     }
@@ -31,10 +44,13 @@ class LiveHLSManager {
 
     liveHlsLogger.debug('source:', source.id, 'started');
 
-    worker.on('end', () => {
+    worker.on('end', async (isError: boolean) => {
       if (!source.id) throw new Error('source invalid');
       this.workers.delete(source.id);
-      liveHlsLogger.debug('source:', source.id, 'stopped');
+      liveHlsLogger.debug('source:', source.id, 'stopped', 'err?:', isError);
+      if (isError) {
+        await dropConnection(source.id);
+      }
     });
 
     const record = worker.getRecord();
@@ -51,62 +67,6 @@ class LiveHLSManager {
       if (worker) await worker.tryStop();
     } else {
       liveHlsLogger.debug('ffmpeg seemed to be stopped');
-    }
-  }
-
-  async cleanUpUnused() {
-    const liveInputs = await RtmpInput.find({ status: RtmpStatus.Live });
-    const now = Date.now();
-    for (const input of liveInputs) {
-      const records = await RecordSource.find({
-        source: input._id,
-        status: {
-          $in: [TranscodeStatus.Running, TranscodeStatus.Pending],
-        },
-      });
-      if (
-        records.filter(record => now - record.updatedAt!.getTime() < 1000 * 60)
-          .length > 0
-      ) {
-        continue;
-      }
-
-      for (const record of records) {
-        liveHlsLogger.warn(
-          'record:',
-          record.id,
-          ' by source:',
-          input.id,
-          ' seems to be failed',
-        );
-        await record.updateOne({
-          $set: {
-            status: TranscodeStatus.Failed,
-          },
-        });
-      }
-
-      liveHlsLogger.warn('source:', input.id, ' seems to be unused');
-      await input.updateOne({
-        $set: {
-          status: RtmpStatus.Unused,
-        },
-      });
-    }
-
-    const notUpdatedRunningSources = await RecordSource.find({
-      status: TranscodeStatus.Running,
-      lastManifestAppend: {
-        $lte: new Date(now - 1000 * 60 * 2),
-      },
-    });
-    for (const source of notUpdatedRunningSources) {
-      liveHlsLogger.warn('record:', source.id, ' seems to be failed');
-      await source.updateOne({
-        $set: {
-          status: TranscodeStatus.Failed,
-        },
-      });
     }
   }
 }

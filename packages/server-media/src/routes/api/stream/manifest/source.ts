@@ -1,3 +1,20 @@
+/*
+ * This file is part of Mitei Server.
+ * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
+ *
+ * Mitei Server is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Mitei Server is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import {
   Manifest,
   SourceType,
@@ -9,8 +26,8 @@ import { config } from '../../../../config';
 import {
   generateManifest,
   ManifestInput,
-} from '../../../../utils/hls/manifest';
-import { encodeSegmentRef } from '../../../../utils/hls/segment-ref';
+} from '../../../../streaming/hls/manifest';
+import { encodeSegmentRef } from '../../../../streaming/hls/segment-ref';
 
 export const router = Router();
 
@@ -24,21 +41,21 @@ router.get('/:sourceId/manifest.m3u8', async (req, res) => {
 
   if (source.type === SourceType.File) {
     if (source.status !== TranscodeStatus.Success) {
-      return res.status(404).end('source not found');
+      return res.status(404).end('source error');
     }
   } else if (source.type === SourceType.Record) {
     if (
       source.status !== TranscodeStatus.Running &&
       source.status !== TranscodeStatus.Success
     ) {
-      return res.status(404).end('source not found');
+      return res.status(404).end('source error');
     }
 
     if (
       source.status === TranscodeStatus.Running &&
-      source.manifest.length < 4
+      source.manifest.length < 2
     ) {
-      return res.status(404).end('source not found');
+      return res.status(404).end('source is not prepared');
     }
   }
 

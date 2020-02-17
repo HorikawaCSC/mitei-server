@@ -1,7 +1,0 @@
-query getMyselfSimple {
-  me {
-    id
-    iconUrl
-    kind
-  }
-}
