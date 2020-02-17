@@ -19,11 +19,13 @@ print "## Current Branch: $branch\n";
 sleep 5;
 
 if($branch =~ /master/) {
-  my $latest_tag = (exec_command('git describe --exact-match --abbrev=0'))[0];
+  my $latest_tag = (exec_command('git describe --abbrev=0'))[0];
   chomp $latest_tag;
   if($latest_tag !~ /fatal/) {
     print "Tag found in $branch: $latest_tag\n";
     system("npm", "run", "publish:production") == 0 or die;
+  }else{
+    die "No tags";
   }
 }elsif($branch =~ /develop/) {
   print "Using canary publishing\n";
