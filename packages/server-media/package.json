@@ -4,6 +4,10 @@
   "author": "f0reachARR <f0reach@f0reach.me>",
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
   "license": "GPL-3.0",
+  "main": "./dist/app.js",
+  "bin": {
+    "mitei-server-media": "./dist/app.js"
+  },
   "files": [
     "dist",
     "package.json"
