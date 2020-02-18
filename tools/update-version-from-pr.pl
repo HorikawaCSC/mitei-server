@@ -26,9 +26,11 @@ if($ENV{CHECK_ONLY}) {
 $version =~ s/^v//;
 
 system("git", "checkout", "-b", "release-$version") == 0 or die;
-system("git", "push", "-u", "origin", "--tags", "release-$version") == 0 or die;
 
-system("npx", "lerna", "version", "$version", "--yes") == 0 or die;
+system("npx", "lerna", "version", "$version", "--yes", "--no-git-tag-version", "--no-push") == 0 or die;
+
+system("git", "tag", "-a", "v$version", "-m", "v$version") == 0 or die;
+system("git", "push", "-u", "origin", "--tags", "release-$version") == 0 or die;
 
 sub exec_command {
   my $command = shift;
