@@ -27,7 +27,7 @@ $version =~ s/^v//;
 
 system("git", "checkout", "-b", "release-$version") == 0 or die;
 system("npx", "lerna", "version", "$version", "--yes", "--no-push") == 0 or die;
-system("git", "push", "-u", "origin", "release-$version") == 0 or die;
+system("git", "push", "-u", "origin", "--tags", "release-$version") == 0 or die;
 
 sub exec_command {
   my $command = shift;
