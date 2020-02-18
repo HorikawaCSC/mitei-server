@@ -277,7 +277,7 @@ export class Transcoder extends EventEmitter {
       } catch (err) {
         transcodeLogger.error('failed to update hls manifest', err);
         if (this.ffmpeg) {
-          this.ffmpeg.kill('KILL');
+          this.ffmpeg.kill('SIGKILL');
         }
       }
     }
