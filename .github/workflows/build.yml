@@ -3,6 +3,8 @@ name: Test / Build
 on:
   pull_request:
     types: [closed]
+    branches:
+      - master
   push:
     branches: "*"
 
@@ -34,11 +36,7 @@ jobs:
 
   version-update:
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'pull_request' &&
-      contains(github.base_ref, '/master') &&
-      github.event.pull_request.merged &&
-      startsWith(github.event.pull_request.title, 'Release version:')
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.title, 'Release version:')
     steps:
     - uses: actions/checkout@v2
       with:
