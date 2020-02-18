@@ -2,13 +2,14 @@ name: Test / Build
 
 on:
   pull_request:
+    types: [closed]
   push:
     branches: "*"
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: github.event_name != 'push'
+    if: github.event_name == 'push' && !contains(github.ref, '/master')
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
@@ -28,21 +29,59 @@ jobs:
         CI: true
     - name: Build
       run: npm run build
-      env:
-        NODE_ENV: development
     - name: Test codes
       run: npm run test
 
-  test-build-publish:
+  version-update:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: |
+      github.event_name == 'pull_request' &&
+      contains(github.base_ref, '/master') &&
+      github.event.pull_request.merged &&
+      startsWith(github.event.pull_request.title, 'Release version:')
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.base_ref }}
+    - name: Fetch all tags
+      run: git fetch origin +refs/tags/*:refs/tags/*
+    - name: Reset & Reattach HEAD
+      run: git reset --hard
+    - name: Check pull request
+      run: perl ./tools/update-version-from-pr.pl
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        CHECK_ONLY: true
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+        registry-url: 'https://registry.npmjs.org'
+    - uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: Install packages of root directory
+      run: npm ci
+    - name: Setup git
+      run: git remote set-url --push origin https://${{ github.actor }}:$GITHUB_TOKEN@github.com/${{ github.repository }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update version
+      run: perl ./tools/update-version-from-pr.pl
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
+
+  build-publish:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && contains(github.ref, '/master')
     steps:
     - uses: actions/checkout@v2
     - name: Fetch all tags
-      if: contains(github.ref, '/staging') || contains(github.ref, '/master') || contains(github.ref, '/develop')
+      if: contains(github.ref, '/master') || contains(github.ref, '/develop')
       run: |
         git fetch origin +refs/tags/*:refs/tags/*
-        git fetch --prune --unshallow
     - uses: actions/setup-node@v1
       with:
         node-version: 12.x
@@ -66,8 +105,7 @@ jobs:
     - name: Test codes
       run: npm run test
     - name: Reset & Reattach HEAD
-      run: |
-        git reset --hard
+      run: git reset --hard
     - name: Publish
       run: perl ./tools/publish.pl
       env:
@@ -76,18 +114,19 @@ jobs:
     - name: Docker Login
       if: contains(github.ref, '/master')
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+    - name: Docker dynamic file generation
+      if: contains(github.ref, '/master')
+      run: perl ./tools/generate-dockerfile.pl
     - name: Docker build
       if: contains(github.ref, '/master')
       run: |
-        perl ./tools/generate-dockerfile.pl
-
         IMAGE_ID=`echo "docker.pkg.github.com/${{ github.repository }}" | tr '[A-Z]' '[a-z]'`
         VERSION=`git describe --abbrev=0`
 
         echo Target ImageID: $IMAGE_ID
 
-        docker build . --tag $IMAGE_ID/main:$VERSION
+        docker build . -f ./dockerfiles/Dockerfile.server-media --tag $IMAGE_ID/server-media:$VERSION
         docker build ./nginx --tag $IMAGE_ID/nginx:$VERSION
 
-        docker push $IMAGE_ID/main:$VERSION
+        docker push $IMAGE_ID/server-media:$VERSION
         docker push $IMAGE_ID/nginx:$VERSION

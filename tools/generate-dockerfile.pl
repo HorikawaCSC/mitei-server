@@ -4,27 +4,44 @@ use strict;
 use utf8;
 
 my @versions = exec_command('npx lerna list -lp');
+my $pkgprefix = '@mitei/';
 
-my $latest_tag = undef;
+my %version = ();
 foreach(@versions) {
-  $latest_tag = $1 if $_ =~ m|\@mitei/server-media:(.+)|;
+  if($_ =~ m|(${pkgprefix}[^:]+):([^:]+)$|) {
+    $version{$1} = $2;
+  }
 }
 
-die "No version available" unless $latest_tag;
+print "Found versions of: ", join(' ', keys(%version)), "\n";
 
-print "Latest version: $latest_tag\n";
+opendir(my $dir, './tools/dockerfile') or die "Failed to scan dockerfiles";
+my @files = grep { $_ =~ /\.tmpl$/ } readdir($dir);
+closedir($dir);
 
-$latest_tag =~ s/^v//;
+print "Found templates: ", join(' ', @files), "\n";
 
-open(my $tmpl, './tools/Dockerfile.tmpl') or die "Failed to open template Dockerfile";
-open(my $output, '> ./Dockerfile') or die "Failed to open Dockerfile";
-while(<$tmpl>) {
-  chomp;
-  $_ =~ s/{VERSION}/$latest_tag/;
-  print $output "$_\n";
+mkdir('./dockerfiles') unless -d './dockerfiles';
+
+foreach(@files) {
+  my $component = $_;
+  $component =~ s/\.tmpl$//;
+
+  my $component_version = $version{"$pkgprefix$component"};
+  if(!$component_version) {
+    die "No packages";
+  }
+
+  open(my $output, "> ./dockerfiles/Dockerfile.$component") or die "Failed to open output file";
+  open(my $input, "./tools/dockerfile/$component.tmpl") or die "Failed to open input file";
+  while(<$input>) {
+    chomp;
+    $_ =~ s/{VERSION}/$component_version/g;
+    print $output $_, "\n";
+  }
+  close($input);
+  close($output);
 }
-close($output);
-close($tmpl);
 
 sub exec_command {
   my $command = shift;
