@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * This file is part of Mitei Server.
  * Copyright (c) 2019 f0reachARR <f0reach@f0reach.me>
