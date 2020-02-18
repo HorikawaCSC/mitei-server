@@ -39,7 +39,7 @@ system("git", "push", "-u", "origin", "--tags", "release-$version") == 0 or die;
 sub exec_command {
   my $command = shift;
   open(my $stdout, "$command 2>&1 |");
-  my @result = <$stdout>;
+  my @result = map { $_ =~ s/[\r\n]+//; } <$stdout>;
   close($stdout);
   return @result;
 }
