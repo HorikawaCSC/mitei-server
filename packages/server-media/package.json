@@ -31,6 +31,7 @@
   "dependencies": {
     "@mitei/client-admin": "^1.0.4",
     "@mitei/client-viewer": "^1.0.4",
+    "@mitei/schema": "^1.0.4",
     "@mitei/server-models": "^1.0.4",
     "apollo-resolvers": "^1.4.1",
     "apollo-server-express": "^2.6.3",
@@ -59,7 +60,6 @@
     "@graphql-codegen/cli": "^1.9.1",
     "@graphql-codegen/typescript": "^1.9.1",
     "@graphql-codegen/typescript-resolvers": "^1.9.1",
-    "@mitei/schema": "^1.0.4",
     "@types/base-x": "^3.0.0",
     "@types/body-parser": "^1.17.0",
     "@types/bull": "^3.5.11",
