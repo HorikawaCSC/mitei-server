@@ -257,11 +257,11 @@ export class LiveHLSWorker extends EventEmitter {
   async tryStop() {
     if (!this.ffmpegProcess || !this.exitPromise)
       throw new Error('ffmpeg ended or not started');
-    this.ffmpegProcess.kill('TERM');
+    this.ffmpegProcess.kill('SIGTERM');
     await Promise.race([this.exitPromise, sleep(1000 * 5)]);
     if (!this.isExited) {
       try {
-        this.ffmpegProcess.kill('KILL');
+        this.ffmpegProcess.kill('SIGKILL');
         await Promise.race([this.exitPromise, sleep(1000 * 5)]);
         if (!this.isExited) {
           await this.finalize(TranscodeStatus.Failed);
