@@ -2,8 +2,7 @@
   "command": {
     "version": {
       "allowBranch": [
-        "master",
-        "staging"
+        "release-*"
       ]
     },
     "bootstrap": {
