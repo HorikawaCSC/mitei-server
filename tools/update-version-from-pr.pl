@@ -14,7 +14,7 @@ $version =~ s/^Release version: //g;
 
 print "Target version: $version\n";
 
-my @tags = exec_command('git tag');
+my @tags = map { chomp; $_ } exec_command('git tag');
 if(scalar(grep { $_ eq $version } @tags) > 0) {
   die "Tag already found";
 }
@@ -29,7 +29,9 @@ system("git", "checkout", "-b", "release-$version") == 0 or die;
 
 system("npx", "lerna", "version", "$version", "--yes", "--no-git-tag-version", "--no-push") == 0 or die;
 
-my @tags = exec_command('git tag');
+my @tags = map { chomp; $_ } exec_command('git tag');
+print "Tags: ", join(' ', @tags), "\n";
+
 if(scalar(grep { $_ eq "v$version" } @tags) == 0) {
   system("git", "tag", "-a", "v$version", "-m", "v$version") == 0 or die;
 }
