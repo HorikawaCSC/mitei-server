@@ -36,13 +36,15 @@ jobs:
 
   version-update:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.title, 'Release version:')
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.title, 'Release version:') && contains(github.base_ref, 'master')
     steps:
     - uses: actions/checkout@v2
       with:
         ref: ${{ github.base_ref }}
     - name: Fetch all tags
-      run: git fetch origin +refs/tags/*:refs/tags/*
+      run: |
+        git fetch origin +refs/tags/*:refs/tags/*
+        git fetch --prune --unshallow
     - name: Reset & Reattach HEAD
       run: git reset --hard
     - name: Check pull request
@@ -77,9 +79,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Fetch all tags
-      if: contains(github.ref, '/master') || contains(github.ref, '/develop')
       run: |
         git fetch origin +refs/tags/*:refs/tags/*
+        git fetch --prune --unshallow
     - uses: actions/setup-node@v1
       with:
         node-version: 12.x
@@ -110,13 +112,10 @@ jobs:
         NPM_TOKEN: ${{ secrets.NPM_SECRET }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
     - name: Docker Login
-      if: contains(github.ref, '/master')
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
     - name: Docker dynamic file generation
-      if: contains(github.ref, '/master')
       run: perl ./tools/generate-dockerfile.pl
     - name: Docker build
-      if: contains(github.ref, '/master')
       run: |
         IMAGE_ID=`echo "docker.pkg.github.com/${{ github.repository }}" | tr '[A-Z]' '[a-z]'`
         VERSION=`git describe --abbrev=0`
