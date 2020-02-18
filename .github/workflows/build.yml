@@ -65,7 +65,10 @@ jobs:
     - name: Install packages of root directory
       run: npm ci
     - name: Setup git
-      run: git remote set-url --push origin https://${{ github.actor }}:$GITHUB_TOKEN@github.com/${{ github.repository }}
+      run: |
+        git remote set-url --push origin https://${{ github.actor }}:$GITHUB_TOKEN@github.com/${{ github.repository }}
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Update version
