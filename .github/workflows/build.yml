@@ -34,7 +34,7 @@ jobs:
     - name: Test codes
       run: npm run test
 
-  version-update:
+  version-update-publish:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.pull_request.merged && startsWith(github.event.pull_request.title, 'Release version:') && contains(github.base_ref, 'master')
     steps:
@@ -75,28 +75,6 @@ jobs:
       run: perl ./tools/update-version-from-pr.pl
       env:
         PR_TITLE: ${{ github.event.pull_request.title }}
-
-  build-publish:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.ref, '/release')
-    steps:
-    - uses: actions/checkout@v2
-    - name: Fetch all tags
-      run: |
-        git fetch origin +refs/tags/*:refs/tags/*
-        git fetch --prune --unshallow
-    - uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-        registry-url: 'https://registry.npmjs.org'
-    - uses: actions/cache@v1
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-    - name: Install packages of root directory
-      run: npm ci
     - name: Install dependencies packages
       run: npm run bootstrap
       env:
@@ -112,7 +90,6 @@ jobs:
     - name: Publish
       run: perl ./tools/publish.pl
       env:
-        NPM_TOKEN: ${{ secrets.NPM_SECRET }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_SECRET }}
     - name: Docker Login
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
