@@ -8,7 +8,6 @@
     "publish:production": "lerna publish from-package --yes"
   },
   "name": "mitei-server",
-  "version": "v0.0.1-alpha.0",
   "license": "GPL-3.0",
   "devDependencies": {
     "@material-ui/core": "^4.8.1",
@@ -18,6 +17,6 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "lerna": "^3.16.4"
+    "lerna": "^3.20.2"
   }
 }
