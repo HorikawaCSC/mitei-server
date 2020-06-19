@@ -46,9 +46,11 @@ passport.use(
           return done(null, user);
         }
 
+        const count = await User.estimatedDocumentCount();
+
         const userNew = new User();
         userNew.userId = profile.id;
-        userNew.role = UserRole.Normal;
+        userNew.role = count === 0 ? UserRole.Admin : UserRole.Normal;
         userNew.type = AuthType.Twitter;
         userNew.iconUrl = profile.photos ? profile.photos[0].value : '';
         userNew.token = token;
