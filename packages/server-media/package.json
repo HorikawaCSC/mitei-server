@@ -1,6 +1,6 @@
 {
   "name": "@mitei/server-media",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "f0reachARR <f0reach@f0reach.me>",
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
   "license": "GPL-3.0",
@@ -29,10 +29,10 @@
     "start": "node ./dist/app.js"
   },
   "dependencies": {
-    "@mitei/client-admin": "^1.0.5",
-    "@mitei/client-viewer": "^1.0.5",
-    "@mitei/schema": "^1.0.5",
-    "@mitei/server-models": "^1.0.5",
+    "@mitei/client-admin": "^1.0.6",
+    "@mitei/client-viewer": "^1.0.6",
+    "@mitei/schema": "^1.0.6",
+    "@mitei/server-models": "^1.0.6",
     "apollo-resolvers": "^1.4.1",
     "apollo-server-express": "^2.6.3",
     "base-x": "^3.0.6",

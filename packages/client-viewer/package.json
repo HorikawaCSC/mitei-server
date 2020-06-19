@@ -1,6 +1,6 @@
 {
   "name": "@mitei/client-viewer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Mitei-server viewer",
   "author": "f0reachARR <f0reach@f0reach.me>",
   "homepage": "https://github.com/HorikawaCSC/mitei-server#readme",
@@ -40,8 +40,8 @@
     "@graphql-codegen/typescript": "^1.9.1",
     "@graphql-codegen/typescript-operations": "^1.9.1",
     "@graphql-codegen/typescript-react-apollo": "^1.9.1",
-    "@mitei/client-common": "^1.0.5",
-    "@mitei/schema": "^1.0.5",
+    "@mitei/client-common": "^1.0.6",
+    "@mitei/schema": "^1.0.6",
     "@types/graphql": "^14.2.1",
     "@types/graphql-iso-date": "^3.3.1",
     "@types/luxon": "^1.15.1",
