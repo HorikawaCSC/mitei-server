@@ -24,7 +24,11 @@ export const LoginView = () => {
   return (
     <PageContainer title='認証'>
       <Typography>ログインしてください</Typography>
-      <Button component='a' href='/auth/login/twitter' color='secondary'>
+      <Button
+        component='a'
+        href='/auth/login/twitter?redirect=/admin/'
+        color='secondary'
+      >
         Twitter ログイン
       </Button>
     </PageContainer>
