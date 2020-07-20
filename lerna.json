@@ -4,13 +4,12 @@
       "allowBranch": [
         "release-*"
       ]
-    },
-    "bootstrap": {
-      "hoist": true
     }
   },
   "packages": [
     "packages/*"
   ],
+  "npmClient": "yarn",
+  "useWorkspaces": true,
   "version": "1.0.5"
 }

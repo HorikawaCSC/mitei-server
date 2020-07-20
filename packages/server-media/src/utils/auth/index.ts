@@ -61,7 +61,9 @@ export const authenticateWebSocket = async (request: IncomingMessage) => {
     return prev.then(req => {
       return new Promise((resolve, reject) => {
         // tslint:disable-next-line: no-any
-        handler(req, {} as any, err => (err ? reject(err) : resolve(req)));
+        handler(req, {} as any, (err: unknown) =>
+          err ? reject(err) : resolve(req),
+        );
       });
     });
   }, Promise.resolve(request as Request));

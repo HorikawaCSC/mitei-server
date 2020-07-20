@@ -40,7 +40,7 @@ type Props = {
     duration?: number | null;
     preset?: {
       name: string;
-    };
+    } | null;
   };
 };
 

@@ -21,13 +21,13 @@ export enum UserRole {
   Admin = 'admin',
   Normal = 'normal',
 }
-export enum AuthType {
+export enum IdPType {
   Twitter = 'twitter',
 }
 
 export interface UserDocument extends Document {
   userId: string;
-  type: AuthType;
+  type: IdPType;
   token: string;
   tokenSecret: string;
   screenName: string;
@@ -45,9 +45,9 @@ const schema = new Schema<UserDocument>(
     },
     type: {
       type: SchemaTypes.String,
-      enum: Object.values(AuthType),
+      enum: Object.values(IdPType),
       required: true,
-      default: AuthType.Twitter,
+      default: IdPType.Twitter,
     },
     token: {
       type: SchemaTypes.String,

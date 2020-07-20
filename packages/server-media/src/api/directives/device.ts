@@ -16,13 +16,13 @@
  */
 
 import { AuthenticationError } from 'apollo-server-core';
+import { SchemaDirectiveVisitor } from 'apollo-server-express';
 import {
   defaultFieldResolver,
   GraphQLField,
   GraphQLInterfaceType,
   GraphQLObjectType,
 } from 'graphql';
-import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { GqlContext } from '../context';
 
 interface DeviceObjectType extends GraphQLObjectType {

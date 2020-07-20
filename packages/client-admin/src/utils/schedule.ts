@@ -30,7 +30,7 @@ export type SimpleProgramData = {
   source?: {
     id: string;
     name: string;
-  };
+  } | null;
 };
 export const programText = (input: SimpleProgramData) => {
   const duration = Duration.fromMillis(input.duration * 1000).toFormat(

@@ -16,12 +16,20 @@
  */
 
 import { ObjectID } from 'mongodb';
+// tslint:disable-next-line: no-any
+type OmitUndefined<T extends Record<string, any>> = {
+  [TKey in keyof T]?: NonNullable<T[TKey]>;
+};
 
 // tslint:disable-next-line: no-any
-export const omitUndefined = <T extends Record<string, any>>(query: T): T => {
+export const omitUndefined = <T extends Record<string, any>>(
+  query: T,
+): OmitUndefined<T> => {
   return Object.keys(query)
     .filter(key => !!query[key])
-    .reduce((obj, key) => ({ ...obj, [key]: query[key] }), {}) as T;
+    .reduce((obj, key) => ({ ...obj, [key]: query[key] }), {}) as OmitUndefined<
+    T
+  >;
 };
 
 export const findIdCondition = (id: ObjectID | string) => {

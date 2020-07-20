@@ -40,8 +40,8 @@ const useStyles = makeStyles({
 });
 
 export const WaitingView = () => {
-  const styles = useStyles();
-  const [time, setTime] = React.useState();
+  const styles = useStyles({});
+  const [time, setTime] = React.useState('');
 
   React.useEffect(() => {
     setTime(DateTime.local().toFormat('HH:mm'));

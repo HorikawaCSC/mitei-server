@@ -15,7 +15,7 @@
  * along with Mitei Server.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AuthType, User, UserDocument, UserRole } from '@mitei/server-models';
+import { IdPType, User, UserDocument, UserRole } from '@mitei/server-models';
 import { Router } from 'express';
 import * as passport from 'passport';
 import { Strategy as TwitterStrategy } from 'passport-twitter';
@@ -34,7 +34,7 @@ passport.use(
       try {
         const user = await User.findOne({
           userId: profile.id,
-          type: 'twitter',
+          type: IdPType.Twitter,
         });
         if (user) {
           user.iconUrl = profile.photos ? profile.photos[0].value : '';
@@ -51,7 +51,7 @@ passport.use(
         const userNew = new User();
         userNew.userId = profile.id;
         userNew.role = count === 0 ? UserRole.Admin : UserRole.Normal;
-        userNew.type = AuthType.Twitter;
+        userNew.type = IdPType.Twitter;
         userNew.iconUrl = profile.photos ? profile.photos[0].value : '';
         userNew.token = token;
         userNew.tokenSecret = tokenSecret;
