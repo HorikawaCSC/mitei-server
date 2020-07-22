@@ -19,20 +19,18 @@ jobs:
         node-version: 12.x
     - uses: actions/cache@v1
       with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
         restore-keys: |
-          ${{ runner.os }}-node-
-    - name: Install packages of root directory
-      run: npm ci
+          ${{ runner.os }}-yarn-
     - name: Install dependencies packages
-      run: npm run bootstrap
+      run: yarn --frozen-lockfile
       env:
         CI: true
     - name: Build
-      run: npm run build
+      run: yarn run build
     - name: Test codes
-      run: npm run test
+      run: yarn run test
 
   version-update-publish:
     runs-on: ubuntu-latest
@@ -58,12 +56,14 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
     - uses: actions/cache@v1
       with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
         restore-keys: |
-          ${{ runner.os }}-node-
-    - name: Install packages of root directory
-      run: npm ci
+          ${{ runner.os }}-yarn-
+    - name: Install dependencies packages
+      run: yarn --frozen-lockfile
+      env:
+        CI: true
     - name: Setup git
       run: |
         git remote set-url --push origin https://${{ github.actor }}:$GITHUB_TOKEN@github.com/${{ github.repository }}
@@ -75,16 +75,12 @@ jobs:
       run: perl ./tools/update-version-from-pr.pl
       env:
         PR_TITLE: ${{ github.event.pull_request.title }}
-    - name: Install dependencies packages
-      run: npm run bootstrap
-      env:
-        CI: true
     - name: Build (production)
-      run: npm run build
+      run: yarn run build
       env:
         NODE_ENV: production
     - name: Test codes
-      run: npm run test
+      run: yarn run test
     - name: Reset & Reattach HEAD
       run: git reset --hard
     - name: Publish

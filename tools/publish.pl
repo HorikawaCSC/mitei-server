@@ -23,7 +23,7 @@ if($branch =~ /release-/) {
   chomp $latest_tag;
   if($latest_tag !~ /fatal/) {
     print "Tag found in $branch: $latest_tag\n";
-    system("npm", "run", "publish:production") == 0 or die;
+    system("yarn", "run", "publish:production") == 0 or die;
   }else{
     die "No tags";
   }
@@ -31,7 +31,7 @@ if($branch =~ /release-/) {
   print "Using canary publishing\n";
   my $preid = $branch =~ /develop/ ? 'alpha' : $branch;
   $branch =~ s|.+/||;
-  system("npm", "run", "publish:canary", "--", "--preid", $branch, "--force-publish") == 0 or die;
+  system("yarn", "run", "publish:canary", "--", "--preid", $branch, "--force-publish") == 0 or die;
 }else{
   print "Not a publishable version\n";
 }
